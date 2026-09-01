@@ -1,4 +1,4 @@
-#  RecipeHub
+# recipehub-management-final-project
 
 A full-stack recipe management application built with **Angular, Node.js, Express.js, and MongoDB**. Users will be able to securely create, manage, search, and filter recipes with role-based authorization for admins.
 
@@ -41,4 +41,4 @@ User
  ▼
 Recipe.owner
 ```
-# recipehub-management-final-project
+
