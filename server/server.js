@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./config/db.js";
+import authRoutes from './routes/authRoutes.js'
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.get("/api/health", (req, res) => {
     message: "RecipeHub API is running",
   });
 });
+
+app.use('/api/auth',authRoutes);
 
 const startServer = async () => {
   await connectDB();
