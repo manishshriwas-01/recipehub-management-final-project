@@ -42,3 +42,19 @@ User
 Recipe.owner
 ```
 
+
+
+## Day 2 — Authentication & JWT
+
+### Today, I implemented the complete backend authentication flow for RecipeHub.
+
+* Implemented user registration API with server-side validation.
+* Added bcrypt password hashing before storing passwords in MongoDB.
+* Added duplicate email handling.
+* Implemented login API with bcrypt password verification.
+* Added JWT token generation with expiry.
+* Created JWT authentication middleware for protected routes.
+* Implemented GET /api/auth/me to fetch the authenticated user's details.
+* Added proper 401 responses for missing, invalid, or expired authentication.
+* Tested valid and invalid registration, login, JWT, and /me scenarios.
+
