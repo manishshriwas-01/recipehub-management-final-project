@@ -1,0 +1,124 @@
+<section class="auth-page">
+  <div class="auth-container">
+
+    <div class="auth-image">
+      <img
+        src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80"
+        alt="Delicious food"
+      />
+
+      <div class="image-overlay">
+        <span>🍴</span>
+
+        <h2>Good food brings people together.</h2>
+
+        <p>
+          Discover recipes, try something new and make every meal special.
+        </p>
+      </div>
+    </div>
+
+    <div class="auth-content">
+
+      <a routerLink="/" class="back-home">
+        ← Back to home
+      </a>
+
+      <div class="auth-header">
+        <span class="logo-icon">🍴</span>
+
+        <h1>Welcome back</h1>
+
+        <p>
+          Login to continue exploring RecipeHub.
+        </p>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+      >
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email</label>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+          />
+
+          @if (
+            loginForm.controls.email.touched &&
+            loginForm.controls.email.invalid
+          ) {
+            <small class="error">
+              @if (loginForm.controls.email.errors?.['required']) {
+                Email is required.
+              }
+
+              @if (loginForm.controls.email.errors?.['email']) {
+                Enter a valid email address.
+              }
+            </small>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+          />
+
+          @if (
+            loginForm.controls.password.touched &&
+            loginForm.controls.password.invalid
+          ) {
+            <small class="error">
+              @if (loginForm.controls.password.errors?.['required']) {
+                Password is required.
+              }
+
+              @if (loginForm.controls.password.errors?.['minlength']) {
+                Password must be at least 8 characters.
+              }
+            </small>
+          }
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="loginForm.invalid || isLoading"
+        >
+          @if (isLoading) {
+            Logging in...
+          } @else {
+            Login
+          }
+        </button>
+
+      </form>
+
+      <p class="register-text">
+        Don't have an account?
+        <a routerLink="/register">Create one</a>
+      </p>
+
+    </div>
+  </div>
+</section>

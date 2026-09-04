@@ -201,3 +201,32 @@ If an unexpected error occurs:
 
 **Secured and validated RecipeHub API with CRUD operations, ownership-based authorization, admin override, proper HTTP status handling, and centralized error management.**
 
+
+
+## Day 4 — API Hardening & Testing
+
+### Work Completed
+
+- Added API security using Helmet.
+- Added rate limiting to protect API endpoints from excessive requests.
+- Configured CORS for frontend-backend communication.
+- Added centralized error handling middleware.
+- Handled Mongoose validation errors and invalid MongoDB IDs properly.
+- Added search functionality for recipes by title.
+- Added category-based recipe filtering.
+- Added pagination for recipe listing.
+- Added Jest and Supertest for API testing.
+- Added authentication, validation, and authorization test cases.
+- Verified the complete backend API using automated tests.
+
+### Testing
+
+All backend tests are passing successfully.
+
+**Test Result:**
+- 14/14 tests passed ✅
+
+### Day 4 Outcome
+
+The RecipeHub backend API is now more secure, validated, tested, and ready for frontend integration.
+

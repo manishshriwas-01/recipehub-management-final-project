@@ -1,0 +1,157 @@
+<section class="auth-page">
+  <div class="auth-container">
+
+    <div class="auth-image">
+      <img
+        src="https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1000&q=80"
+        alt="Cooking delicious food"
+      />
+
+      <div class="image-overlay">
+        <span>🥗</span>
+
+        <h2>Start your recipe journey.</h2>
+
+        <p>
+          Create your account and discover delicious recipes
+          made for every kind of food lover.
+        </p>
+      </div>
+    </div>
+
+    <div class="auth-content">
+
+      <a routerLink="/" class="back-home">
+        ← Back to home
+      </a>
+
+      <div class="auth-header">
+        <span class="logo-icon">🍴</span>
+
+        <h1>Create an account</h1>
+
+        <p>
+          Join RecipeHub and start exploring.
+        </p>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <form
+        [formGroup]="registerForm"
+        (ngSubmit)="onSubmit()"
+      >
+
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name">Name</label>
+
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="Enter your name"
+          />
+
+          @if (
+            registerForm.controls.name.touched &&
+            registerForm.controls.name.invalid
+          ) {
+            <small class="error">
+
+              @if (registerForm.controls.name.errors?.['required']) {
+                Name is required.
+              }
+
+              @if (registerForm.controls.name.errors?.['minlength']) {
+                Name must be at least 2 characters.
+              }
+
+            </small>
+          }
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email</label>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+          />
+
+          @if (
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.invalid
+          ) {
+            <small class="error">
+
+              @if (registerForm.controls.email.errors?.['required']) {
+                Email is required.
+              }
+
+              @if (registerForm.controls.email.errors?.['email']) {
+                Enter a valid email address.
+              }
+
+            </small>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Create a password"
+          />
+
+          @if (
+            registerForm.controls.password.touched &&
+            registerForm.controls.password.invalid
+          ) {
+            <small class="error">
+
+              @if (registerForm.controls.password.errors?.['required']) {
+                Password is required.
+              }
+
+              @if (registerForm.controls.password.errors?.['minlength']) {
+                Password must be at least 8 characters.
+              }
+
+            </small>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="register-btn"
+          [disabled]="registerForm.invalid || isLoading"
+        >
+          @if (isLoading) {
+            Creating account...
+          } @else {
+            Create account
+          }
+        </button>
+
+      </form>
+
+      <p class="login-text">
+        Already have an account?
+        <a routerLink="/login">Login</a>
+      </p>
+
+    </div>
+  </div>
+</section>

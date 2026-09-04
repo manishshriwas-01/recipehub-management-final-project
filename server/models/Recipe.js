@@ -14,6 +14,11 @@ const recipeSchema = new mongoose.Schema(
             minlength: [3, "Title must be at least 3 characters"],
             maxlength: [100, "Title cannot exceed 100 characters"],
         },
+        imageUrl: {
+            type: String,
+            required: [true, "Recipe image is required"],
+            trim: true,
+        },
         ingredients: {
             type: [String],
             required: [true, "Ingredients are required"],
@@ -51,6 +56,6 @@ const recipeSchema = new mongoose.Schema(
 
 );
 
-const Recipe=mongoose.model("Recipe",recipeSchema);
+const Recipe = mongoose.model("Recipe", recipeSchema);
 
 export default Recipe;

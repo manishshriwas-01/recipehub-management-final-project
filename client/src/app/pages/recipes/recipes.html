@@ -1,0 +1,89 @@
+<section class="recipes-page">
+
+    <div class="recipes-container">
+
+        <!-- Header -->
+        <div class="recipes-header">
+            <div>
+                <span class="section-label">RECIPE COLLECTION</span>
+
+                <h1>Discover delicious recipes</h1>
+
+                <p>
+                    Explore recipes from different cuisines and find
+                    something delicious to cook today.
+                </p>
+            </div>
+        </div>
+
+        <!-- Loading + Recipes -->
+        @if (recipes$ | async; as response) {
+
+        @if (response.recipes.length > 0) {
+
+        <div class="recipe-grid">
+
+            @for (recipe of response.recipes; track recipe._id) {
+
+            <article class="recipe-card">
+
+                <div class="recipe-image">
+                    <img [src]="recipe.imageUrl" [alt]="recipe.title" />
+                </div>
+
+                <div class="recipe-content">
+
+                    <span class="recipe-category">
+                        {{ recipe.category }}
+                    </span>
+
+                    <h2>
+                        {{ recipe.title }}
+                    </h2>
+
+                    <p class="recipe-owner">
+                        By {{ recipe.owner.name }}
+                    </p>
+
+
+                    <button class="view-btn" type="button" (click)="viewRecipe(recipe._id)">
+                        View Recipe
+                    </button>
+
+
+
+                </div>
+
+            </article>
+
+            }
+
+        </div>
+
+        } @else {
+
+        <div class="empty-state">
+            <span>🍽️</span>
+
+            <h2>No recipes found</h2>
+
+            <p>
+                There are no recipes available right now.
+            </p>
+        </div>
+
+        }
+
+        } @else {
+
+        <div class="loading-state">
+            <div class="spinner"></div>
+
+            <p>Loading delicious recipes...</p>
+        </div>
+
+        }
+
+    </div>
+
+</section>

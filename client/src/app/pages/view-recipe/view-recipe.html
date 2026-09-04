@@ -1,0 +1,77 @@
+<section class="recipe-detail-page">
+
+  <div class="recipe-detail-container">
+
+    <a routerLink="/recipes" class="back-btn">
+      ← Back to Recipes
+    </a>
+
+    @if (recipe$ | async; as response) {
+
+      <article class="recipe-detail">
+
+        <div class="recipe-detail-image">
+          <img
+            [src]="response.recipe.imageUrl"
+            [alt]="response.recipe.title"
+          />
+        </div>
+
+        <div class="recipe-detail-content">
+
+          <span class="recipe-category">
+            {{ response.recipe.category }}
+          </span>
+
+          <h1>{{ response.recipe.title }}</h1>
+
+          <p class="recipe-owner">
+            By {{ response.recipe.owner.name }}
+          </p>
+
+          <div class="recipe-section">
+
+            <h2>Ingredients</h2>
+
+            <ul>
+              @for (
+                ingredient of response.recipe.ingredients;
+                track $index
+              ) {
+                <li>{{ ingredient }}</li>
+              }
+            </ul>
+
+          </div>
+
+          <div class="recipe-section">
+
+            <h2>Instructions</h2>
+
+            <ol>
+              @for (
+                step of response.recipe.steps;
+                track $index
+              ) {
+                <li>{{ step }}</li>
+              }
+            </ol>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    } @else {
+
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading recipe...</p>
+      </div>
+
+    }
+
+  </div>
+
+</section>

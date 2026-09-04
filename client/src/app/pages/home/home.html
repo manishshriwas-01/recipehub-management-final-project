@@ -1,0 +1,93 @@
+<section class="hero">
+  <div class="hero-container">
+    <div class="hero-content">
+      <span class="eyebrow">🍳 Cook. Share. Enjoy.</span>
+
+      <h1>
+        Discover recipes
+        <span>you'll love.</span>
+      </h1>
+
+      <p>
+        Find delicious recipes, explore new flavors, and share your
+        favorite dishes with the RecipeHub community.
+      </p>
+
+      <div class="hero-actions">
+        <a routerLink="/recipes" class="primary-btn">
+          Explore Recipes
+        </a>
+
+        <a routerLink="/register" class="secondary-btn">
+          Join RecipeHub
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-image">
+      <div class="image-card">
+        <img
+          src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80"
+          alt="Delicious food"
+        />
+      </div>
+
+      <div class="floating-card">
+        <span class="floating-icon">⭐</span>
+        <div>
+          <strong>1000+</strong>
+          <small>Recipes to explore</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="featured">
+  <div class="section-container">
+    <div class="section-header">
+      <div>
+        <span class="section-label">EXPLORE</span>
+        <h2>Popular recipes</h2>
+      </div>
+
+      <a routerLink="/recipes" class="view-all">
+        View all →
+      </a>
+    </div>
+
+    @if (recipes$ | async; as response) {
+
+      <div class="recipe-grid">
+
+        @for (recipe of response.recipes; track recipe._id) {
+
+          <article class="recipe-card">
+            <img
+              [src]="recipe.imageUrl"
+              [alt]="recipe.title"
+            />
+
+            <div class="recipe-info">
+              <span class="category">
+                {{ recipe.category }}
+              </span>
+
+              <h3>{{ recipe.title }}</h3>
+
+              <p>
+                By {{ recipe.owner.name }}
+              </p>
+
+              <a [routerLink]="['/recipes', recipe._id]" class="view-btn" > View Recipe </a>
+            </div>
+          </article>
+
+        }
+
+      </div>
+
+    }
+  </div>
+</section>

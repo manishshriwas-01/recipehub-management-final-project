@@ -9,6 +9,13 @@ export const createRecipeValidator = [
     .isLength({ min: 3, max: 100 })
     .withMessage("Title must be between 3 and 100 characters"),
 
+  body("imageUrl")
+    .trim()
+    .notEmpty()
+    .withMessage("Recipe image is required")
+    .isURL()
+    .withMessage("Image URL must be a valid URL"),
+
   body("ingredients")
     .isArray({ min: 1 })
     .withMessage("Ingredients must be a non-empty array"),
@@ -50,6 +57,12 @@ export const updateRecipeValidator = [
     .trim()
     .isLength({ min: 3, max: 100 })
     .withMessage("Title must be between 3 and 100 characters"),
+
+  body("imageUrl")
+    .optional()
+    .trim()
+    .isURL()
+    .withMessage("Image URL must be a valid URL"),
 
   body("ingredients")
     .optional()

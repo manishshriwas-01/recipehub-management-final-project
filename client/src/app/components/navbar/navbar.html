@@ -1,0 +1,100 @@
+<nav class="navbar">
+  <div class="navbar-container">
+
+    <a
+      routerLink="/"
+      class="logo"
+      (click)="closeMenu()"
+    >
+      <span class="logo-icon">🍴</span>
+      <span>RecipeHub</span>
+    </a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      (click)="toggleMenu()"
+      aria-label="Toggle navigation"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div
+      class="nav-menu"
+      [class.open]="menuOpen()"
+    >
+
+      <a
+        routerLink="/"
+        (click)="closeMenu()"
+      >
+        Home
+      </a>
+
+      <a
+        routerLink="/recipes"
+        (click)="closeMenu()"
+      >
+        Recipes
+      </a>
+
+      @if (user()) {
+
+        <a
+          routerLink="/my-recipes"
+          (click)="closeMenu()"
+        >
+          My Recipes
+        </a>
+
+        <a
+          routerLink="/create-recipe"
+          (click)="closeMenu()"
+          class="create-btn"
+        >
+          Create Recipe
+        </a>
+
+        @if (user()?.role === 'admin') {
+
+          <a
+            routerLink="/manage-recipes"
+            (click)="closeMenu()"
+          >
+            Manage Recipes
+          </a>
+
+        }
+
+        <button
+          type="button"
+          class="logout-btn"
+          (click)="logout()"
+        >
+          Logout
+        </button>
+
+      } @else {
+
+        <a
+          routerLink="/login"
+          (click)="closeMenu()"
+        >
+          Login
+        </a>
+
+        <a
+          routerLink="/register"
+          class="register-btn"
+          (click)="closeMenu()"
+        >
+          Get Started
+        </a>
+
+      }
+
+    </div>
+  </div>
+</nav>
