@@ -230,3 +230,89 @@ All backend tests are passing successfully.
 
 The RecipeHub backend API is now more secure, validated, tested, and ready for frontend integration.
 
+
+## Day 5 — Angular Foundation & Authentication
+
+### Work Completed
+
+Today, the RecipeHub frontend was developed using modern Angular standalone architecture.
+
+#### Angular Frontend Setup
+- Created the Angular standalone application.
+- Configured the frontend structure with pages, components, services, guards and models.
+- Configured Angular routing with lazy-loaded standalone components.
+- Added a common application shell with Navbar and RouterOutlet.
+- Added a custom 404 / Not Found page.
+
+#### Authentication
+- Implemented user registration using Reactive Forms.
+- Implemented user login using Reactive Forms.
+- Connected Angular authentication forms with the backend API.
+- Stored the JWT token in localStorage after successful login.
+- Implemented /me API integration to retrieve the currently authenticated user.
+- Added logout functionality.
+- Added authentication state management using Angular signals.
+
+#### Route Guards
+- Created a functional authentication guard for protected routes.
+- Created an admin guard for admin-only routes.
+- Configured protected routes such as My Recipes, Create Recipe, Edit Recipe and Manage Recipes.
+
+#### HTTP Authentication
+- Configured an HTTP interceptor to attach the JWT token to authenticated API requests.
+- Added handling for unauthorized (401) responses.
+
+#### Role-Based Navigation
+Updated the Navbar based on authentication and user role.
+
+*Guest users:*
+- Home
+- Recipes
+- Login
+- Get Started
+
+*Authenticated users:*
+- Home
+- Recipes
+- My Recipes
+- Create Recipe
+- Logout
+
+*Admin users:*
+- Manage Recipes
+
+#### Recipe Listing
+- Created a typed Recipe model.
+- Created RecipeService for backend recipe API communication.
+- Connected the Recipes page with the backend.
+- Displayed recipes dynamically from MongoDB through the API.
+- Added recipe images, category, title and owner information.
+- Added navigation from recipe cards to individual recipe details.
+
+#### Home Page Integration
+- Preserved the existing RecipeHub home page design.
+- Replaced the static Popular Recipes cards with dynamic recipe data from the backend.
+- Configured the home page to display the latest 6 recipes from the database.
+- Kept the existing hero section and overall UI design unchanged.
+
+### Technical Concepts Used
+
+- Angular Standalone Components
+- Lazy Loading
+- Angular Router
+- Reactive Forms
+- Angular Signals
+- HttpClient
+- HTTP Interceptors
+- Functional Route Guards
+- Role-Based Navigation
+- RxJS Observables
+- AsyncPipe
+- Typed API Responses
+- Modern Angular @if and @for control flow
+
+### Day 5 Outcome
+
+The RecipeHub Angular frontend is now connected with the backend API and has a working authentication flow, JWT-based request handling, protected routes, role-aware navigation and dynamic recipe listing.
+
+
