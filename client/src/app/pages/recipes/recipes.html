@@ -1,89 +1,273 @@
 <section class="recipes-page">
-
-    <div class="recipes-container">
-
-        <!-- Header -->
-        <div class="recipes-header">
-            <div>
-                <span class="section-label">RECIPE COLLECTION</span>
-
-                <h1>Discover delicious recipes</h1>
-
-                <p>
-                    Explore recipes from different cuisines and find
-                    something delicious to cook today.
-                </p>
-            </div>
-        </div>
-
-        <!-- Loading + Recipes -->
-        @if (recipes$ | async; as response) {
-
-        @if (response.recipes.length > 0) {
-
-        <div class="recipe-grid">
-
-            @for (recipe of response.recipes; track recipe._id) {
-
-            <article class="recipe-card">
-
-                <div class="recipe-image">
-                    <img [src]="recipe.imageUrl" [alt]="recipe.title" />
-                </div>
-
-                <div class="recipe-content">
-
-                    <span class="recipe-category">
-                        {{ recipe.category }}
-                    </span>
-
-                    <h2>
-                        {{ recipe.title }}
-                    </h2>
-
-                    <p class="recipe-owner">
-                        By {{ recipe.owner.name }}
-                    </p>
+  
+  <div class="recipes-container">
 
 
-                    <button class="view-btn" type="button" (click)="viewRecipe(recipe._id)">
-                        View Recipe
-                    </button>
+    <div class="page-header">
+      <div>
+        <!-- Small orange section heading -->
+        <span class="section-label">EXPLORE</span>
+
+        <!-- Main page heading -->
+        <h1>All Recipes</h1>
+
+        <!-- Page description -->
+        <p>
+          Discover delicious recipes from the RecipeHub community.
+        </p>
+      </div>
+    </div>
 
 
+    <!-- =========================
+         Search & Category Filters
+    ========================== -->
 
-                </div>
+    <div class="filters-section">
 
-            </article>
+      <!-- Search -->
+      <div class="filter-group">
+        <label for="search">
+          Search Recipes
+        </label>
 
-            }
+        <input
+          id="search"
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Search recipes..."
+        />
+      </div>
 
-        </div>
 
-        } @else {
+      <!-- Category -->
+      <div class="filter-group">
+        <label for="category">
+          Category
+        </label>
 
-        <div class="empty-state">
-            <span>🍽️</span>
+        <select
+          id="category"
+          [formControl]="categoryControl"
+        >
+          <option value="">All Categories</option>
 
-            <h2>No recipes found</h2>
+          <option value="Indian">Indian</option>
 
-            <p>
-                There are no recipes available right now.
-            </p>
-        </div>
+          <option value="Italian">Italian</option>
 
-        }
+          <option value="Chinese">Chinese</option>
 
-        } @else {
+          <option value="Mexican">Mexican</option>
 
-        <div class="loading-state">
-            <div class="spinner"></div>
+          <option value="Dessert">Dessert</option>
 
-            <p>Loading delicious recipes...</p>
-        </div>
+          <option value="Healthy">Healthy</option>
 
-        }
+          <option value="Breakfast">Breakfast</option>
+
+          <option value="Other">Other</option>
+        </select>
+      </div>
 
     </div>
 
+
+    <!-- =========================
+         Error Message
+    ========================== -->
+
+    @if (errorMessage$ | async; as errorMessage) {
+
+      @if (errorMessage) {
+
+        <div class="error-state">
+
+          <span>⚠️</span>
+
+          <p>
+            {{ errorMessage }}
+          </p>
+
+        </div>
+
+      }
+
+    }
+
+
+    <!-- =========================
+         Recipes Content
+    ========================== -->
+
+    <div class="recipes-content">
+
+      @if (recipes$ | async; as response) {
+
+        <!-- =========================
+             Recipes Found
+        ========================== -->
+
+        @if (response.recipes.length > 0) {
+
+          <div class="recipe-grid">
+
+            @for (
+              recipe of response.recipes;
+              track recipe._id
+            ) {
+
+              <article class="recipe-card">
+
+                <!-- Recipe Image -->
+                <div class="recipe-image">
+
+                  <img
+                    [src]="recipe.imageUrl"
+                    [alt]="recipe.title"
+                  />
+
+                </div>
+
+
+                <!-- Recipe Information -->
+                <div class="recipe-info">
+
+                  <!-- Category -->
+                  <span class="category">
+                    {{ recipe.category }}
+                  </span>
+
+                  <!-- Recipe Title -->
+                  <h2>
+                    {{ recipe.title }}
+                  </h2>
+
+                  <!-- Recipe Owner -->
+                  <p>
+                    By {{ recipe.owner.name }}
+                  </p>
+
+                  <!-- View Recipe -->
+                  <button
+                    class="view-btn"
+                    type="button"
+                    (click)="viewRecipe(recipe._id)"
+                  >
+                    View Recipe
+                  </button>
+
+                </div>
+
+              </article>
+
+            }
+
+          </div>
+
+
+          <!-- =========================
+               Pagination
+          ========================== -->
+
+          @if (response.pages > 1) {
+
+            <div class="pagination">
+
+              <!-- Previous Button -->
+              <button
+                type="button"
+                class="page-btn"
+                [disabled]="response.page === 1"
+                (click)="previousPage(response.page)"
+              >
+                ← Previous
+              </button>
+
+
+              <!-- Page Numbers -->
+              <div class="page-numbers">
+
+                @for (
+                  page of [].constructor(response.pages);
+                  track $index
+                ) {
+
+                  <button
+                    type="button"
+                    class="page-number"
+                    [class.active]="response.page === $index + 1"
+                    (click)="goToPage($index + 1)"
+                  >
+                    {{ $index + 1 }}
+                  </button>
+
+                }
+
+              </div>
+
+
+              <!-- Next Button -->
+              <button
+                type="button"
+                class="page-btn"
+                [disabled]="response.page === response.pages"
+                (click)="nextPage(response.page, response.pages)"
+              >
+                Next →
+              </button>
+
+            </div>
+
+          }
+
+        }
+
+
+        <!-- =========================
+             Empty State
+        ========================== -->
+
+        @else {
+
+          <div class="empty-state">
+
+            <span>🍽️</span>
+
+            <h2>
+              No recipes found
+            </h2>
+
+            <p>
+              Try changing your search or category filter.
+            </p>
+
+          </div>
+
+        }
+
+      }
+
+
+      <!-- =========================
+           Loading State
+      ========================== -->
+
+      @else {
+
+        <div class="loading-state">
+
+          <div class="spinner"></div>
+
+          <p>
+            Loading recipes...
+          </p>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
 </section>

@@ -1,1 +1,165 @@
-<p>edit-recipe works!</p>
+<section class="create-page">
+  <div class="create-container">
+
+    <div class="page-header">
+      <span class="section-label">EDIT RECIPE</span>
+
+      <h1>Update your recipe</h1>
+
+      <p>
+        Make changes to your recipe and keep it up to date.
+      </p>
+    </div>
+
+    @if (isLoading) {
+
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading recipe...</p>
+      </div>
+
+    } @else {
+
+      @if (errorMessage) {
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <form
+        [formGroup]="recipeForm"
+        (ngSubmit)="onSubmit()"
+      >
+
+        <div class="form-group">
+          <label for="title">
+            Recipe Title
+          </label>
+
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            placeholder="e.g. Paneer Butter Masala"
+          />
+
+          @if (
+            recipeForm.controls.title.touched &&
+            recipeForm.controls.title.invalid
+          ) {
+            <small class="field-error">
+              Title is required and must be between 3 and 100 characters.
+            </small>
+          }
+        </div>
+
+
+        <div class="form-group">
+          <label for="imageUrl">
+            Image URL
+          </label>
+
+          <input
+            id="imageUrl"
+            type="url"
+            formControlName="imageUrl"
+            placeholder="https://example.com/image.jpg"
+          />
+
+          @if (
+            recipeForm.controls.imageUrl.touched &&
+            recipeForm.controls.imageUrl.invalid
+          ) {
+            <small class="field-error">
+              Please enter a valid image URL.
+            </small>
+          }
+        </div>
+
+
+        <div class="form-group">
+          <label for="category">
+            Category
+          </label>
+
+          <select
+            id="category"
+            formControlName="category"
+          >
+            <option value="Indian">Indian</option>
+            <option value="Italian">Italian</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Mexican">Mexican</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Healthy">Healthy</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+
+        <div class="form-group">
+          <label for="ingredients">
+            Ingredients
+            <span>One ingredient per line</span>
+          </label>
+
+          <textarea
+            id="ingredients"
+            rows="7"
+            formControlName="ingredients"
+            placeholder="2 cups rice&#10;1 onion&#10;1 tsp salt"
+          ></textarea>
+
+          @if (
+            recipeForm.controls.ingredients.touched &&
+            recipeForm.controls.ingredients.invalid
+          ) {
+            <small class="field-error">
+              Ingredients are required.
+            </small>
+          }
+        </div>
+
+
+        <div class="form-group">
+          <label for="steps">
+            Instructions
+            <span>One step per line</span>
+          </label>
+
+          <textarea
+            id="steps"
+            rows="8"
+            formControlName="steps"
+            placeholder="Heat oil.&#10;Add ingredients.&#10;Cook until ready."
+          ></textarea>
+
+          @if (
+            recipeForm.controls.steps.touched &&
+            recipeForm.controls.steps.invalid
+          ) {
+            <small class="field-error">
+              Instructions are required.
+            </small>
+          }
+        </div>
+
+
+        <button
+          type="submit"
+          class="submit-btn"
+          [disabled]="isSaving"
+        >
+          @if (isSaving) {
+            Updating Recipe...
+          } @else {
+            Update Recipe
+          }
+        </button>
+
+      </form>
+    }
+
+  </div>
+</section>

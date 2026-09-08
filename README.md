@@ -316,3 +316,245 @@ Updated the Navbar based on authentication and user role.
 The RecipeHub Angular frontend is now connected with the backend API and has a working authentication flow, JWT-based request handling, protected routes, role-aware navigation and dynamic recipe listing.
 
 
+## Day 6 – Angular UX, Recipe Management & Responsive UI
+
+Today, I focused on completing the Angular UX and recipe management features of the RecipeHub application. The main objective was to build a complete and user-friendly recipe experience with reactive forms, recipe searching, filtering, pagination, recipe details, ownership-based actions, admin management, error handling, and responsive UI.
+
+### 🚀 Features Completed
+
+- Implemented **Create Recipe** functionality using Angular Reactive Forms.
+- Added client-side validation for recipe title, image URL, ingredients, steps, and category.
+- Implemented **Edit Recipe** functionality with existing recipe data pre-filled automatically.
+- Added the **Recipe Detail** page to display complete recipe information including image, ingredients, steps, category, and owner details.
+- Implemented **recipe search** using RxJS.
+- Added **category-based filtering**.
+- Implemented efficient search using:
+  - `combineLatest`
+  - `debounceTime`
+  - `distinctUntilChanged`
+  - `switchMap`
+- Added **recipe pagination** for browsing multiple pages of recipes.
+- Completed the **My Recipes** page for displaying recipes created by the logged-in user.
+- Added **View, Edit, and Delete** actions for user-owned recipes.
+- Implemented the **Admin Manage Recipes** page for managing recipes created by all users.
+- Added **loading states** while API requests are in progress.
+- Added proper **error states** for failed API operations.
+- Added **empty states** when no recipes are available or no search results are found.
+- Improved the Recipes page by moving the **Search and Category filters to the top** of the page.
+- Fixed the **Search and Category field overlapping issue** using a responsive CSS grid layout.
+- Implemented responsive recipe grids for **desktop, tablet, and mobile** devices.
+- Added a dedicated **404 Not Found page** with a Back to Home option.
+- Fixed the recipe API URL integration issue and verified the frontend-to-backend recipe data flow.
+- Improved overall UI consistency with responsive cards, buttons, spacing, filters, pagination, and recipe layouts.
+
+### 🔄 RecipeHub Day 6 Flow
+
+                         ┌──────────────────────┐
+                         │      RecipeHub       │
+                         │    Angular Client    │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                    ┌─────────────────────────────┐
+                    │       Recipe Features       │
+                    └──────────────┬──────────────┘
+                                   │
+             ┌─────────────────────┼─────────────────────┐
+             │                     │                     │
+             ▼                     ▼                     ▼
+      ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+      │   Browse    │       │    Create   │       │  My Recipes │
+      │   Recipes   │       │   Recipe    │       │             │
+      └──────┬──────┘       └──────┬──────┘       └──────┬──────┘
+             │                     │                     │
+             ▼                     ▼                     ▼
+      ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+      │   Search    │       │  Reactive   │       │ View / Edit │
+      │  Category   │       │    Form     │       │   / Delete  │
+      │ Pagination  │       │ Validation  │       │   Recipes   │
+      └──────┬──────┘       └──────┬──────┘       └──────┬──────┘
+             │                     │                     │
+             └─────────────────────┼─────────────────────┘
+                                   │
+                                   ▼
+                         ┌─────────────────────┐
+                         │   Recipe Service    │
+                         │      HttpClient     │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   Express REST API  │
+                         │   /api/recipes      │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │     MongoDB Atlas   │
+                         │   Recipe Collection │
+                         └─────────────────────┘
+
+
+### 🔐 Recipe Authorization Flow
+
+                    ┌───────────────┐
+                    │  User / Admin │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │ Recipe Action │
+                    │ View/Edit/Del │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │   JWT Token   │
+                    │   Interceptor │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌────────────────┐
+                    │ Auth Middleware│
+                    └───────┬────────┘
+                            │
+                   ┌────────┴────────┐
+                   │                 │
+                   ▼                 ▼
+             ┌───────────┐      ┌───────────┐
+             │   Owner   │      │   Admin   │
+             │    User   │      │           │
+             └─────┬─────┘      └─────┬─────┘
+                   │                  │
+                   ▼                  ▼
+             ┌───────────┐      ┌───────────┐
+             │  Allowed  │      │   Admin   │
+             │   Action  │      │  Override │
+             └─────┬─────┘      └─────┬─────┘
+                   │                  │
+                   └────────┬─────────┘
+                            ▼
+                    ┌───────────────┐
+                    │Recipe Updated │
+                    │   / Deleted   │
+                    └───────────────┘
+
+
+### 🔎 RxJS Search Flow
+
+┌───────────────────────┐
+│ User enters search    │
+│       text            │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│     FormControl       │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│     valueChanges      │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│   debounceTime(400ms) │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ distinctUntilChanged  │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│    combineLatest()    │
+│ Search + Category +   │
+│       Page            │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│      switchMap()      │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ RecipeService         │
+│    getRecipes()       │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│    Express API        │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│   Filtered Recipes    │
+└───────────────────────┘
+
+
+### 📱 Responsive UI Flow
+
+                    ┌──────────────────┐
+                    │    Recipe Grid   │
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+              ▼              ▼              ▼
+       ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+       │   Desktop   │ │   Tablet    │ │   Mobile    │
+       │             │ │             │ │             │
+       │  3 Cards    │ │  2 Cards    │ │  1 Card     │
+       │  Per Row    │ │  Per Row    │ │  Per Row    │
+       └─────────────┘ └─────────────┘ └─────────────┘
+
+
+### 📄 404 Not Found Flow
+
+┌──────────────────────┐
+│ User enters invalid  │
+│        URL           │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Angular Router       │
+│   Wildcard Route `**`│
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│   Not Found Page     │
+│        404           │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│    Back to Home      │
+└──────────────────────┘
+
+
+### 📋 Day 6 Completion Status
+
+| Feature | Status |
+|---|---|
+| Create Recipe | ✅ Completed |
+| Edit Recipe | ✅ Completed |
+| Recipe Detail | ✅ Completed |
+| Search | ✅ Completed |
+| Category Filtering | ✅ Completed |
+| RxJS Search Flow | ✅ Completed |
+| Pagination | ✅ Completed |
+| My Recipes | ✅ Completed |
+| View / Edit / Delete | ✅ Completed |
+| Admin Manage Recipes | ✅ Completed |
+| Loading States | ✅ Completed |
+| Error States | ✅ Completed |
+| Empty States | ✅ Completed |
+| Responsive UI | ✅ Completed |
+| Search & Category UI Fix | ✅ Completed |
+| 404 Not Found Page | ✅ Completed |

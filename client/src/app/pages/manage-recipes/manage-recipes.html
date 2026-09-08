@@ -1,1 +1,109 @@
-<p>manage-recipes works!</p>
+<section class="manage-recipes-page">
+  <div class="manage-recipes-container">
+
+    <div class="page-header">
+      <div>
+        <span class="section-label">ADMIN PANEL</span>
+        <h1>Manage Recipes</h1>
+        <p>
+          View and manage all recipes created by RecipeHub users.
+        </p>
+      </div>
+    </div>
+
+    @if (errorMessage) {
+      <div class="error-state">
+        <span>⚠️</span>
+        <p>{{ errorMessage }}</p>
+      </div>
+    }
+
+    @if (recipes$ | async; as response) {
+
+      @if (response.recipes.length > 0) {
+
+        <div class="recipe-grid">
+
+          @for (recipe of response.recipes; track recipe._id) {
+
+            <article class="recipe-card">
+
+              <div class="recipe-image">
+                <img
+                  [src]="recipe.imageUrl"
+                  [alt]="recipe.title"
+                />
+              </div>
+
+              <div class="recipe-content">
+
+                <span class="recipe-category">
+                  {{ recipe.category }}
+                </span>
+
+                <h2>{{ recipe.title }}</h2>
+
+                <div class="recipe-owner">
+                  <strong>Created by</strong>
+                  <span>{{ recipe.owner.name }}</span>
+                  <small>{{ recipe.owner.email }}</small>
+                </div>
+
+                <div class="recipe-actions">
+
+                  <button
+                    class="view-btn"
+                    type="button"
+                    (click)="viewRecipe(recipe._id)"
+                  >
+                    View
+                  </button>
+
+                  <button
+                    class="edit-btn"
+                    type="button"
+                    (click)="editRecipe(recipe._id)"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    class="delete-btn"
+                    type="button"
+                    (click)="deleteRecipe(recipe._id)"
+                    [disabled]="isDeleting"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+          <span>🍽️</span>
+          <h2>No recipes found</h2>
+          <p>There are currently no recipes to manage.</p>
+        </div>
+
+      }
+
+    } @else {
+
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading all recipes...</p>
+      </div>
+
+    }
+
+  </div>
+</section>

@@ -27,7 +27,7 @@ export const createRecipe = async (req, res, next) => {
 export const getRecipes = async (req, res, next) => {
     try {
         
-        const{search,category,page=1,limit=10}=req.query;
+        const{search,category,page=1,limit=9}=req.query;
         const filter={};
         //search by recipe
         if(search){
@@ -166,3 +166,21 @@ export const deleteRecipe = async (req, res, next) => {
         next(error);
     }
 }
+
+export const getMyRecipes = async (req, res, next) => {
+    try {
+        const recipes = await Recipe.find({
+            owner: req.user.userId,
+        })
+            .populate("owner", "name email")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            count: recipes.length,
+            recipes,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
