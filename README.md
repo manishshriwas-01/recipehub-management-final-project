@@ -542,4 +542,29 @@ Today, I focused on completing the Angular UX and recipe management features of 
                     │   / Deleted   │
                     └───────────────┘
 
+## 📸 Screenshots
 
+### Home Page
+![Home Page](screenshots/home.png)
+
+### Recipes
+![Recipes](screenshots/allrecipes.png)
+
+### Recipe Detail
+![Recipe Detail](screenshots/details.png)
+
+### Login Page
+![Login Page](screenshots/login.png)
+
+### Register Page
+![Register Page](screenshots/register.png)
+
+### Create Page
+![Create Page](screenshots/create.png)
+
+
+### My Recipe Page
+![My Recipe Page](screenshots/myrecipe.png)
+
+### Admin Management
+![Admin Management](screenshots/admin.png)
