@@ -571,3 +571,43 @@ Today, I focused on completing the Angular UX and recipe management features of 
 
 ### Not Found Page
 ![Not Found Page](screenshots/notfound.png)
+
+
+
+
+## 🌐 Live Demo
+
+### Frontend
+
+🚀 **RecipeHub Live Application:**  
+https://recipehub-management-final-project-0kc9.onrender.com/
+
+### Backend
+
+🔗 **RecipeHub API:**  
+https://recipehub-management-final-project.onrender.com/
+
+### API Health Check
+
+https://recipehub-management-final-project.onrender.com/api/health
+
+---
+
+## 🔑 Demo Credentials
+
+Use the following credentials to explore the deployed application.
+
+### 👤 Normal User
+
+```text
+Email:    ram@gmail.com
+Password: qwerty@7897
+Role:     user
+
+
+### 👤 Admin User
+
+```text
+Email:    manish@gmail.com
+Password: 12345678
+Role:     admin
