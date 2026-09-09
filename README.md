@@ -1,6 +1,109 @@
-# recipehub-management-final-project
+# 🍴 RecipeHub — Full-Stack Recipe Management Application
 
-A full-stack recipe management application built with **Angular, Node.js, Express.js, and MongoDB**. Users will be able to securely create, manage, search, and filter recipes with role-based authorization for admins.
+RecipeHub is a full-stack recipe management application built with **Angular 17+ standalone architecture** on the frontend and **Node.js, Express, and MongoDB** on the backend.
+
+The project focuses on **RESTful API design, structured MongoDB schemas, secure JWT authentication, role-based authorization, recipe CRUD operations, API validation, search, filtering, pagination, and a responsive reactive Angular frontend**.
+
+## ✨ Features
+
+- 🔐 **Secure Authentication**: JWT-based authentication with bcrypt password hashing, protected routes, and centralized `401 Unauthorized` handling.
+- 👑 **Role-Based Access Control**: User and Admin roles with protected admin functionality and owner-based recipe authorization.
+- 🍳 **Recipe Management**: Create, view, update, and delete recipes with ownership and admin authorization.
+- 🔍 **Recipe Search**: Search recipes by title using backend API filtering.
+- 🏷️ **Category Filtering**: Filter recipes by categories such as Indian, Italian, Chinese, Mexican, Dessert, Healthy, Breakfast, and Other.
+- 📄 **Pagination**: Backend-supported pagination for efficient recipe listing.
+- 🖼️ **Recipe Images**: Recipes support image URLs for displaying attractive recipe cards and details.
+- 🛡️ **API Security**: Helmet, CORS configuration, rate limiting, centralized error handling, and request validation.
+- ✅ **API Validation**: Express-validator is used to validate authentication and recipe inputs.
+- 🧪 **Automated Testing**: Jest and Supertest integration tests for health, authentication, and recipe APIs.
+- 📱 **Responsive UI**: Responsive Angular interface designed for desktop, tablet, and mobile screens.
+- ⚡ **Reactive Angular Frontend**: RxJS-based API data flow with Observables, AsyncPipe, reactive forms, search, filtering, and pagination.
+- 🧩 **Modern Angular Architecture**: Standalone components, functional guards, HTTP interceptor, Signals, modern `@if` and `@for` control flow, and lazy-loaded routes.
+
+---
+
+## 📂 Folder Structure
+
+RecipeHub follows a clean monorepo-style structure by separating the Angular frontend and Node.js/Express backend.
+
+### Frontend (`client/`)
+
+```text
+client/
+├── src/
+│   ├── app/
+│   │   ├── components/
+│   │   │   └── navbar/              # Application navigation
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── home/                # Home page
+│   │   │   ├── login/               # Login page
+│   │   │   ├── register/            # Registration page
+│   │   │   ├── recipes/             # Recipe listing, search & pagination
+│   │   │   ├── recipe-detail/       # Recipe details
+│   │   │   ├── create-recipe/       # Create recipe
+│   │   │   ├── edit-recipe/         # Edit recipe
+│   │   │   ├── my-recipes/          # User's recipes
+│   │   │   ├── manage-recipes/      # Admin recipe management
+│   │   │   └── not-found/           # 404 page
+│   │   │
+│   │   ├── services/
+│   │   │   ├── auth.service.ts      # Authentication API & state
+│   │   │   └── recipe.service.ts     # Recipe API communication
+│   │   │
+│   │   ├── guards/
+│   │   │   ├── auth.guard.ts        # Protect authenticated routes
+│   │   │   └── admin.guard.ts       # Protect admin routes
+│   │   │
+│   │   ├── interceptors/
+│   │   │   └── auth.interceptor.ts  # Attach JWT & handle 401
+│   │   │
+│   │   ├── models/
+│   │   │   └── Recipe.ts            # Typed recipe interfaces
+│   │   │
+│   │   ├── app.routes.ts            # Application routing
+│   │   ├── app.ts                   # Root component
+│   │   └── app.html                 # Application shell
+│   │
+│   ├── styles.css                   # Global styles
+│   └── main.ts                      # Angular application bootstrap
+
+
+### Server (`server/`)
+
+server/
+├── config/
+│   └── db.js                        # MongoDB connection
+│
+├── controllers/
+│   ├── authController.js            # Register, login & current user
+│   └── recipeController.js          # Recipe CRUD & listing logic
+│
+├── middleware/
+│   ├── authMiddleware.js            # JWT verification
+│   ├── validate.js                  # Validation middleware
+│   └── errorMiddleware.js           # Centralized error handling
+│
+├── models/
+│   ├── User.js                      # User schema
+│   └── Recipe.js                    # Recipe schema
+│
+├── routes/
+│   ├── authRoutes.js                # Authentication routes
+│   └── recipeRoutes.js              # Recipe API routes
+│
+├── validators/
+│   ├── authValidator.js             # Auth validation rules
+│   └── recipeValidator.js           # Recipe validation rules
+│
+├── tests/
+│   ├── health.test.js               # Health API tests
+│   ├── auth.test.js                 # Authentication tests
+│   └── recipe.test.js               # Recipe API tests
+│
+├── .env                             # Environment configuration
+├── server.js                        # Express app & server entry point
+└── package.json                     # Backend dependencies & scripts
 
 ## Day 1 — Setup & Data Layer
 
