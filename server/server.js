@@ -16,9 +16,15 @@ const app = express();
 
 app.use(helmet());
 
-app.use(cors({
-  origin:"http://localhost:4200",
-})
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://recipehub-management-final-project-0kc9.onrender.com',
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
 );
 const limiter=rateLimit({
   windowMs:15*60*1000,
