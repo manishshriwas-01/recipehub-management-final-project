@@ -47,8 +47,7 @@ export class ManageRecipes {
   selectedUserName = signal('All Recipes');
 
   // User selection ko observable banaya
-  selectedUserEmail$ =
-    new BehaviorSubject<string | null>(null);
+  selectedUserEmail$ = new BehaviorSubject<string | null>(null);
 
   isDeleting = false;
   errorMessage = '';
@@ -106,13 +105,10 @@ export class ManageRecipes {
   }
 
   // HTML se email yahan aayegi
-  selectUser(
-    email: string,
-    name: string
-  ): void {
+  selectUser( email: string, name: string): void {
 
-    console.log('Selected User:', name);
-    console.log('Selected Email:', email);
+    // console.log('Selected User:', name);
+    // console.log('Selected Email:', email);
 
     this.selectedUserEmail.set(email);
     this.selectedUserName.set(name);

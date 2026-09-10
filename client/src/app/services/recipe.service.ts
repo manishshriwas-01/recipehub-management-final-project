@@ -16,12 +16,7 @@ export class RecipeService {
 
   // private apiUrl = 'http://localhost:3000/api/recipes';
 
-  getRecipes(
-    page: number = 1,
-    limit: number = 9,
-    search: string = '',
-    category: string = ''
-  ): Observable<RecipeResponse> {
+  getRecipes(page: number = 1,limit: number = 9,search: string = '', category: string = ''): Observable<RecipeResponse> {
     let url = `${this.apiUrl}?page=${page}&limit=${limit}`;
 
     if (search) {
@@ -141,12 +136,9 @@ export class RecipeService {
   }
 
 
-  getRecipesByUser(
-    email: string,
-    search: string = ''
-  ): Observable<RecipeResponse> {
-    let url =
-      `${this.apiUrl}?ownerEmail=${encodeURIComponent(email)}`;
+  getRecipesByUser(email: string, search: string = ''): Observable<RecipeResponse>
+   {
+    let url = `${this.apiUrl}?ownerEmail=${encodeURIComponent(email)}`;
 
     if (search.trim()) {
       url += `&search=${encodeURIComponent(search.trim())}`;
