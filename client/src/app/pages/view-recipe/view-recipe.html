@@ -1,5 +1,4 @@
 <section class="recipe-detail-page">
-
   <div class="recipe-detail-container">
 
     <a routerLink="/recipes" class="back-btn">
@@ -7,7 +6,6 @@
     </a>
 
     @if (recipe$ | async; as response) {
-
       <article class="recipe-detail">
 
         <div class="recipe-detail-image">
@@ -29,8 +27,24 @@
             By {{ response.recipe.owner.name }}
           </p>
 
-          <div class="recipe-section">
+          <!-- Favorite -->
+          <button
+            type="button"
+            class="favorite-btn"
+            [class.active]="isFavorite()"
+            [disabled]="isFavoriteLoading()"
+            (click)="toggleFavorite()"
+            aria-label="Toggle favorite"
+          >
+            <span class="heart">
+              {{ isFavorite() ? '♥' : '♡' }}
+            </span>
 
+            {{ isFavorite() ? 'Remove from Favorites' : 'Add to Favorites' }}
+          </button>
+
+          <!-- Ingredients -->
+          <div class="recipe-section">
             <h2>Ingredients</h2>
 
             <ul>
@@ -41,11 +55,10 @@
                 <li>{{ ingredient }}</li>
               }
             </ul>
-
           </div>
 
+          <!-- Instructions -->
           <div class="recipe-section">
-
             <h2>Instructions</h2>
 
             <ol>
@@ -56,11 +69,9 @@
                 <li>{{ step }}</li>
               }
             </ol>
-
           </div>
 
         </div>
-
       </article>
 
     } @else {
@@ -73,5 +84,4 @@
     }
 
   </div>
-
 </section>

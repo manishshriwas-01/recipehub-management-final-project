@@ -53,6 +53,14 @@ export const routes: Routes = [
       (m) => m.ViewRecipe
     ),
 },
+{
+  path: 'favorites',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./pages/favorites/favorites').then(
+      (m) => m.Favorites
+    ),
+},
   // Admin only
   {
     path: 'manage-recipes',

@@ -11,6 +11,13 @@ import {
     updateRecipe
 } from '../controllers/recipeController.js';
 
+import {
+    addFavorite,
+    removeFavorite,
+    getFavorites
+} from '../controllers/favoriteController.js';
+
+
 const router = express.Router();
 
 router.post('/', authMiddleware, createRecipe);
@@ -18,6 +25,12 @@ router.post('/', authMiddleware, createRecipe);
 router.get('/', getRecipes);
 
 router.get('/my-recipes', authMiddleware, getMyRecipes);
+
+router.get('/favorites', authMiddleware, getFavorites);
+
+router.post('/:id/favorite', authMiddleware, addFavorite);
+
+router.delete('/:id/favorite', authMiddleware, removeFavorite);
 
 router.get('/:id', getRecipe);
 

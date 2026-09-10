@@ -191,3 +191,15 @@
   background: #fff5ef;
   color: #e85d25;
 }
+
+
+.favorite-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.heart {
+  color: #e85d25;
+  font-size: 18px;
+}

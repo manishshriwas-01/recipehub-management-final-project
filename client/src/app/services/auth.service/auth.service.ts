@@ -20,9 +20,10 @@ export interface User {
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:3000/api/auth';
 
-  private apiUrl =
-  'https://recipehub-management-final-project.onrender.com/api/auth';
+  // private apiUrl =
+  // 'https://recipehub-management-final-project.onrender.com/api/auth';
 
   user = signal<User | null>(null);
 
@@ -68,5 +69,38 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
+  }
+
+
+  getAllUsers(): Observable<{
+    success: boolean;
+    count: number;
+    users: {
+      _id: string;
+      name: string;
+      email: string;
+      role: string;
+    }[];
+  }> {
+    return this.http.get<{
+      success: boolean;
+      count: number;
+      users: {
+        _id: string;
+        name: string;
+        email: string;
+        role: string;
+      }[];
+    }>(`${this.apiUrl}/users`);
+  }
+
+  deleteUser(userId: string): Observable<{
+    success: boolean;
+    message: string;
+  }> {
+    return this.http.delete<{
+      success: boolean;
+      message: string;
+    }>(`${this.apiUrl}/users/${userId}`);
   }
 }

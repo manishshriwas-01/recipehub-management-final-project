@@ -1,0 +1,97 @@
+<section class="favorites-page">
+  <div class="favorites-container">
+
+    <div class="favorites-header">
+      <div>
+        <h1>My Favorites ❤️</h1>
+        <p>Recipes you have saved for later.</p>
+      </div>
+
+      <a routerLink="/recipes" class="browse-btn">
+        Browse Recipes
+      </a>
+    </div>
+
+    @if (loading()) {
+
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your favorites...</p>
+      </div>
+
+    } @else if (favorites().length > 0) {
+
+      <div class="favorites-grid">
+
+        @for (recipe of favorites(); track recipe._id) {
+
+          <article class="recipe-card">
+
+            <div class="recipe-image">
+              <img
+                [src]="recipe.imageUrl"
+                [alt]="recipe.title"
+              />
+
+              <span class="category">
+                {{ recipe.category }}
+              </span>
+
+              <!-- Remove Favorite -->
+              <button
+                type="button"
+                class="favorite-btn"
+                (click)="removeFavorite(recipe._id)"
+                aria-label="Remove from favorites"
+              >
+                ♥
+              </button>
+            </div>
+
+            <div class="recipe-content">
+
+              <h2>{{ recipe.title }}</h2>
+
+              <p class="recipe-owner">
+                By {{ recipe.owner.name }}
+              </p>
+
+              <a
+                [routerLink]="['/recipes', recipe._id]"
+                class="view-btn"
+              >
+                View Recipe →
+              </a>
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    } @else {
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          ♡
+        </div>
+
+        <h2>No Favorite Recipes Yet</h2>
+
+        <p>
+          Start exploring recipes and save your favorites here.
+        </p>
+
+        <a routerLink="/recipes" class="browse-btn">
+          Explore Recipes
+        </a>
+
+      </div>
+
+    }
+
+  </div>
+</section>

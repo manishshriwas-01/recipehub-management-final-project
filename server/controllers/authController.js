@@ -115,11 +115,11 @@ export const getMe = async (req, res, next) => {
 }
 
 
-export const deleteMyAccount = async (req, res, next) => {
+export const deleteUserByAdmin = async (req, res, next) => {
   try {
-    const userId = req.user.userId;
+    const { id } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(id);
 
     if (!user) {
       return res.status(404).json({
@@ -128,11 +128,36 @@ export const deleteMyAccount = async (req, res, next) => {
       });
     }
 
-    await User.findByIdAndDelete(userId);
+    // Admin account ko delete nahi karne dena
+    if (user.role === "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin user cannot be deleted",
+      });
+    }
+
+    await User.findByIdAndDelete(id);
 
     return res.status(200).json({
       success: true,
-      message: "Account deleted successfully",
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find()
+      .select("_id name email role")
+      .sort({ name: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: users.length,
+      users,
     });
   } catch (error) {
     next(error);

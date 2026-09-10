@@ -49,6 +49,17 @@
           My Recipes
         </a>
 
+        <!-- Favorites -->
+        <a
+          routerLink="/favorites"
+          (click)="closeMenu()"
+          class="favorite-link"
+          aria-label="Favorites"
+        >
+          <span class="heart">♥</span>
+          <span>Favorites</span>
+        </a>
+
         <a
           routerLink="/create-recipe"
           (click)="closeMenu()"

@@ -1,8 +1,9 @@
 import Recipe from '../models/Recipe.js';
+import User from '../models/User.js';
 
 export const createRecipe = async (req, res, next) => {
     try {
-        const { title, imageUrl, ingredients, steps, category, } = req.body;
+        const { title, imageUrl, ingredients, steps, category } = req.body;
 
         const recipe = await Recipe.create({
             owner: req.user.userId,
@@ -11,7 +12,6 @@ export const createRecipe = async (req, res, next) => {
             ingredients,
             steps,
             category
-
         });
 
         return res.status(201).json({
@@ -24,55 +24,89 @@ export const createRecipe = async (req, res, next) => {
     }
 };
 
+
 export const getRecipes = async (req, res, next) => {
     try {
-        
-        const{search,category,page=1,limit=9}=req.query;
-        const filter={};
-        //search by recipe
-        if(search){
-            filter.title={
-                $regex:search,
-                $options:"i",
+        const {
+            search,
+            category,
+            ownerEmail,
+            page = 1,
+            limit = 9
+        } = req.query;
+
+        const filter = {};
+
+        // Search by recipe name
+        if (search) {
+            const searchRegex = new RegExp(search, "i");
+
+            filter.title = {
+                $regex: searchRegex,
             };
         }
-        //filter by category
 
-        if(category){
-            filter.category=category;
+        // Filter by category
+        if (category) {
+            filter.category = category;
         }
 
-        //pagination
+        // Filter by user email
+        if (ownerEmail) {
+            const user = await User.findOne({
+                email: ownerEmail,
+            });
 
-        const pageNumber=Number(page);
-        const  limitNumber=Number(limit);
-        const skip=(pageNumber-1)*limitNumber;
-        
-        const recipes=await Recipe.find(filter)
-        .populate("owner", "name email")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limitNumber);
+            if (!user) {
+                return res.status(200).json({
+                    success: true,
+                    count: 0,
+                    total: 0,
+                    page: Number(page),
+                    pages: 0,
+                    recipes: [],
+                });
+            }
 
-        const totalRecipes=await Recipe.countDocuments(filter);
+            filter.owner = user._id;
+        }
+
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const skip = (pageNumber - 1) * limitNumber;
+
+        const recipes = await Recipe.find(filter)
+            .populate("owner", "name email")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNumber);
+
+        const totalRecipes =
+            await Recipe.countDocuments(filter);
 
         return res.status(200).json({
             success: true,
             count: recipes.length,
-            total:totalRecipes,
-            page:pageNumber,
-            pages:Math.ceil(totalRecipes/limitNumber),
+            total: totalRecipes,
+            page: pageNumber,
+            pages: Math.ceil(
+                totalRecipes / limitNumber
+            ),
             recipes,
         });
+
     } catch (error) {
         next(error);
     }
 };
 
+
 export const getRecipe = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const recipe = await Recipe.findById(id).populate("owner", "name email");
+
+        const recipe = await Recipe.findById(id)
+            .populate("owner", "name email");
 
         if (!recipe) {
             return res.status(404).json({
@@ -80,6 +114,7 @@ export const getRecipe = async (req, res, next) => {
                 message: "Recipe not found",
             });
         }
+
         return res.status(200).json({
             success: true,
             recipe,
@@ -89,9 +124,11 @@ export const getRecipe = async (req, res, next) => {
     }
 };
 
+
 export const updateRecipe = async (req, res, next) => {
     try {
         const { id } = await req.params;
+
         const {
             title,
             imageUrl,
@@ -101,6 +138,7 @@ export const updateRecipe = async (req, res, next) => {
         } = req.body;
 
         const recipe = await Recipe.findById(id);
+
         if (!recipe) {
             return res.status(404).json({
                 success: false,
@@ -108,14 +146,19 @@ export const updateRecipe = async (req, res, next) => {
             });
         }
 
-        const isOwner = recipe.owner.toString() === req.user.userId;
-        const isAdmin = req.user.role === "admin";
+        const isOwner =
+            recipe.owner.toString() === req.user.userId;
+
+        const isAdmin =
+            req.user.role === "admin";
+
         if (!isOwner && !isAdmin) {
             return res.status(403).json({
                 success: false,
                 message: "You are not authorized to delete this recipe",
             });
         }
+
         recipe.title = title ?? recipe.title;
         recipe.imageUrl = imageUrl ?? recipe.imageUrl;
         recipe.ingredients = ingredients ?? recipe.ingredients;
@@ -129,10 +172,12 @@ export const updateRecipe = async (req, res, next) => {
             message: "Recipe updated successfully",
             recipe,
         });
+
     } catch (error) {
         next(error);
     }
-}
+};
+
 
 export const deleteRecipe = async (req, res, next) => {
     try {
@@ -147,8 +192,12 @@ export const deleteRecipe = async (req, res, next) => {
             });
         }
 
-        const isOwner = recipe.owner.toString() === req.user.userId;
-        const isAdmin = req.user.role === "admin";
+        const isOwner =
+            recipe.owner.toString() === req.user.userId;
+
+        const isAdmin =
+            req.user.role === "admin";
+
         if (!isOwner && !isAdmin) {
             return res.status(403).json({
                 success: false,
@@ -162,10 +211,12 @@ export const deleteRecipe = async (req, res, next) => {
             success: true,
             message: "Recipe deleted successfully",
         });
+
     } catch (error) {
         next(error);
     }
-}
+};
+
 
 export const getMyRecipes = async (req, res, next) => {
     try {

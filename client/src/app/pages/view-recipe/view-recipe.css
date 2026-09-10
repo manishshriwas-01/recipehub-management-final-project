@@ -152,3 +152,37 @@
     padding: 25px 20px;
   }
 }
+.favorite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 30px;
+  padding: 10px 16px;
+  border: 1px solid #e85d25;
+  border-radius: 8px;
+  background: white;
+  color: #e85d25;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.favorite-btn:hover:not(:disabled) {
+  background: #fff3ed;
+}
+
+.favorite-btn.active {
+  background: #e85d25;
+  color: white;
+}
+
+.heart {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.favorite-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

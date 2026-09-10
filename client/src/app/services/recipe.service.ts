@@ -11,8 +11,10 @@ import { RecipeResponse, Recipe } from '../models/Recipe';
 export class RecipeService {
   private http = inject(HttpClient);
 
-  private apiUrl =
-  'https://recipehub-management-final-project.onrender.com/api/recipes';
+  // private apiUrl =
+  //   'https://recipehub-management-final-project.onrender.com/api/recipes';
+
+  private apiUrl = 'http://localhost:3000/api/recipes';
 
   getRecipes(
     page: number = 1,
@@ -105,4 +107,53 @@ export class RecipeService {
   }
 
 
+  addFavorite(id: string): Observable<{
+    success: boolean;
+    message: string;
+  }> {
+    return this.http.post<{
+      success: boolean;
+      message: string;
+    }>(`${this.apiUrl}/${id}/favorite`, {});
+  }
+
+  removeFavorite(id: string): Observable<{
+    success: boolean;
+    message: string;
+  }> {
+    return this.http.delete<{
+      success: boolean;
+      message: string;
+    }>(`${this.apiUrl}/${id}/favorite`);
+  }
+
+
+  getFavorites(): Observable<{
+    success: boolean;
+    count: number;
+    recipes: Recipe[];
+  }> {
+    return this.http.get<{
+      success: boolean;
+      count: number;
+      recipes: Recipe[];
+    }>(`${this.apiUrl}/favorites`);
+  }
+
+
+  getRecipesByUser(
+    email: string,
+    search: string = ''
+  ): Observable<RecipeResponse> {
+    let url =
+      `${this.apiUrl}?ownerEmail=${encodeURIComponent(email)}`;
+
+    if (search.trim()) {
+      url += `&search=${encodeURIComponent(search.trim())}`;
+    }
+    console.log('User Recipe API:', url);
+    return this.http.get<RecipeResponse>(url);
+  }
 }
+
+
