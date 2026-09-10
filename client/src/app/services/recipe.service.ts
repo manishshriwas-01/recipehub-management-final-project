@@ -11,10 +11,10 @@ import { RecipeResponse, Recipe } from '../models/Recipe';
 export class RecipeService {
   private http = inject(HttpClient);
 
-  // private apiUrl =
-  //   'https://recipehub-management-final-project.onrender.com/api/recipes';
+  private apiUrl =
+    'https://recipehub-management-final-project.onrender.com/api/recipes';
 
-  private apiUrl = 'http://localhost:3000/api/recipes';
+  // private apiUrl = 'http://localhost:3000/api/recipes';
 
   getRecipes(
     page: number = 1,
