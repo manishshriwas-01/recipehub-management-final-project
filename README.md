@@ -567,7 +567,7 @@ Today, I focused on completing the Angular UX and recipe management features of 
 ![My Recipe Page](screenshots/myrecipe.png)
 
 ### Admin Management
-![Admin Management](screenshots/admin.png)
+![Admin Management](screenshots/admin1.png)
 
 ### Not Found Page
 ![Not Found Page](screenshots/notfound.png)
