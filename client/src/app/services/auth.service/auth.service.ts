@@ -20,10 +20,10 @@ export interface User {
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/auth';
+  // private apiUrl = 'http://localhost:3000/api/auth';
 
-  // private apiUrl =
-  // 'https://recipehub-management-final-project.onrender.com/api/auth';
+  private apiUrl =
+  'https://recipehub-management-final-project.onrender.com/api/auth';
 
   user = signal<User | null>(null);
 
