@@ -1,31 +1,20 @@
 <section class="recipes-page">
-  
   <div class="recipes-container">
-
 
     <div class="page-header">
       <div>
-        <!-- Small orange section heading -->
         <span class="section-label">EXPLORE</span>
 
-        <!-- Main page heading -->
         <h1>All Recipes</h1>
 
-        <!-- Page description -->
         <p>
           Discover delicious recipes from the RecipeHub community.
         </p>
       </div>
     </div>
 
-
-    <!-- =========================
-         Search & Category Filters
-    ========================== -->
-
     <div class="filters-section">
 
-      <!-- Search -->
       <div class="filter-group">
         <label for="search">
           Search Recipes
@@ -39,8 +28,6 @@
         />
       </div>
 
-
-      <!-- Category -->
       <div class="filter-group">
         <label for="category">
           Category
@@ -48,78 +35,51 @@
 
         <select
           id="category"
-          [formControl]="categoryControl"
-        >
+          [formControl]="categoryControl">
+
           <option value="">All Categories</option>
-
           <option value="Indian">Indian</option>
-
           <option value="Italian">Italian</option>
-
           <option value="Chinese">Chinese</option>
-
           <option value="Mexican">Mexican</option>
-
           <option value="Dessert">Dessert</option>
-
           <option value="Healthy">Healthy</option>
-
           <option value="Breakfast">Breakfast</option>
-
           <option value="Other">Other</option>
+
         </select>
       </div>
 
     </div>
-
-
-    <!-- =========================
-         Error Message
-    ========================== -->
 
     @if (errorMessage$ | async; as errorMessage) {
 
       @if (errorMessage) {
 
         <div class="error-state">
-
           <span>⚠️</span>
 
           <p>
             {{ errorMessage }}
           </p>
-
         </div>
 
       }
 
     }
 
-
-    <!-- =========================
-         Recipes Content
-    ========================== -->
-
     <div class="recipes-content">
 
       @if (recipes$ | async; as response) {
-
-        <!-- =========================
-             Recipes Found
-        ========================== -->
 
         @if (response.recipes.length > 0) {
 
           <div class="recipe-grid">
 
-            @for (
-              recipe of response.recipes;
-              track recipe._id
-            ) {
+            @for (recipe of response.recipes; track recipe._id) {
 
               <article class="recipe-card">
 
-                <!-- Recipe Image -->
                 <div class="recipe-image">
 
                   <img
@@ -129,33 +89,85 @@
 
                 </div>
 
-
-                <!-- Recipe Information -->
                 <div class="recipe-info">
 
-                  <!-- Category -->
                   <span class="category">
                     {{ recipe.category }}
                   </span>
 
-                  <!-- Recipe Title -->
                   <h2>
                     {{ recipe.title }}
                   </h2>
 
-                  <!-- Recipe Owner -->
                   <p>
                     By {{ recipe.owner.name }}
                   </p>
 
-                  <!-- View Recipe -->
-                  <button
-                    class="view-btn"
-                    type="button"
-                    (click)="viewRecipe(recipe._id)"
-                  >
-                    View Recipe
-                  </button>
+                  <div class="recipe-actions">
+
+                    <button
+                      class="view-btn"
+                      type="button"
+                      (click)="viewRecipe(recipe._id)">
+
+                      View Recipe
+
+                    </button>
+
+                    <button
+                      class="share-btn"
+                      type="button"
+                      (click)="shareRecipe(recipe)"
+                      title="Share recipe">
+
+                      <svg
+                        class="share-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+
+                        <circle
+                          cx="18"
+                          cy="5"
+                          r="3">
+                        </circle>
+
+                        <circle
+                          cx="6"
+                          cy="12"
+                          r="3">
+                        </circle>
+
+                        <circle
+                          cx="18"
+                          cy="19"
+                          r="3">
+                        </circle>
+
+                        <line
+                          x1="8.59"
+                          y1="13.51"
+                          x2="15.42"
+                          y2="17.49">
+                        </line>
+
+                        <line
+                          x1="15.41"
+                          y1="6.51"
+                          x2="8.59"
+                          y2="10.49">
+                        </line>
+
+                      </svg>
+
+                      <span>Share</span>
+
+                    </button>
+
+                  </div>
 
                 </div>
 
@@ -165,27 +177,20 @@
 
           </div>
 
-
-          <!-- =========================
-               Pagination
-          ========================== -->
-
           @if (response.pages > 1) {
 
             <div class="pagination">
 
-              <!-- Previous Button -->
               <button
                 type="button"
                 class="page-btn"
                 [disabled]="response.page === 1"
-                (click)="previousPage(response.page)"
-              >
+                (click)="previousPage(response.page)">
+
                 ← Previous
+
               </button>
 
-
-              <!-- Page Numbers -->
               <div class="page-numbers">
 
                 @for (
@@ -197,38 +202,31 @@
                     type="button"
                     class="page-number"
                     [class.active]="response.page === $index + 1"
-                    (click)="goToPage($index + 1)"
-                  >
+                    (click)="goToPage($index + 1)">
+
                     {{ $index + 1 }}
+
                   </button>
 
                 }
 
               </div>
 
-
-              <!-- Next Button -->
               <button
                 type="button"
                 class="page-btn"
                 [disabled]="response.page === response.pages"
-                (click)="nextPage(response.page, response.pages)"
-              >
+                (click)="nextPage(response.page, response.pages)">
+
                 Next →
+
               </button>
 
             </div>
 
           }
 
-        }
-
-
-        <!-- =========================
-             Empty State
-        ========================== -->
-
-        @else {
+        } @else {
 
           <div class="empty-state">
 
@@ -246,14 +244,7 @@
 
         }
 
-      }
-
-
-      <!-- =========================
-           Loading State
-      ========================== -->
-
-      @else {
+      } @else {
 
         <div class="loading-state">
 
@@ -271,3 +262,137 @@
 
   </div>
 </section>
+
+
+@if (selectedRecipe) {
+
+  <div
+    class="share-overlay"
+    (click)="closeShare()">
+
+    <div
+      class="share-popup"
+      (click)="$event.stopPropagation()">
+
+      <div class="share-header">
+
+        <div class="share-title-wrapper">
+
+          <span class="share-label">
+            SHARE RECIPE
+          </span>
+
+          <h3>
+            Share Recipe
+          </h3>
+
+        </div>
+
+        <button
+          type="button"
+          class="close-btn"
+          (click)="closeShare()"
+          aria-label="Close share popup">
+
+          ×
+
+        </button>
+
+      </div>
+
+      <div class="share-recipe-preview">
+
+        <img
+          [src]="selectedRecipe.imageUrl"
+          [alt]="selectedRecipe.title"
+        />
+
+        <div>
+          <h4>
+            {{ selectedRecipe.title }}
+          </h4>
+
+          <span>
+            {{ selectedRecipe.category }}
+          </span>
+        </div>
+
+      </div>
+
+      <p class="share-description">
+        Share this delicious recipe with your friends and family.
+      </p>
+
+      <div class="share-options">
+
+        <button
+          type="button"
+          class="share-option whatsapp"
+          (click)="shareOnWhatsApp(selectedRecipe)">
+
+          <span class="option-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+
+              <path
+                d="M21 11.5a8.4 8.4 0 0 1-9 8.5 8.7 8.7 0 0 1-4-.9L3 21l1.9-4.6A8.4 8.4 0 1 1 21 11.5Z">
+              </path>
+
+              <path
+                d="M8.5 8.5c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.7 1.6c.1.2.1.4 0 .6l-.4.5c-.1.1-.1.3 0 .5.5.8 1.2 1.5 2.1 2 .2.1.4.1.5 0l.5-.5c.2-.2.4-.2.6-.1l1.5.7c.3.1.4.3.4.6v.5c0 .3-.1.5-.4.7-.4.3-1 .4-1.5.3-1.1-.2-2.4-.9-3.5-1.9-1.1-1-2-2.2-2.4-3.2-.2-.6-.1-1.2.2-1.8Z">
+              </path>
+
+            </svg>
+          </span>
+
+          <span>
+            WhatsApp
+          </span>
+
+        </button>
+
+        <button
+          type="button"
+          class="share-option copy"
+          (click)="copyRecipeLink(selectedRecipe)">
+
+          <span class="option-icon">
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+
+              <path
+                d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1">
+              </path>
+
+              <path
+                d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 7 20l1.1-1.1">
+              </path>
+
+            </svg>
+
+          </span>
+
+          <span>
+            {{ copied ? 'Copied!' : 'Copy Link' }}
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

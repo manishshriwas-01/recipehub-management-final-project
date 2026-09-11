@@ -23,6 +23,8 @@ import { RecipeService } from '../../services/recipe.service';
 export class Recipes {
   private recipeService = inject(RecipeService);
   private router = inject(Router);
+  selectedRecipe: any = null;
+  copied = false;
 
   searchControl = new FormControl('', {
     nonNullable: true,
@@ -73,8 +75,8 @@ export class Recipes {
   }
 
   createRecipe(): void {
-  this.router.navigate(['/create-recipe']);
-}
+    this.router.navigate(['/create-recipe']);
+  }
 
   viewRecipe(id: string): void {
     this.router.navigate(['/recipes', id]);
@@ -95,4 +97,34 @@ export class Recipes {
   goToPage(page: number): void {
     this.currentPage$.next(page);
   }
+
+  closeShare(): void {
+    this.selectedRecipe = null;
+  }
+
+  shareRecipe(recipe: any): void {
+    this.selectedRecipe = recipe;
+  }
+
+  shareOnWhatsApp(recipe: any): void {
+    const recipeUrl = `${window.location.origin}/recipes/${recipe._id}`;
+
+    const message = `Check out this recipe: ${recipe.title}\n${recipeUrl}`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, '_blank');
+  }
+
+  copyRecipeLink(recipe: any): void {
+  const recipeUrl = `${window.location.origin}/recipes/${recipe._id}`;
+
+  navigator.clipboard.writeText(recipeUrl)
+    .then(() => {
+      console.log('Recipe link copied:', recipeUrl);
+    })
+    .catch((error) => {
+      console.error('Failed to copy recipe link:', error);
+    });
+}
 }
