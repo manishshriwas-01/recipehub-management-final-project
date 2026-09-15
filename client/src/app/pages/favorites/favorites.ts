@@ -12,7 +12,7 @@ import { RecipeService } from '../../services/recipe.service';
   styleUrl: './favorites.css',
 })
 export class Favorites {
-  private recipeService = inject(RecipeService);
+   recipeService = inject(RecipeService);
 
   favorites = signal<Recipe[]>([]);
   loading = signal(true);

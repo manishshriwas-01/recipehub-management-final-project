@@ -13,7 +13,7 @@ import { RecipeResponse } from '../../models/Recipe';
   styleUrl: './home.css',
 })
 export class Home {
-  private recipeService = inject(RecipeService);
+   recipeService = inject(RecipeService);
   recipes$: Observable<RecipeResponse> =
     this.recipeService.getRecipes(1, 6);
 

@@ -1,24 +1,28 @@
 import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./config/db.js";
-import authRoutes from './routes/authRoutes.js'
-import recipeRoutes from './routes/recipeRoutes.js'
+import authRoutes from "./routes/authRoutes.js";
+import recipeRoutes from "./routes/recipeRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 
-
-
 dotenv.config();
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
+  })
+);
 
 const allowedOrigins = [
-  'http://localhost:4200',
-  'https://recipehub-management-final-project-0kc9.onrender.com',
+  "http://localhost:4200",
+  "https://recipehub-management-final-project-0kc9.onrender.com",
 ];
 
 app.use(
@@ -26,19 +30,23 @@ app.use(
     origin: allowedOrigins,
   })
 );
-const limiter=rateLimit({
-  windowMs:15*60*1000,
-  max:10000,
-  message:{
-    success:false,
-    message:"Too many requests, please try again later",
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10000,
+  message: {
+    success: false,
+    message: "Too many requests, please try again later",
   },
 });
+
 app.use(limiter);
 
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.use("/uploads", express.static("uploads"));
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -47,8 +55,8 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/recipes', recipeRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/recipes", recipeRoutes);
 
 app.use(errorMiddleware);
 
@@ -61,6 +69,7 @@ const startServer = async () => {
     console.log(`Server running on port ${PORT}`);
   });
 };
+
 if (process.env.NODE_ENV !== "test") {
   startServer();
 }

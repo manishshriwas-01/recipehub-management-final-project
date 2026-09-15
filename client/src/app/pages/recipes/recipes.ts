@@ -21,7 +21,7 @@ import { RecipeService } from '../../services/recipe.service';
   styleUrl: './recipes.css',
 })
 export class Recipes {
-  private recipeService = inject(RecipeService);
+  recipeService = inject(RecipeService);
   private router = inject(Router);
   selectedRecipe: any = null;
   copied = false;

@@ -47,7 +47,7 @@
               <!-- Recipe Image -->
               <div class="recipe-image">
                 <img
-                  [src]="recipe.imageUrl"
+                  [src]="recipeService.getImageUrl(recipe.imageUrl)"
                   [alt]="recipe.title"
                 />
               </div>

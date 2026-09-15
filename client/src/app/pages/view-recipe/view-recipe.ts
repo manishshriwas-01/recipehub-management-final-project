@@ -14,7 +14,7 @@ import { RecipeService } from '../../services/recipe.service';
 })
 export class ViewRecipe {
   private route = inject(ActivatedRoute);
-  private recipeService = inject(RecipeService);
+   recipeService = inject(RecipeService);
   private router = inject(Router);
 
   isFavorite = signal(false);

@@ -11,6 +11,8 @@ import {
     updateRecipe
 } from '../controllers/recipeController.js';
 
+import upload from '../middleware/uploadMiddleware.js';
+
 import {
     addFavorite,
     removeFavorite,
@@ -20,22 +22,39 @@ import {
 
 const router = express.Router();
 
-router.post('/', authMiddleware, createRecipe);
 
-router.get('/', getRecipes);
+// Create Recipe
+router.post(
+    '/',
+    authMiddleware,
+    upload.single('image'),
+    createRecipe
+);
+
+
 
 router.get('/my-recipes', authMiddleware, getMyRecipes);
 
 router.get('/favorites', authMiddleware, getFavorites);
 
+
+router.get('/:id', getRecipe);
+
+
+
+router.get('/', getRecipes);
+
+
+
 router.post('/:id/favorite', authMiddleware, addFavorite);
 
 router.delete('/:id/favorite', authMiddleware, removeFavorite);
 
-router.get('/:id', getRecipe);
+
 
 router.put('/:id', authMiddleware, updateRecipe);
 
 router.delete('/:id', authMiddleware, deleteRecipe);
+
 
 export default router;

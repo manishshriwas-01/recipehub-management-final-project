@@ -10,7 +10,7 @@
 
         <div class="recipe-detail-image">
           <img
-            [src]="response.recipe.imageUrl"
+             [src]="recipeService.getImageUrl(response.recipe.imageUrl)"
             [alt]="response.recipe.title"
           />
         </div>

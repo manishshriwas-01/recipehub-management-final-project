@@ -21,7 +21,7 @@ import { AuthService } from '../../services/auth.service/auth.service';
   styleUrl: './manage-recipes.css',
 })
 export class ManageRecipes {
-  private recipeService = inject(RecipeService);
+   recipeService = inject(RecipeService);
   private authService = inject(AuthService);
   private router = inject(Router);
 

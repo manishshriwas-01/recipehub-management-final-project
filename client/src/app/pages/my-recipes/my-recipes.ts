@@ -15,7 +15,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 })
 export class MyRecipes {
   private router = inject(Router);
-  private recipeService = inject(RecipeService);
+   recipeService = inject(RecipeService);
   private cdr=inject(ChangeDetectorRef);
 
   recipes$: Observable<{

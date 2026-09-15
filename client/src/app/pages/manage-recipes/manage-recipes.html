@@ -147,7 +147,7 @@
 
         <div class="recipe-image">
 
-          <img [src]="recipe.imageUrl" [alt]="recipe.title" />
+          <img [src]="recipeService.getImageUrl(recipe.imageUrl)" [alt]="recipe.title" />
 
           <span class="recipe-category">
             {{ recipe.category }}

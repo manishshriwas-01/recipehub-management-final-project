@@ -3,12 +3,12 @@ import User from '../models/User.js';
 
 export const createRecipe = async (req, res, next) => {
     try {
-        const { title, imageUrl, ingredients, steps, category } = req.body;
+        const { title,ingredients, steps, category } = req.body;
 
         const recipe = await Recipe.create({
             owner: req.user.userId,
             title,
-            imageUrl,
+                imageUrl: `/uploads/${req.file.filename}`,
             ingredients,
             steps,
             category
