@@ -2,6 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectorRef,Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 import { Recipe } from '../../models/Recipe';
 import { RecipeService } from '../../services/recipe.service';
@@ -17,6 +18,7 @@ export class MyRecipes {
   private router = inject(Router);
    recipeService = inject(RecipeService);
   private cdr=inject(ChangeDetectorRef);
+  private toastr = inject(ToastrService);
 
   recipes$: Observable<{
     success: boolean;
@@ -49,7 +51,11 @@ export class MyRecipes {
     }
 
     this.recipeService.deleteRecipe(id).subscribe({
-      next: () => {
+      next: (response) => {
+        this.toastr.success(
+        response.message || 'Recipe deleted successfully!'
+      );
+
         // Delete successful hone ke baad
         // My Recipes ko dobara fetch karo
         this.recipes$ = this.recipeService.getMyRecipes();
@@ -57,9 +63,7 @@ export class MyRecipes {
       },
 
       error: (error) => {
-        this.errorMessage =
-          error.error?.message ||
-          'Failed to delete recipe. Please try again.';
+        
       },
     });
   }

@@ -5,7 +5,9 @@
     <div class="page-header">
       <div>
         <span class="section-label">ADMIN PANEL</span>
+
         <h1>Manage Recipes</h1>
+
         <p>
           Manage users and recipes created on RecipeHub.
         </p>
@@ -28,15 +30,20 @@
       <div class="section-heading">
         <div>
           <h2>RecipeHub Users</h2>
+
           <p>
             Click on a user to see only their recipes.
           </p>
         </div>
 
         @if (selectedUserEmail()) {
-        <button type="button" class="all-recipes-btn" (click)="showAllRecipes()">
-          ← All Recipes
-        </button>
+          <button
+            type="button"
+            class="all-recipes-btn"
+            (click)="showAllRecipes()"
+          >
+            ← All Recipes
+          </button>
         }
       </div>
 
@@ -45,40 +52,55 @@
 
         @for (user of users(); track user.email) {
 
-        <div class="user-card" [class.selected]="selectedUserEmail() === user.email"
-          (click)="selectUser(user.email, user.name)">
+          <div
+            class="user-card"
+            [class.selected]="selectedUserEmail() === user.email"
+            (click)="selectUser(user.email, user.name)"
+          >
 
-          <div class="user-avatar">
-            {{ user.name.charAt(0).toUpperCase() }}
-          </div>
+            <div class="user-avatar">
+              {{ user.name.charAt(0).toUpperCase() }}
+            </div>
 
-          <div class="user-info">
-            <h3>{{ user.name }}</h3>
-            <p>{{ user.email }}</p>
+            <div class="user-info">
 
-            @if (user.role === 'admin') {
-            <span class="admin-badge">
-              ADMIN
-            </span>
-            } @else {
-            <span class="user-badge">
-              USER
-            </span>
+              <h3>{{ user.name }}</h3>
+
+              <p>{{ user.email }}</p>
+
+              @if (user.role === 'admin') {
+
+                <span class="admin-badge">
+                  ADMIN
+                </span>
+
+              } @else {
+
+                <span class="user-badge">
+                  USER
+                </span>
+
+              }
+
+            </div>
+
+
+            @if (user.role !== 'admin') {
+
+              <button
+                type="button"
+                class="user-delete-btn"
+                (click)="
+                  $event.stopPropagation();
+                  deleteUser(user._id, user.name)
+                "
+              >
+                🗑️
+              </button>
+
             }
+
           </div>
-
-          @if (user.role !== 'admin') {
-          <button type="button" class="user-delete-btn" (click)="
-          $event.stopPropagation();
-          deleteUser(user._id, user.name)
-        ">
-            🗑️
-          </button>
-          }
-
-        </div>
-
-
 
         }
 
@@ -88,146 +110,161 @@
 
 
     <!-- Recipe Heading -->
-
     <div class="recipe-heading">
 
       <div>
+
         <span class="section-label">
-          {{ selectedUserEmail()
-          ? 'USER RECIPES'
-          : 'ALL RECIPES'
+          {{
+            selectedUserEmail()
+              ? 'USER RECIPES'
+              : 'ALL RECIPES'
           }}
         </span>
 
         <h2>{{ selectedUserName() }}</h2>
+
       </div>
 
     </div>
 
 
     <!-- Search -->
-
     <div class="search-section">
 
       <label for="recipe-search">
         Search Recipes
       </label>
 
-      <input id="recipe-search" type="text" [formControl]="searchControl" placeholder="Search by recipe name..." />
+      <input
+        id="recipe-search"
+        type="text"
+        [formControl]="searchControl"
+        placeholder="Search by recipe name..."
+      />
 
     </div>
-
-
-    <!-- Error -->
-
-    @if (errorMessage) {
-
-    <div class="error-state">
-      <span>⚠️</span>
-      <p>{{ errorMessage }}</p>
-    </div>
-
-    }
 
 
     <!-- Recipes -->
-
     @if (recipes$ | async; as response) {
 
-    @if (response.recipes.length > 0) {
+      @if (response.recipes.length > 0) {
 
-    <div class="recipe-grid">
+        <div class="recipe-grid">
 
-      @for (
-      recipe of response.recipes;
-      track recipe._id
-      ) {
+          @for (recipe of response.recipes; track recipe._id) {
 
-      <article class="recipe-card">
+            <article class="recipe-card">
 
-        <div class="recipe-image">
+              <div class="recipe-image">
 
-          <img [src]="recipeService.getImageUrl(recipe.imageUrl)" [alt]="recipe.title" />
+                <img
+                  [src]="recipeService.getImageUrl(recipe.imageUrl)"
+                  [alt]="recipe.title"
+                />
 
-          <span class="recipe-category">
-            {{ recipe.category }}
-          </span>
+                <span class="recipe-category">
+                  {{ recipe.category }}
+                </span>
+
+              </div>
+
+
+              <div class="recipe-content">
+
+                <h2>{{ recipe.title }}</h2>
+
+
+                <div class="recipe-owner">
+
+                  <strong>Created by</strong>
+
+                  <span>
+                    {{ recipe.owner.name }}
+                  </span>
+
+                  <small>
+                    {{ recipe.owner.email }}
+                  </small>
+
+                </div>
+
+
+                <div class="recipe-actions">
+
+                  <button
+                    class="view-btn"
+                    type="button"
+                    (click)="viewRecipe(recipe._id)"
+                  >
+                    View
+                  </button>
+
+
+                  <button
+                    class="edit-btn"
+                    type="button"
+                    (click)="editRecipe(recipe._id)"
+                  >
+                    Edit
+                  </button>
+
+
+                  <button
+                    class="delete-btn"
+                    type="button"
+                    (click)="deleteRecipe(recipe._id)"
+                    [disabled]="isDeleting"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          }
 
         </div>
 
+      } @else {
 
-        <div class="recipe-content">
+        <div class="empty-state">
 
-          <h2>{{ recipe.title }}</h2>
+          <span>🍽️</span>
 
-          <div class="recipe-owner">
+          <h2>No recipes found</h2>
 
-            <strong>Created by</strong>
+          <p>
 
-            <span>
-              {{ recipe.owner.name }}
-            </span>
+            @if (selectedUserEmail()) {
 
-            <small>
-              {{ recipe.owner.email }}
-            </small>
+              This user has not created any recipes yet.
 
-          </div>
+            } @else {
 
+              Try searching with a recipe name.
 
-          <div class="recipe-actions">
+            }
 
-            <button class="view-btn" type="button" (click)="viewRecipe(recipe._id)">
-              View
-            </button>
-
-            <button class="edit-btn" type="button" (click)="editRecipe(recipe._id)">
-              Edit
-            </button>
-
-            <button class="delete-btn" type="button" (click)="deleteRecipe(recipe._id)" [disabled]="isDeleting">
-              Delete
-            </button>
-
-          </div>
+          </p>
 
         </div>
-
-      </article>
 
       }
 
-    </div>
-
     } @else {
 
-    <div class="empty-state">
+      <div class="loading-state">
 
-      <span>🍽️</span>
+        <div class="spinner"></div>
 
-      <h2>No recipes found</h2>
+        <p>Loading recipes...</p>
 
-      <p>
-        @if (selectedUserEmail()) {
-        This user has not created any recipes yet.
-        } @else {
-        Try searching with a recipe name.
-        }
-      </p>
-
-    </div>
-
-    }
-
-    } @else {
-
-    <div class="loading-state">
-
-      <div class="spinner"></div>
-
-      <p>Loading recipes...</p>
-
-    </div>
+      </div>
 
     }
 

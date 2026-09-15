@@ -5,19 +5,23 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service/auth.service';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
+import { AuthService } from '../../services/auth.service/auth.service';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
 export class Register {
-  private authService = inject(AuthService)
+  private authService = inject(AuthService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
+
+  isLoading = false;
 
   registerForm = new FormGroup({
     name: new FormControl('', {
@@ -40,39 +44,37 @@ export class Register {
       nonNullable: true,
       validators: [
         Validators.required,
-        Validators.minLength(8),
+        Validators.minLength(6),
       ],
     }),
   });
 
-  isLoading = false;
-  errorMessage = '';
-
-  onSubmit() {
+  onSubmit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
 
-    this.authService
-      .register(this.registerForm.getRawValue())
-      .subscribe({
-        next: (response) => {
-          this.isLoading = false;
+    const formData = this.registerForm.getRawValue();
 
-          this.router.navigate(['/login']);
-        },
+    this.authService.register(formData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
 
-        error: (error) => {
-          this.isLoading = false;
+        this.toastr.success(
+          response.message || 'Registration successful!'
+        );
 
-          this.errorMessage =
-            error.error?.message ||
-            'Registration failed. Please try again.';
-        },
-      });
+        this.router.navigate(['/login']);
+      },
+
+      error: () => {
+        this.isLoading = false;
+
+        // API error is handled by the HTTP interceptor.
+      },
+    });
   }
 }

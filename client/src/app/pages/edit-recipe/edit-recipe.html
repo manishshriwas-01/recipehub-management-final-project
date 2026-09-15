@@ -20,17 +20,12 @@
 
     } @else {
 
-      @if (errorMessage) {
-        <div class="error-message">
-          {{ errorMessage }}
-        </div>
-      }
-
       <form
         [formGroup]="recipeForm"
         (ngSubmit)="onSubmit()"
       >
 
+        <!-- Recipe Title -->
         <div class="form-group">
           <label for="title">
             Recipe Title
@@ -54,29 +49,39 @@
         </div>
 
 
+        <!-- Recipe Image -->
         <div class="form-group">
-          <label for="imageUrl">
-            Image URL
+          <label for="image">
+            Recipe Image
           </label>
 
+          @if (currentImageUrl) {
+            <div class="current-image">
+              <p>Current Image</p>
+
+              <img
+                [src]="recipeService.getImageUrl(currentImageUrl)"
+                alt="Current recipe image"
+              />
+            </div>
+          }
+
           <input
-            id="imageUrl"
-            type="url"
-            formControlName="imageUrl"
-            placeholder="https://example.com/image.jpg"
+            id="image"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
           />
 
-          @if (
-            recipeForm.controls.imageUrl.touched &&
-            recipeForm.controls.imageUrl.invalid
-          ) {
-            <small class="field-error">
-              Please enter a valid image URL.
+          @if (selectedImage) {
+            <small>
+              Selected image: {{ selectedImage.name }}
             </small>
           }
         </div>
 
 
+        <!-- Category -->
         <div class="form-group">
           <label for="category">
             Category
@@ -98,6 +103,7 @@
         </div>
 
 
+        <!-- Ingredients -->
         <div class="form-group">
           <label for="ingredients">
             Ingredients
@@ -122,6 +128,7 @@
         </div>
 
 
+        <!-- Instructions -->
         <div class="form-group">
           <label for="steps">
             Instructions
@@ -146,6 +153,7 @@
         </div>
 
 
+        <!-- Submit -->
         <button
           type="submit"
           class="submit-btn"

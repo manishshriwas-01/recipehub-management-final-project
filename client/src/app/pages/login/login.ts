@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import {
   FormControl,
   FormGroup,
@@ -15,6 +16,7 @@ import { AuthService } from '../../services/auth.service/auth.service';
   styleUrl: './login.css',
 })
 export class Login {
+  private toastr = inject(ToastrService);
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -57,24 +59,26 @@ export class Login {
             this.authService.setUser(meResponse.user);
 
             this.isLoading = false;
+            this.toastr.success(
+              response.message || 'Login successful!'
+            );
 
             this.router.navigate(['/recipes']);
           },
 
           error: () => {
             this.isLoading = false;
+            this.toastr.error(
+              'Unable to load user information. Please try again.'
+            );
             this.router.navigate(['/recipes']);
           },
         });
       },
 
-      error: (error) => {
+      error: () => {
         this.isLoading = false;
-
-        this.errorMessage =
-          error.error?.message ||
-          'Login failed. Please try again.';
-      },
+      }
     });
   }
 }

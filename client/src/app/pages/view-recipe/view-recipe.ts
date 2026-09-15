@@ -5,6 +5,7 @@ import { Observable, switchMap } from 'rxjs';
 
 import { Recipe } from '../../models/Recipe';
 import { RecipeService } from '../../services/recipe.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-view-recipe',
@@ -14,8 +15,9 @@ import { RecipeService } from '../../services/recipe.service';
 })
 export class ViewRecipe {
   private route = inject(ActivatedRoute);
-   recipeService = inject(RecipeService);
+  recipeService = inject(RecipeService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   isFavorite = signal(false);
   isFavoriteLoading = signal(false);
@@ -50,34 +52,32 @@ export class ViewRecipe {
     if (this.isFavorite()) {
       // Remove from favorites
       this.recipeService.removeFavorite(this.recipeId).subscribe({
-        next: () => {
+        next: (response) => {
           this.isFavorite.set(false);
           this.isFavoriteLoading.set(false);
+
+          this.toastr.success(
+            response.message || 'Recipe removed from favorites!'
+          );
         },
 
-        error: (error) => {
-          console.error('Remove favorite error:', error);
+        error: () => {
           this.isFavoriteLoading.set(false);
         },
       });
     } else {
       // Add to favorites
       this.recipeService.addFavorite(this.recipeId).subscribe({
-        next: () => {
-          // Successfully added
+        next: (response) => {
           this.isFavorite.set(true);
           this.isFavoriteLoading.set(false);
+
+          this.toastr.success(
+            response.message || 'Recipe added to favorites!'
+          );
         },
 
-        error: (error) => {
-          console.error('Add favorite error:', error);
-
-          // Backend says recipe is already favorite
-          if (error.status === 400) {
-            alert('Recipe is already in favorites ❤️');
-          }
-
-          // Don't change heart state on error
+        error: () => {
           this.isFavoriteLoading.set(false);
         },
       });

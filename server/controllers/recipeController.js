@@ -124,14 +124,12 @@ export const getRecipe = async (req, res, next) => {
     }
 };
 
-
 export const updateRecipe = async (req, res, next) => {
     try {
-        const { id } = await req.params;
+        const { id } = req.params;
 
         const {
             title,
-            imageUrl,
             ingredients,
             steps,
             category,
@@ -155,15 +153,26 @@ export const updateRecipe = async (req, res, next) => {
         if (!isOwner && !isAdmin) {
             return res.status(403).json({
                 success: false,
-                message: "You are not authorized to delete this recipe",
+                message: "You are not authorized to update this recipe",
             });
         }
 
         recipe.title = title ?? recipe.title;
-        recipe.imageUrl = imageUrl ?? recipe.imageUrl;
-        recipe.ingredients = ingredients ?? recipe.ingredients;
-        recipe.steps = steps ?? recipe.steps;
+
+        if (ingredients) {
+            recipe.ingredients = JSON.parse(ingredients);
+        }
+
+        if (steps) {
+            recipe.steps = JSON.parse(steps);
+        }
+
         recipe.category = category ?? recipe.category;
+
+        // New image selected
+        if (req.file) {
+            recipe.imageUrl = `/uploads/${req.file.filename}`;
+        }
 
         await recipe.save();
 
@@ -177,8 +186,6 @@ export const updateRecipe = async (req, res, next) => {
         next(error);
     }
 };
-
-
 export const deleteRecipe = async (req, res, next) => {
     try {
         const { id } = req.params;

@@ -13,6 +13,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { RecipeService } from '../../services/recipe.service';
 import { AuthService } from '../../services/auth.service/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-manage-recipes',
@@ -21,9 +22,10 @@ import { AuthService } from '../../services/auth.service/auth.service';
   styleUrl: './manage-recipes.css',
 })
 export class ManageRecipes {
-   recipeService = inject(RecipeService);
+  recipeService = inject(RecipeService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   searchControl = new FormControl('', {
     nonNullable: true,
@@ -46,11 +48,9 @@ export class ManageRecipes {
 
   selectedUserName = signal('All Recipes');
 
-  // User selection ko observable banaya
   selectedUserEmail$ = new BehaviorSubject<string | null>(null);
 
   isDeleting = false;
-  errorMessage = '';
 
   recipes$ = combineLatest([
     this.searchControl.valueChanges.pipe(
@@ -59,11 +59,9 @@ export class ManageRecipes {
       distinctUntilChanged()
     ),
 
-    this.selectedUserEmail$
+    this.selectedUserEmail$,
   ]).pipe(
     switchMap(([search, email]) => {
-
-      // User selected hai
       if (email) {
         return this.recipeService.getRecipesByUser(
           email,
@@ -71,7 +69,6 @@ export class ManageRecipes {
         );
       }
 
-      // All recipes
       return this.recipeService.getRecipes(
         1,
         50,
@@ -91,38 +88,23 @@ export class ManageRecipes {
         this.totalUsers.set(response.count);
       },
 
-      error: (error) => {
-        console.error(
-          'Failed to load users:',
-          error
-        );
-
-        this.errorMessage =
-          error.error?.message ||
-          'Failed to load users.';
+      error: () => {
+        // API error handled by HTTP interceptor
       },
     });
   }
 
-  // HTML se email yahan aayegi
-  selectUser( email: string, name: string): void {
-
-    // console.log('Selected User:', name);
-    // console.log('Selected Email:', email);
-
+  selectUser(email: string, name: string): void {
     this.selectedUserEmail.set(email);
     this.selectedUserName.set(name);
 
-    // Observable ko trigger karo
     this.selectedUserEmail$.next(email);
   }
 
   showAllRecipes(): void {
-
     this.selectedUserEmail.set(null);
     this.selectedUserName.set('All Recipes');
 
-    // All recipes dobara fetch
     this.selectedUserEmail$.next(null);
   }
 
@@ -135,7 +117,6 @@ export class ManageRecipes {
   }
 
   deleteRecipe(id: string): void {
-
     const confirmed = confirm(
       'Are you sure you want to delete this recipe?'
     );
@@ -145,27 +126,25 @@ export class ManageRecipes {
     }
 
     this.isDeleting = true;
-    this.errorMessage = '';
 
     this.recipeService.deleteRecipe(id).subscribe({
-      next: () => {
-
+      next: (response) => {
         this.isDeleting = false;
 
-        // Current selection/search ke according
-        // recipes dobara fetch
+        this.toastr.success(
+          response.message || 'Recipe deleted successfully!'
+        );
+
+        // Refresh current recipe list
         this.selectedUserEmail$.next(
           this.selectedUserEmail()
         );
       },
 
-      error: (error) => {
-
+      error: () => {
         this.isDeleting = false;
 
-        this.errorMessage =
-          error.error?.message ||
-          'Failed to delete recipe. Please try again.';
+        // API error handled by HTTP interceptor
       },
     });
   }
@@ -174,7 +153,6 @@ export class ManageRecipes {
     userId: string,
     userName: string
   ): void {
-
     const confirmed = confirm(
       `Are you sure you want to delete "${userName}"?`
     );
@@ -184,8 +162,7 @@ export class ManageRecipes {
     }
 
     this.authService.deleteUser(userId).subscribe({
-      next: () => {
-
+      next: (response) => {
         this.users.update((users) =>
           users.filter(
             (user) => user._id !== userId
@@ -194,6 +171,10 @@ export class ManageRecipes {
 
         this.totalUsers.update(
           (count) => count - 1
+        );
+
+        this.toastr.success(
+          response.message || 'User deleted successfully!'
         );
 
         const selectedEmail =
@@ -213,11 +194,8 @@ export class ManageRecipes {
         }
       },
 
-      error: (error) => {
-
-        this.errorMessage =
-          error.error?.message ||
-          'Failed to delete user.';
+      error: () => {
+        // API error handled by HTTP interceptor
       },
     });
   }

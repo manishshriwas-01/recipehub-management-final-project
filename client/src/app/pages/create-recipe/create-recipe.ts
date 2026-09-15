@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RecipeService } from '../../services/recipe.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import {
   FormControl,
   FormGroup,
@@ -17,6 +18,7 @@ import {
 export class CreateRecipe {
   private recipeService = inject(RecipeService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   selectedImage: File | null = null;
 
@@ -62,7 +64,7 @@ export class CreateRecipe {
       this.recipeForm.markAllAsTouched();
 
       if (!this.selectedImage) {
-        this.errorMessage = 'Recipe image is required.';
+        this.toastr.error('Recipe image is required.');
       }
 
       return;
@@ -105,18 +107,18 @@ export class CreateRecipe {
       next: (response) => {
         this.isLoading = false;
 
+        this.toastr.success(
+          response.message || 'Recipe created successfully!'
+        );
+
         this.router.navigate([
           '/recipes',
           response.recipe._id,
         ]);
       },
 
-      error: (error) => {
+      error: () => {
         this.isLoading = false;
-
-        this.errorMessage =
-          error.error?.message ||
-          'Failed to create recipe. Please try again.';
       },
     });
   }

@@ -19,11 +19,13 @@
       </div>
     </div>
 
+
     <div class="auth-content">
 
       <a routerLink="/" class="back-home">
         ← Back to home
       </a>
+
 
       <div class="auth-header">
         <span class="logo-icon">🍴</span>
@@ -35,11 +37,6 @@
         </p>
       </div>
 
-      @if (errorMessage) {
-        <div class="error-message">
-          {{ errorMessage }}
-        </div>
-      }
 
       <form
         [formGroup]="registerForm"
@@ -48,6 +45,7 @@
 
         <!-- Name -->
         <div class="form-group">
+
           <label for="name">Name</label>
 
           <input
@@ -61,6 +59,7 @@
             registerForm.controls.name.touched &&
             registerForm.controls.name.invalid
           ) {
+
             <small class="error">
 
               @if (registerForm.controls.name.errors?.['required']) {
@@ -72,11 +71,15 @@
               }
 
             </small>
+
           }
+
         </div>
+
 
         <!-- Email -->
         <div class="form-group">
+
           <label for="email">Email</label>
 
           <input
@@ -90,6 +93,7 @@
             registerForm.controls.email.touched &&
             registerForm.controls.email.invalid
           ) {
+
             <small class="error">
 
               @if (registerForm.controls.email.errors?.['required']) {
@@ -101,11 +105,15 @@
               }
 
             </small>
+
           }
+
         </div>
+
 
         <!-- Password -->
         <div class="form-group">
+
           <label for="password">Password</label>
 
           <input
@@ -119,6 +127,7 @@
             registerForm.controls.password.touched &&
             registerForm.controls.password.invalid
           ) {
+
             <small class="error">
 
               @if (registerForm.controls.password.errors?.['required']) {
@@ -130,22 +139,29 @@
               }
 
             </small>
+
           }
+
         </div>
 
+
+        <!-- Submit Button -->
         <button
           type="submit"
           class="register-btn"
           [disabled]="registerForm.invalid || isLoading"
         >
+
           @if (isLoading) {
             Creating account...
           } @else {
             Create account
           }
+
         </button>
 
       </form>
+
 
       <p class="login-text">
         Already have an account?
@@ -153,5 +169,6 @@
       </p>
 
     </div>
+
   </div>
 </section>

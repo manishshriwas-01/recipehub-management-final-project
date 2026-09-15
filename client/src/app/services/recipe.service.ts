@@ -48,26 +48,20 @@ export class RecipeService {
   }
 
 
-  updateRecipe(
-    id: string,
-    data: {
-      title?: string;
-      imageUrl?: string;
-      ingredients?: string[];
-      steps?: string[];
-      category?: string;
-    }
-  ): Observable<{
+updateRecipe(
+  id: string,
+  data: FormData
+): Observable<{
+  success: boolean;
+  message: string;
+  recipe: Recipe;
+}> {
+  return this.http.put<{
     success: boolean;
     message: string;
     recipe: Recipe;
-  }> {
-    return this.http.put<{
-      success: boolean;
-      message: string;
-      recipe: Recipe;
-    }>(`${this.apiUrl}/${id}`, data);
-  }
+  }>(`${this.apiUrl}/${id}`, data);
+}
 
 
   getMyRecipes(): Observable<{
@@ -154,11 +148,13 @@ export class RecipeService {
 
     const finalUrl = `${serverUrl}${imageUrl}`;
 
-    console.log('Original imageUrl:', imageUrl);
-    console.log('Final image URL:', finalUrl);
+    // console.log('Original imageUrl:', imageUrl);
+    // console.log('Final image URL:', finalUrl);
 
     return finalUrl;
   }
+
+  
 }
 
 

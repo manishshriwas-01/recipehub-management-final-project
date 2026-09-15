@@ -52,7 +52,7 @@ router.delete('/:id/favorite', authMiddleware, removeFavorite);
 
 
 
-router.put('/:id', authMiddleware, updateRecipe);
+router.put('/:id', authMiddleware, upload.single('image'), updateRecipe);
 
 router.delete('/:id', authMiddleware, deleteRecipe);
 

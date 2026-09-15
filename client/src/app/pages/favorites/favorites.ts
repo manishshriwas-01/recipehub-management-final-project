@@ -1,9 +1,9 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-
 import { Recipe } from '../../models/Recipe';
 import { RecipeService } from '../../services/recipe.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-favorites',
@@ -12,7 +12,8 @@ import { RecipeService } from '../../services/recipe.service';
   styleUrl: './favorites.css',
 })
 export class Favorites {
-   recipeService = inject(RecipeService);
+  private toastr = inject(ToastrService);
+  recipeService = inject(RecipeService);
 
   favorites = signal<Recipe[]>([]);
   loading = signal(true);
@@ -27,8 +28,8 @@ export class Favorites {
         this.favorites.set(response.recipes);
         this.loading.set(false);
       },
-      error: (error) => {
-        console.error('Failed to load favorites:', error);
+
+      error: () => {
         this.loading.set(false);
       },
     });
@@ -36,13 +37,18 @@ export class Favorites {
 
   removeFavorite(recipeId: string): void {
     this.recipeService.removeFavorite(recipeId).subscribe({
-      next: () => {
+      next: (response) => {
         this.favorites.update((recipes) =>
           recipes.filter((recipe) => recipe._id !== recipeId)
         );
+
+        this.toastr.success(
+          response.message || 'Recipe removed from favorites!'
+        );
       },
-      error: (error) => {
-        console.error('Remove favorite error:', error);
+
+      error: () => {
+        // Error handled by HTTP interceptor
       },
     });
   }
