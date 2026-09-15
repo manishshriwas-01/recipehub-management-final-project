@@ -48,6 +48,13 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
+// Handle unknown API routes
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
 
 app.use(errorMiddleware);
 

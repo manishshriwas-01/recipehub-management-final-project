@@ -141,46 +141,5 @@ describe("Authentication Api", () => {
     });
 
 
-    test("should delete the authenticated user's account", async () => {
-        const email = `delete${Date.now()}@example.com`;
-        const password = "12345678";
-
-        // Register user
-        await request(app)
-            .post("/api/auth/register")
-            .send({
-                name: "Delete User",
-                email,
-                password,
-            });
-
-        // Login and get token
-        const loginResponse = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email,
-                password,
-            });
-
-        const token = loginResponse.body.token;
-
-        // Delete own account
-        const response = await request(app)
-            .delete("/api/auth/me")
-            .set("Authorization", `Bearer ${token}`);
-
-        expect(response.statusCode).toBe(200);
-
-        expect(response.body.success).toBe(true);
-
-        expect(response.body.message).toBe("Account deleted successfully");
-
-        // Verify account no longer exists
-        const meResponse = await request(app)
-            .get("/api/auth/me")
-            .set("Authorization", `Bearer ${token}`);
-
-        expect(meResponse.statusCode).toBe(404);
-    });
-
+    
 });

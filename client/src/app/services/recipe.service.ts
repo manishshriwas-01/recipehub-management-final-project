@@ -3,6 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { RecipeResponse, Recipe } from '../models/Recipe';
+import { environment } from '../../environments/environment';
+
+
 
 
 @Injectable({
@@ -11,10 +14,10 @@ import { RecipeResponse, Recipe } from '../models/Recipe';
 export class RecipeService {
   private http = inject(HttpClient);
 
-  private apiUrl =
-    'https://recipehub-management-final-project.onrender.com/api/recipes';
+  // private apiUrl =
+  //   'https://recipehub-management-final-project.onrender.com/api/recipes';
 
-  // private apiUrl = 'http://localhost:3000/api/recipes';
+  private apiUrl = `${environment.apiUrl}/recipes`;
 
   getRecipes(page: number = 1, limit: number = 9, search: string = '', category: string = ''): Observable<RecipeResponse> {
     let url = `${this.apiUrl}?page=${page}&limit=${limit}`;

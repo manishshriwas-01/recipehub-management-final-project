@@ -4,9 +4,11 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   BehaviorSubject,
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  of,
   startWith,
   switchMap,
 } from 'rxjs';
@@ -60,6 +62,19 @@ export class Recipes {
         9,
         search.trim(),
         category
+      ).pipe(
+        catchError(() => {
+          this.errorMessage$.next('Failed to load recipes');
+
+          return of({
+            success: false,
+            recipes: [],
+            count: 0,
+            total: 0,
+            page: page,
+            pages: 0,
+          });
+        })
       );
     })
   );
@@ -117,14 +132,14 @@ export class Recipes {
   }
 
   copyRecipeLink(recipe: any): void {
-  const recipeUrl = `${window.location.origin}/recipes/${recipe._id}`;
+    const recipeUrl = `${window.location.origin}/recipes/${recipe._id}`;
 
-  navigator.clipboard.writeText(recipeUrl)
-    .then(() => {
-      console.log('Recipe link copied:', recipeUrl);
-    })
-    .catch((error) => {
-      console.error('Failed to copy recipe link:', error);
-    });
-}
+    navigator.clipboard.writeText(recipeUrl)
+      .then(() => {
+        console.log('Recipe link copied:', recipeUrl);
+      })
+      .catch((error) => {
+        console.error('Failed to copy recipe link:', error);
+      });
+  }
 }

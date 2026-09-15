@@ -76,10 +76,24 @@
 
     } @else {
 
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading recipe...</p>
-      </div>
+  @if (errorMessage()) {
+
+    <div class="error-state">
+      <p>{{ errorMessage() }}</p>
+      <a routerLink="/recipes" class="back-btn">
+        Back to Recipes
+      </a>
+    </div>
+
+  } @else {
+
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading recipe...</p>
+    </div>
+
+  }
+
 
     }
 

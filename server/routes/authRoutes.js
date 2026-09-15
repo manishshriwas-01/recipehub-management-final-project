@@ -9,11 +9,12 @@ import {
   deleteUserByAdmin,
 } from "../controllers/authController.js";
 
-import { registerValidator } from "../validators/authValidator.js";
+import { registerValidator } from "../validators/registerValidator.js";
 import validate from "../middleware/validate.js";
-import { loginValidator } from "../validators/loginValidator.js";
+
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
+import { loginValidator } from "../validators/loginValidator.js";
 
 
 const router = express.Router();

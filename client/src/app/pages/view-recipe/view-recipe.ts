@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, of, catchError, switchMap } from 'rxjs';
 
 import { Recipe } from '../../models/Recipe';
 import { RecipeService } from '../../services/recipe.service';
@@ -22,14 +22,23 @@ export class ViewRecipe {
   isFavorite = signal(false);
   isFavoriteLoading = signal(false);
 
+  errorMessage = signal('');
+
   recipeId = '';
 
-  recipe$: Observable<{ success: boolean; recipe: Recipe }> =
+  recipe$: Observable<{ success: boolean; recipe: Recipe } | null> =
     this.route.paramMap.pipe(
       switchMap((params) => {
         this.recipeId = params.get('id')!;
 
-        return this.recipeService.getRecipe(this.recipeId);
+        this.errorMessage.set('');
+
+        return this.recipeService.getRecipe(this.recipeId).pipe(
+          catchError(() => {
+            this.errorMessage.set('Recipe not found');
+            return of(null);
+          })
+        );
       })
     );
 
