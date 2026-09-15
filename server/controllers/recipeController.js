@@ -3,12 +3,12 @@ import User from '../models/User.js';
 
 export const createRecipe = async (req, res, next) => {
     try {
-        const { title,ingredients, steps, category } = req.body;
+        const { title, ingredients, steps, category } = req.body;
 
         const recipe = await Recipe.create({
             owner: req.user.userId,
             title,
-                imageUrl: `/uploads/${req.file.filename}`,
+            imageUrl: `/uploads/${req.file.filename}`,
             ingredients,
             steps,
             category
@@ -32,14 +32,42 @@ export const getRecipes = async (req, res, next) => {
             category,
             ownerEmail,
             page = 1,
-            limit = 9
+            limit = 9,
         } = req.query;
+
+        // Validate pagination
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+
+        if (!Number.isInteger(pageNumber) || pageNumber < 1) {
+            return res.status(400).json({
+                success: false,
+                message: "Page must be a positive integer",
+            });
+        }
+
+        if (!Number.isInteger(limitNumber) || limitNumber < 1) {
+            return res.status(400).json({
+                success: false,
+                message: "Limit must be a positive integer",
+            });
+        }
+
+        // Prevent excessively large requests
+        const safeLimit = Math.min(limitNumber, 50);
 
         const filter = {};
 
-        // Search by recipe name
+        // Escape special regex characters
+        const escapeRegex = (text) => {
+            return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        };
+
+        // Search by recipe title
         if (search) {
-            const searchRegex = new RegExp(search, "i");
+            const safeSearch = escapeRegex(search);
+
+            const searchRegex = new RegExp(safeSearch, "i");
 
             filter.title = {
                 $regex: searchRegex,
@@ -62,7 +90,7 @@ export const getRecipes = async (req, res, next) => {
                     success: true,
                     count: 0,
                     total: 0,
-                    page: Number(page),
+                    page: pageNumber,
                     pages: 0,
                     recipes: [],
                 });
@@ -71,15 +99,13 @@ export const getRecipes = async (req, res, next) => {
             filter.owner = user._id;
         }
 
-        const pageNumber = Number(page);
-        const limitNumber = Number(limit);
-        const skip = (pageNumber - 1) * limitNumber;
+        const skip = (pageNumber - 1) * safeLimit;
 
         const recipes = await Recipe.find(filter)
             .populate("owner", "name email")
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limitNumber);
+            .limit(safeLimit);
 
         const totalRecipes =
             await Recipe.countDocuments(filter);
@@ -89,9 +115,7 @@ export const getRecipes = async (req, res, next) => {
             count: recipes.length,
             total: totalRecipes,
             page: pageNumber,
-            pages: Math.ceil(
-                totalRecipes / limitNumber
-            ),
+            pages: Math.ceil(totalRecipes / safeLimit),
             recipes,
         });
 
@@ -99,7 +123,6 @@ export const getRecipes = async (req, res, next) => {
         next(error);
     }
 };
-
 
 export const getRecipe = async (req, res, next) => {
     try {
@@ -160,11 +183,11 @@ export const updateRecipe = async (req, res, next) => {
         recipe.title = title ?? recipe.title;
 
         if (ingredients) {
-            recipe.ingredients = JSON.parse(ingredients);
+            recipe.ingredients = ingredients;
         }
 
         if (steps) {
-            recipe.steps = JSON.parse(steps);
+            recipe.steps = steps;
         }
 
         recipe.category = category ?? recipe.category;

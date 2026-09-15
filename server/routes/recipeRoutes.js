@@ -10,6 +10,7 @@ import {
     getMyRecipes,
     updateRecipe
 } from '../controllers/recipeController.js';
+import { parseRecipeFields } from '../middleware/parseRecipeFields.js';
 
 import upload from '../middleware/uploadMiddleware.js';
 
@@ -18,6 +19,13 @@ import {
     removeFavorite,
     getFavorites
 } from '../controllers/favoriteController.js';
+
+import {
+    createRecipeValidator,
+    updateRecipeValidator
+} from '../validators/recipeValidator.js';
+
+import validate from '../middleware/validate.js';
 
 
 const router = express.Router();
@@ -28,33 +36,77 @@ router.post(
     '/',
     authMiddleware,
     upload.single('image'),
+    parseRecipeFields,
+    createRecipeValidator,
+    validate,
     createRecipe
 );
 
 
-
-router.get('/my-recipes', authMiddleware, getMyRecipes);
-
-router.get('/favorites', authMiddleware, getFavorites);
-
-
-router.get('/:id', getRecipe);
-
+// Get Current User's Recipes
+router.get(
+    '/my-recipes',
+    authMiddleware,
+    getMyRecipes
+);
 
 
-router.get('/', getRecipes);
+// Get Favorites
+router.get(
+    '/favorites',
+    authMiddleware,
+    getFavorites
+);
 
 
+// Get Single Recipe
+router.get(
+    '/:id',
+    getRecipe
+);
 
-router.post('/:id/favorite', authMiddleware, addFavorite);
 
-router.delete('/:id/favorite', authMiddleware, removeFavorite);
+// Get All Recipes
+router.get(
+    '/',
+    getRecipes
+);
 
 
+// Add Favorite
+router.post(
+    '/:id/favorite',
+    authMiddleware,
+    addFavorite
+);
 
-router.put('/:id', authMiddleware, upload.single('image'), updateRecipe);
 
-router.delete('/:id', authMiddleware, deleteRecipe);
+// Remove Favorite
+router.delete(
+    '/:id/favorite',
+    authMiddleware,
+    removeFavorite
+);
+
+
+// Update Recipe
+router.put(
+    '/:id',
+    authMiddleware,
+    upload.single('image'),
+    parseRecipeFields,
+    updateRecipeValidator,
+    validate,
+    updateRecipe
+);
+
+
+// Delete Recipe
+router.delete(
+    '/:id',
+    authMiddleware,
+    deleteRecipe
+);
 
 
 export default router;

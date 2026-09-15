@@ -18,11 +18,13 @@
       </div>
     </div>
 
+
     <div class="auth-content">
 
       <a routerLink="/" class="back-home">
         ← Back to home
       </a>
+
 
       <div class="auth-header">
         <span class="logo-icon">🍴</span>
@@ -34,11 +36,6 @@
         </p>
       </div>
 
-      @if (errorMessage) {
-        <div class="error-message">
-          {{ errorMessage }}
-        </div>
-      }
 
       <form
         [formGroup]="loginForm"
@@ -47,6 +44,7 @@
 
         <!-- Email -->
         <div class="form-group">
+
           <label for="email">Email</label>
 
           <input
@@ -60,7 +58,9 @@
             loginForm.controls.email.touched &&
             loginForm.controls.email.invalid
           ) {
+
             <small class="error">
+
               @if (loginForm.controls.email.errors?.['required']) {
                 Email is required.
               }
@@ -68,12 +68,17 @@
               @if (loginForm.controls.email.errors?.['email']) {
                 Enter a valid email address.
               }
+
             </small>
+
           }
+
         </div>
+
 
         <!-- Password -->
         <div class="form-group">
+
           <label for="password">Password</label>
 
           <input
@@ -87,7 +92,9 @@
             loginForm.controls.password.touched &&
             loginForm.controls.password.invalid
           ) {
+
             <small class="error">
+
               @if (loginForm.controls.password.errors?.['required']) {
                 Password is required.
               }
@@ -95,24 +102,31 @@
               @if (loginForm.controls.password.errors?.['minlength']) {
                 Password must be at least 8 characters.
               }
+
             </small>
+
           }
+
         </div>
+
 
         <!-- Submit -->
         <button
           type="submit"
           class="login-btn"
-          [disabled]="loginForm.invalid || isLoading"
+          [disabled]="loginForm.invalid || isLoading()"
         >
-          @if (isLoading) {
+
+          @if (isLoading()) {
             Logging in...
           } @else {
             Login
           }
+
         </button>
 
       </form>
+
 
       <p class="register-text">
         Don't have an account?
@@ -120,5 +134,6 @@
       </p>
 
     </div>
+
   </div>
 </section>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import {
   FormControl,
@@ -38,17 +38,15 @@ export class Login {
     }),
   });
 
-  isLoading = false;
-  errorMessage = '';
+  isLoading = signal(false);
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isLoading.set(true);
 
     this.authService.login(this.loginForm.getRawValue()).subscribe({
       next: (response) => {
@@ -58,7 +56,8 @@ export class Login {
           next: (meResponse) => {
             this.authService.setUser(meResponse.user);
 
-            this.isLoading = false;
+            this.isLoading.set(false);
+
             this.toastr.success(
               response.message || 'Login successful!'
             );
@@ -67,18 +66,20 @@ export class Login {
           },
 
           error: () => {
-            this.isLoading = false;
+            this.isLoading.set(false);
+
             this.toastr.error(
               'Unable to load user information. Please try again.'
             );
+
             this.router.navigate(['/recipes']);
           },
         });
       },
 
       error: () => {
-        this.isLoading = false;
-      }
+        this.isLoading.set(false);
+      },
     });
   }
 }

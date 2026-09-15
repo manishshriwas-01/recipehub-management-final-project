@@ -5,7 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
+
 import cors from "cors";
 
 dotenv.config();
@@ -31,16 +31,7 @@ app.use(
   })
 );
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10000,
-  message: {
-    success: false,
-    message: "Too many requests, please try again later",
-  },
-});
 
-app.use(limiter);
 
 const PORT = process.env.PORT || 3000;
 

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -21,7 +21,7 @@ export class Register {
   private router = inject(Router);
   private toastr = inject(ToastrService);
 
-  isLoading = false;
+  isLoading = signal(false);
 
   registerForm = new FormGroup({
     name: new FormControl('', {
@@ -44,7 +44,7 @@ export class Register {
       nonNullable: true,
       validators: [
         Validators.required,
-        Validators.minLength(6),
+        Validators.minLength(8),
       ],
     }),
   });
@@ -55,13 +55,13 @@ export class Register {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     const formData = this.registerForm.getRawValue();
 
     this.authService.register(formData).subscribe({
       next: (response) => {
-        this.isLoading = false;
+        this.isLoading.set(false);
 
         this.toastr.success(
           response.message || 'Registration successful!'
@@ -71,7 +71,7 @@ export class Register {
       },
 
       error: () => {
-        this.isLoading = false;
+        this.isLoading.set(false);
 
         // API error is handled by the HTTP interceptor.
       },

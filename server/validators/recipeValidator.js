@@ -1,20 +1,13 @@
-
 import { body } from "express-validator";
 
 export const createRecipeValidator = [
+
   body("title")
     .trim()
     .notEmpty()
     .withMessage("Title is required")
     .isLength({ min: 3, max: 100 })
     .withMessage("Title must be between 3 and 100 characters"),
-
-  body("imageUrl")
-    .trim()
-    .notEmpty()
-    .withMessage("Recipe image is required")
-    .isURL()
-    .withMessage("Image URL must be a valid URL"),
 
   body("ingredients")
     .isArray({ min: 1 })
@@ -49,20 +42,17 @@ export const createRecipeValidator = [
       "Other",
     ])
     .withMessage("Invalid category"),
+
 ];
 
+
 export const updateRecipeValidator = [
+
   body("title")
     .optional()
     .trim()
     .isLength({ min: 3, max: 100 })
     .withMessage("Title must be between 3 and 100 characters"),
-
-  body("imageUrl")
-    .optional()
-    .trim()
-    .isURL()
-    .withMessage("Image URL must be a valid URL"),
 
   body("ingredients")
     .optional()
@@ -100,5 +90,5 @@ export const updateRecipeValidator = [
       "Other",
     ])
     .withMessage("Invalid category"),
-];
 
+];

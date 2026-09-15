@@ -149,10 +149,10 @@
         <button
           type="submit"
           class="register-btn"
-          [disabled]="registerForm.invalid || isLoading"
+          [disabled]="registerForm.invalid || isLoading()"
         >
 
-          @if (isLoading) {
+          @if (isLoading()) {
             Creating account...
           } @else {
             Create account
