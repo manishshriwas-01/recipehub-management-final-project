@@ -14,10 +14,10 @@ import { environment } from '../../environments/environment';
 export class RecipeService {
   private http = inject(HttpClient);
 
-  private apiUrl =
-    'https://recipehub-management-final-project.onrender.com/api/recipes';
+  // private apiUrl =
+  //   'https://recipehub-management-final-project.onrender.com/api/recipes';
 
-  // private apiUrl = `${environment.apiUrl}/recipes`;
+  private apiUrl = `${environment.apiUrl}/recipes`;
 
   getRecipes(page: number = 1, limit: number = 9, search: string = '', category: string = ''): Observable<RecipeResponse> {
     let url = `${this.apiUrl}?page=${page}&limit=${limit}`;

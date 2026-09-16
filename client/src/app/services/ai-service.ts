@@ -14,10 +14,9 @@ interface AiResponse {
 })
 export class AiService {
   private http = inject(HttpClient);
-  private apiUrl =
-  'https://recipehub-management-final-project.onrender.com/api/api';
+  
 
-  // private apiUrl = `${environment.apiUrl}/ai`;
+  private apiUrl = `${environment.apiUrl}/ai`;
 
   chat(message: string): Observable<AiResponse> {
     return this.http.post<AiResponse>(`${this.apiUrl}/chat`, {

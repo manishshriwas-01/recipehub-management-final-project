@@ -21,10 +21,10 @@ export interface User {
 })
 export class AuthService {
   private http = inject(HttpClient);
-  // private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl = `${environment.apiUrl}/auth`;
 
-  private apiUrl =
-  'https://recipehub-management-final-project.onrender.com/api/auth';
+  // private apiUrl =
+  // 'https://recipehub-management-final-project.onrender.com/api/auth';
 
   user = signal<User | null>(null);
 
