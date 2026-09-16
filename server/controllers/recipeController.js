@@ -3,6 +3,13 @@ import User from '../models/User.js';
 
 export const createRecipe = async (req, res, next) => {
     try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "Recipe image is required",
+            });
+        }
+
         const { title, ingredients, steps, category } = req.body;
 
         const recipe = await Recipe.create({
