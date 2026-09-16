@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideToastr } from 'ngx-toastr';
 
 import { ManageRecipes } from './manage-recipes';
 
@@ -9,6 +11,10 @@ describe('ManageRecipes', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ManageRecipes],
+      providers: [
+        provideRouter([]),
+        provideToastr(),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ManageRecipes);

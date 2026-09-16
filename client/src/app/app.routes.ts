@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
 import { adminGuard } from './guards/admin-guard';
 
+
 export const routes: Routes = [
   {
     path: '',
@@ -47,20 +48,20 @@ export const routes: Routes = [
       ),
   },
   {
-  path: 'recipes/:id',
-  loadComponent: () =>
-    import('./pages/view-recipe/view-recipe').then(
-      (m) => m.ViewRecipe
-    ),
-},
-{
-  path: 'favorites',
-  canActivate: [authGuard],
-  loadComponent: () =>
-    import('./pages/favorites/favorites').then(
-      (m) => m.Favorites
-    ),
-},
+    path: 'recipes/:id',
+    loadComponent: () =>
+      import('./pages/view-recipe/view-recipe').then(
+        (m) => m.ViewRecipe
+      ),
+  },
+  {
+    path: 'favorites',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/favorites/favorites').then(
+        (m) => m.Favorites
+      ),
+  },
   // Admin only
   {
     path: 'manage-recipes',
@@ -69,6 +70,12 @@ export const routes: Routes = [
       import('./pages/manage-recipes/manage-recipes').then(
         (m) => m.ManageRecipes
       ),
+  },
+  {
+    path: 'ai-assistant',
+    loadComponent: () =>
+      import('./pages/ai-assistant/ai-assistant')
+        .then(m => m.AiAssistant),
   },
   {
     path: '**',

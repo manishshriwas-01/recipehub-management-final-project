@@ -1,9 +1,14 @@
 import request from "supertest";
 import { app } from "../server.js";
 import connectDB from "../config/db.js";
+import mongoose from "mongoose";
 
 beforeAll(async () => {
     await connectDB();
+});
+
+afterAll(async () => {
+    await mongoose.connection.close();
 });
 
 describe("Authentication Api", () => {

@@ -4,6 +4,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import aiRoutes from './routes/aiRoutes.js'
 import helmet from "helmet";
 
 import cors from "cors";
@@ -48,6 +49,9 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
+app.use("/api/ai",aiRoutes);
+
+
 // Handle unknown API routes
 app.use("/api", (req, res) => {
   res.status(404).json({

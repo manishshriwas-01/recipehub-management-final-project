@@ -1,0 +1,169 @@
+<div class="ai-container">
+
+  <div class="ai-header">
+    <div class="ai-icon">🤖</div>
+
+    <div>
+      <h2>AI Recipe Assistant</h2>
+      <p>
+        Ask about recipes, ingredients, cooking techniques and more.
+      </p>
+    </div>
+  </div>
+
+
+  <div class="chat-box" #chatBox>
+
+    @if (messages().length === 0 && !loading()) {
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          👨‍🍳
+        </div>
+
+        <h3>What would you like to cook?</h3>
+
+        <p>
+          Ask me for recipe ideas or cooking help.
+        </p>
+
+        <div class="suggestions">
+
+          <button
+            type="button"
+            (click)="message = 'Suggest a simple vegetarian dinner'"
+          >
+            🥗 Vegetarian dinner
+          </button>
+
+          <button
+            type="button"
+            (click)="message = 'What can I cook with paneer and tomato?'"
+          >
+            🧀 Paneer recipe
+          </button>
+
+          <button
+            type="button"
+            (click)="message = 'How do I make crispy samosas?'"
+          >
+            🥟 Cooking tips
+          </button>
+
+        </div>
+
+      </div>
+    }
+
+
+    @for (chatMessage of messages(); track $index) {
+
+      <div
+        class="message-row"
+        [class.user-row]="chatMessage.role === 'user'"
+        [class.ai-row]="chatMessage.role === 'ai'"
+      >
+
+        @if (chatMessage.role === 'ai') {
+          <div class="avatar">
+            🤖
+          </div>
+        }
+
+        <div
+          class="message"
+          [class.user-message]="chatMessage.role === 'user'"
+          [class.ai-message]="chatMessage.role === 'ai'"
+        >
+
+          @if (chatMessage.role === 'user') {
+
+            <div class="message-content">
+              {{ chatMessage.text }}
+            </div>
+
+          } @else {
+
+            <div
+              class="ai-content"
+              [innerHTML]="formatAiResponse(chatMessage.text)"
+            ></div>
+
+          }
+
+        </div>
+
+      </div>
+
+    }
+
+
+    @if (loading()) {
+
+      <div class="message-row ai-row">
+
+        <div class="avatar">
+          🤖
+        </div>
+
+        <div class="message ai-message loading-message">
+
+          <span class="typing">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+
+  @if (errorMessage()) {
+
+    <div class="error-message">
+      ⚠️ {{ errorMessage() }}
+    </div>
+
+  }
+
+
+  <form
+    class="chat-form"
+    (ngSubmit)="sendMessage()"
+  >
+
+    <input
+      type="text"
+      name="message"
+      [(ngModel)]="message"
+      placeholder="Ask me about recipes..."
+      maxlength="1000"
+      autocomplete="off"
+      [disabled]="loading()"
+    />
+
+    <button
+      type="submit"
+      [disabled]="loading() || !message.trim()"
+    >
+      @if (loading()) {
+        Thinking...
+      } @else {
+        Send
+      }
+    </button>
+
+  </form>
+
+
+  <p class="ai-note">
+    AI-generated responses may not always be accurate.
+  </p>
+
+</div>
