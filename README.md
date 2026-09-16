@@ -34,6 +34,31 @@ The project focuses on **RESTful API design, structured MongoDB schemas, secure 
 
 ---
 
+## 🤖 AI Recipe Assistant
+
+RecipeHub includes a public AI Recipe Assistant that helps users with:
+
+- 🍳 Recipe recommendations
+- 🥗 Ingredient-based suggestions
+- 👨‍🍳 Cooking assistance
+- 💬 Recipe-related questions
+
+### Tech Stack
+
+- Angular + TypeScript
+- Node.js + Express
+- Google Gemini API
+- RxJS + Marked
+
+### API
+
+`POST /api/ai/chat`
+
+```json
+{
+  "message": "Suggest a simple vegetarian dinner recipe"
+}
+
 ## 📂 Folder Structure
 
 RecipeHub follows a clean monorepo-style structure by separating the Angular frontend and Node.js/Express backend.
