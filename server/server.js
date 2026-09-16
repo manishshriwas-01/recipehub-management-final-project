@@ -1,17 +1,29 @@
 import dotenv from "dotenv";
 import express from "express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
-import aiRoutes from './routes/aiRoutes.js'
+import aiRoutes from "./routes/aiRoutes.js";
 import helmet from "helmet";
-
 import cors from "cors";
 
 dotenv.config();
 
 const app = express();
+
+// Resolve the current server directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Create uploads directory if it does not exist
+const uploadsPath = path.join(__dirname, "uploads");
+
+fs.mkdirSync(uploadsPath, { recursive: true });
 
 app.use(
   helmet({
@@ -32,13 +44,12 @@ app.use(
   })
 );
 
-
-
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use("/uploads", express.static("uploads"));
+// Serve uploaded recipe images
+app.use("/uploads", express.static(uploadsPath));
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -49,8 +60,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
-app.use("/api/ai",aiRoutes);
-
+app.use("/api/ai", aiRoutes);
 
 // Handle unknown API routes
 app.use("/api", (req, res) => {
@@ -60,6 +70,7 @@ app.use("/api", (req, res) => {
   });
 });
 
+// Global error handler
 app.use(errorMiddleware);
 
 export { app };
