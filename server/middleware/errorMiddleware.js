@@ -1,5 +1,12 @@
 const errorMiddleware = (err, req, res, next) => {
-  console.error(err);
+  console.error("========== API ERROR ==========");
+console.error("Method:", req.method);
+console.error("URL:", req.originalUrl);
+console.error("Error name:", err.name);
+console.error("Error message:", err.message);
+console.error("Error code:", err.code);
+console.error("Error stack:", err.stack);
+console.error("================================");
 
   if (err.name === "ValidationError") {
     const errors = Object.values(err.errors).map((error) => ({
