@@ -20,7 +20,8 @@ export const createRecipe = async (req, res, next) => {
             recipe,
         });
     } catch (error) {
-        next(error);
+        console.error("CREATE RECIPE ERROR:", error);
+    next(error);
     }
 };
 
