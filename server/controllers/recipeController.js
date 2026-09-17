@@ -1,5 +1,6 @@
 import Recipe from '../models/Recipe.js';
 import User from '../models/User.js';
+import cloudinary from "../config/cloudinary.js";
 
 export const createRecipe = async (req, res, next) => {
     try {
@@ -12,13 +13,31 @@ export const createRecipe = async (req, res, next) => {
 
         const { title, ingredients, steps, category } = req.body;
 
+        const uploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: "recipehub",
+                    resource_type: "image",
+                },
+                (error, result) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
+
+            uploadStream.end(req.file.buffer);
+        });
+
         const recipe = await Recipe.create({
             owner: req.user.userId,
             title,
-            imageUrl: `/uploads/${req.file.filename}`,
+            imageUrl: uploadResult.secure_url,
             ingredients,
             steps,
-            category
+            category,
         });
 
         return res.status(201).json({
@@ -27,8 +46,7 @@ export const createRecipe = async (req, res, next) => {
             recipe,
         });
     } catch (error) {
-        console.error("CREATE RECIPE ERROR:", error);
-    next(error);
+        next(error);
     }
 };
 
@@ -155,6 +173,68 @@ export const getRecipe = async (req, res, next) => {
     }
 };
 
+// export const updateRecipe = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
+
+//         const {
+//             title,
+//             ingredients,
+//             steps,
+//             category,
+//         } = req.body;
+
+//         const recipe = await Recipe.findById(id);
+
+//         if (!recipe) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "Recipe not found",
+//             });
+//         }
+
+//         const isOwner =
+//             recipe.owner.toString() === req.user.userId;
+
+//         const isAdmin =
+//             req.user.role === "admin";
+
+//         if (!isOwner && !isAdmin) {
+//             return res.status(403).json({
+//                 success: false,
+//                 message: "You are not authorized to update this recipe",
+//             });
+//         }
+
+//         recipe.title = title ?? recipe.title;
+
+//         if (ingredients) {
+//             recipe.ingredients = ingredients;
+//         }
+
+//         if (steps) {
+//             recipe.steps = steps;
+//         }
+
+//         recipe.category = category ?? recipe.category;
+
+//         // New image selected
+//         if (req.file) {
+//             recipe.imageUrl = `/uploads/${req.file.filename}`;
+//         }
+
+//         await recipe.save();
+
+//         return res.status(200).json({
+//             success: true,
+//             message: "Recipe updated successfully",
+//             recipe,
+//         });
+
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 export const updateRecipe = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -178,8 +258,7 @@ export const updateRecipe = async (req, res, next) => {
         const isOwner =
             recipe.owner.toString() === req.user.userId;
 
-        const isAdmin =
-            req.user.role === "admin";
+        const isAdmin = req.user.role === "admin";
 
         if (!isOwner && !isAdmin) {
             return res.status(403).json({
@@ -188,35 +267,91 @@ export const updateRecipe = async (req, res, next) => {
             });
         }
 
-        recipe.title = title ?? recipe.title;
+        const updateData = {
+            title,
+            ingredients,
+            steps,
+            category,
+        };
 
-        if (ingredients) {
-            recipe.ingredients = ingredients;
-        }
-
-        if (steps) {
-            recipe.steps = steps;
-        }
-
-        recipe.category = category ?? recipe.category;
-
-        // New image selected
         if (req.file) {
-            recipe.imageUrl = `/uploads/${req.file.filename}`;
+            const uploadResult = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: "recipehub",
+                        resource_type: "image",
+                    },
+                    (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                );
+
+                uploadStream.end(req.file.buffer);
+            });
+
+            updateData.imageUrl = uploadResult.secure_url;
         }
 
-        await recipe.save();
+        const updatedRecipe = await Recipe.findByIdAndUpdate(
+            id,
+            updateData,
+            {
+                new: true,
+                runValidators: true,
+            }
+        ).populate("owner", "name email");
 
         return res.status(200).json({
             success: true,
             message: "Recipe updated successfully",
-            recipe,
+            recipe: updatedRecipe,
         });
-
     } catch (error) {
         next(error);
     }
 };
+
+// export const deleteRecipe = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
+
+//         const recipe = await Recipe.findById(id);
+
+//         if (!recipe) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "Recipe not found",
+//             });
+//         }
+
+//         const isOwner =
+//             recipe.owner.toString() === req.user.userId;
+
+//         const isAdmin =
+//             req.user.role === "admin";
+
+//         if (!isOwner && !isAdmin) {
+//             return res.status(403).json({
+//                 success: false,
+//                 message: "You are not authorized to delete this recipe",
+//             });
+//         }
+
+//         await Recipe.findByIdAndDelete(id);
+
+//         return res.status(200).json({
+//             success: true,
+//             message: "Recipe deleted successfully",
+//         });
+
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 export const deleteRecipe = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -233,8 +368,7 @@ export const deleteRecipe = async (req, res, next) => {
         const isOwner =
             recipe.owner.toString() === req.user.userId;
 
-        const isAdmin =
-            req.user.role === "admin";
+        const isAdmin = req.user.role === "admin";
 
         if (!isOwner && !isAdmin) {
             return res.status(403).json({
@@ -243,18 +377,27 @@ export const deleteRecipe = async (req, res, next) => {
             });
         }
 
+        // Delete image from Cloudinary if it is a Cloudinary URL
+        if (recipe.imageUrl?.includes("res.cloudinary.com")) {
+            const parts = recipe.imageUrl.split("/");
+
+            const filenameWithExtension = parts.pop();
+
+            const publicId = `recipehub/${filenameWithExtension.split(".")[0]}`;
+
+            await cloudinary.uploader.destroy(publicId);
+        }
+
         await Recipe.findByIdAndDelete(id);
 
         return res.status(200).json({
             success: true,
             message: "Recipe deleted successfully",
         });
-
     } catch (error) {
         next(error);
     }
 };
-
 
 export const getMyRecipes = async (req, res, next) => {
     try {
