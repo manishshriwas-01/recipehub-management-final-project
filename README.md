@@ -438,9 +438,15 @@ npm install
 Create a `.env` file inside the `server/` directory:
 
 ```env
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
+MONGODB_URI=your_mongodb_connection_string
 PORT=3000
+JWT_SECRET=your_jwt_secret
+GEMINI_API_KEY=your_gemini_api_key
+MONGODB_TEST_URI=your_test_mongodb_connection_string
+
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 Start the backend:
