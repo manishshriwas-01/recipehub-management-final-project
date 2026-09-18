@@ -186,3 +186,27 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Learn This Recipe Button */
+.learn-recipe-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #ff6b35;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.learn-recipe-btn:hover {
+  background: #e85a2a;
+  transform: translateY(-1px);
+}
+
+.learn-recipe-btn:active {
+  transform: translateY(0);
+}

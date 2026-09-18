@@ -78,6 +78,26 @@ export const routes: Routes = [
         .then(m => m.AiAssistant),
   },
   {
+    path: 'book-appointment/:recipeId',
+    loadComponent: () =>
+      import('./pages/book-appointment/book-appointment')
+        .then(m => m.BookAppointment),
+  },
+    {
+    path: 'my-bookings',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/my-bookings/my-bookings')
+        .then((m) => m.MyBookings),
+  },
+  {
+  path: 'instructor-dashboard',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./pages/instructor-dashboard/instructor-dashboard')
+      .then((m) => m.InstructorDashboard),
+},
+  {
     path: '**',
     loadComponent: () =>
       import('./pages/not-found/not-found').then((m) => m.NotFound),

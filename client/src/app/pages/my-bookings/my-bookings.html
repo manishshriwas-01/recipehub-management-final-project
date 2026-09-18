@@ -1,0 +1,108 @@
+<section class="bookings-page">
+
+  <div class="bookings-container">
+
+    <h1>My Bookings</h1>
+
+    <p class="subtitle">
+      View your upcoming recipe learning sessions.
+    </p>
+
+    @if (appointments$ | async; as response) {
+
+    @if (response.appointments.length > 0) {
+
+    <div class="bookings-list">
+
+      @for (appointment of response.appointments; track appointment._id) {
+
+      <div class="booking-card">
+
+        <div class="recipe-image">
+
+          <img [src]="appointment.recipe.imageUrl" [alt]="appointment.recipe.title" />
+
+        </div>
+
+        <div class="booking-details">
+
+          <h2>
+            {{ appointment.recipe.title }}
+          </h2>
+
+          <p>
+            👨‍🍳 Instructor:
+            <strong>
+              {{ appointment.instructor.name }}
+            </strong>
+          </p>
+
+          <p>
+            📧 {{ appointment.instructor.email }}
+          </p>
+
+          <p>
+            📅
+            {{ appointment.date | date:'dd MMM yyyy' }}
+          </p>
+
+          <p>
+            🕐 {{ appointment.startTime }}
+          </p>
+
+          <p>
+            ⏱ {{ appointment.duration }} minutes
+          </p>
+
+          <p>
+            💰 ₹{{ appointment.amount }}
+          </p>
+
+          <span class="status" [class.confirmed]="appointment.status === 'confirmed'"
+            [class.pending]="appointment.status === 'pending'" [class.cancelled]="appointment.status === 'cancelled'">
+            {{ appointment.status | titlecase }}
+          </span>
+          @if (appointment.meetLink && appointment.status === 'confirmed') {
+          <a [href]="appointment.meetLink" target="_blank" rel="noopener noreferrer" class="join-button">
+            Join Meeting
+          </a>
+          }
+          @if (appointment.status === 'pending') {
+          <button type="button" class="cancel-btn" (click)="cancelAppointment(appointment._id)">
+            Cancel Appointment
+          </button>
+          }
+
+        </div>
+
+      </div>
+
+      }
+
+    </div>
+
+    } @else {
+
+    <div class="empty-state">
+
+      <h2>No bookings yet</h2>
+
+      <p>
+        You don't have any upcoming recipe learning sessions.
+      </p>
+
+    </div>
+
+    }
+
+    } @else {
+
+    <div class="loading-state">
+      <p>Loading your bookings...</p>
+    </div>
+
+    }
+
+  </div>
+
+</section>

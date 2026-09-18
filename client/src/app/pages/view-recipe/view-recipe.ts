@@ -6,6 +6,7 @@ import { Observable, of, catchError, switchMap } from 'rxjs';
 import { Recipe } from '../../models/Recipe';
 import { RecipeService } from '../../services/recipe.service';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../services/auth.service/auth.service';
 
 @Component({
   selector: 'app-view-recipe',
@@ -18,6 +19,9 @@ export class ViewRecipe {
   recipeService = inject(RecipeService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
+  private authService = inject(AuthService);
+
+
 
   isFavorite = signal(false);
   isFavoriteLoading = signal(false);
@@ -91,5 +95,20 @@ export class ViewRecipe {
         },
       });
     }
+  }
+
+  learnRecipe(): void {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      this.router.navigate(['/login'], {
+        queryParams: {
+          returnUrl: `/book-appointment/${this.recipeId}`,
+        },
+      });
+      return;
+    }
+
+    this.router.navigate(['/book-appointment', this.recipeId]);
   }
 }

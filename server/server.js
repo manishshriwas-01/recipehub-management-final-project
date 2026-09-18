@@ -4,6 +4,9 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import availabilityRoutes from "./routes/availabilityRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import helmet from "helmet";
 import cors from "cors";
@@ -45,6 +48,9 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/availability", availabilityRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Handle unknown API routes
 app.use("/api", (req, res) => {

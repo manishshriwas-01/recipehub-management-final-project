@@ -203,3 +203,37 @@
   color: #e85d25;
   font-size: 18px;
 }
+.bookings-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.bookings-link:hover {
+  background: #f1f1f1;
+  color: #ff6b35;
+}
+.instructor-dashboard-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.instructor-dashboard-link:hover {
+  background: #f1f1f1;
+  color: #ff6b35;
+}

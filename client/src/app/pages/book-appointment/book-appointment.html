@@ -1,0 +1,251 @@
+<section class="booking-page">
+
+  @if (recipe$ | async; as response) {
+
+  <div class="booking-container">
+
+
+    <!-- ================================
+           Recipe Information
+      ================================= -->
+
+    <div class="recipe-info">
+
+      <img [src]="recipeService.getImageUrl(response.recipe.imageUrl)" [alt]="response.recipe.title" />
+
+
+      <div class="recipe-details">
+
+        <span>
+          Learn This Recipe
+        </span>
+
+
+        <h1>
+          {{ response.recipe.title }}
+        </h1>
+
+
+        <p>
+          👨‍🍳 By
+          {{ response.recipe.owner.name }}
+        </p>
+
+
+        <p>
+          Book a personal session with the recipe owner
+          to learn this recipe.
+        </p>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ================================
+           Instructor Availability
+      ================================= -->
+
+    @if (
+    availability$ | async;
+    as availabilityResponse
+    ) {
+
+    <div class="availability-section">
+
+      <h2>
+        Instructor Availability
+      </h2>
+
+
+      @if (
+      availabilityResponse.availability.length > 0
+      ) {
+
+      <div class="availability-list">
+
+        @for (
+        slot of availabilityResponse.availability;
+        track slot._id
+        ) {
+
+        <div class="availability-card">
+
+          <strong>
+            {{ slot.dayOfWeek }}
+          </strong>
+
+
+          <span>
+            {{ slot.startTime }}
+            -
+            {{ slot.endTime }}
+          </span>
+
+        </div>
+
+        }
+
+      </div>
+
+      } @else {
+
+      <p class="no-availability">
+        Instructor has no available slots.
+      </p>
+
+      }
+
+    </div>
+
+    } @else {
+
+    <p class="error-message">
+      Unable to load instructor availability.
+    </p>
+
+    }
+
+
+
+    <!-- ================================
+           Booking Form
+      ================================= -->
+
+    <div class="booking-form">
+
+      <h2>
+        Select Your Session
+      </h2>
+
+
+      <!-- ================================
+             Date
+        ================================= -->
+
+      <label for="date">
+
+        Select Date
+
+      </label>
+
+
+      <input id="date" type="date" [value]="selectedDate" (change)="onDateChange($event)" />
+
+
+
+      <!-- ================================
+             Time Slots
+        ================================= -->
+
+      <label class="time-label">
+
+        Select Time Slot
+
+      </label>
+
+
+      @if (selectedDate) {
+
+      @if (availableTimeSlots.length > 0) {
+      <div class="time-slots">
+        @for (slot of availableTimeSlots; track slot) {
+        <button type="button" class="time-slot" [class.selected]="selectedTimeSlot() === slot"
+          [class.booked]="isSlotBooked(slot)" [disabled]="isSlotBooked(slot)" (click)="selectTimeSlot(slot)">
+          {{ slot }}
+          @if (isSlotBooked(slot)) {
+          <span>Booked</span>
+          }
+        </button>
+        }
+      </div>
+      } @else if (selectedDate) {
+      <p class="no-slots">No available time slots for this date.</p>
+      }
+
+
+      } @else {
+
+
+      <div class="select-date-message">
+
+        <p>
+          Please select a date to see available time slots.
+        </p>
+
+      </div>
+
+
+      }
+
+
+
+      <!-- ================================
+             Booking Summary
+        ================================= -->
+
+      <div class="booking-summary">
+
+        <p>
+
+          Duration:
+
+          <strong>
+            60 minutes
+          </strong>
+
+        </p>
+
+
+        <p>
+
+          Price:
+
+          <strong>
+            ₹299
+          </strong>
+
+        </p>
+
+      </div>
+
+
+
+      <!-- ================================
+             Payment Button
+        ================================= -->
+
+      <button type="button" class="payment-btn" [disabled]="bookingLoading()" (click)="bookAppointment()">
+
+        @if (bookingLoading()) {
+
+        Processing...
+
+        } @else {
+
+        Proceed to Payment
+
+        }
+
+      </button>
+
+    </div>
+
+  </div>
+
+  } @else {
+
+
+  <div class="loading-state">
+
+    <p>
+      Loading recipe...
+    </p>
+
+  </div>
+
+
+  }
+
+</section>

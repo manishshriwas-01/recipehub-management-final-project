@@ -6,77 +6,72 @@
     </a>
 
     @if (recipe$ | async; as response) {
-      <article class="recipe-detail">
+    <article class="recipe-detail">
 
-        <div class="recipe-detail-image">
-          <img
-             [src]="recipeService.getImageUrl(response.recipe.imageUrl)"
-            [alt]="response.recipe.title"
-          />
-        </div>
+      <div class="recipe-detail-image">
+        <img [src]="recipeService.getImageUrl(response.recipe.imageUrl)" [alt]="response.recipe.title" />
+      </div>
 
-        <div class="recipe-detail-content">
+      <div class="recipe-detail-content">
 
-          <span class="recipe-category">
-            {{ response.recipe.category }}
+        <span class="recipe-category">
+          {{ response.recipe.category }}
+        </span>
+
+        <h1>{{ response.recipe.title }}</h1>
+
+        <p class="recipe-owner">
+          By {{ response.recipe.owner.name }}
+        </p>
+
+        <!-- Favorite -->
+        <button type="button" class="favorite-btn" [class.active]="isFavorite()" [disabled]="isFavoriteLoading()"
+          (click)="toggleFavorite()" aria-label="Toggle favorite">
+          <span class="heart">
+            {{ isFavorite() ? '♥' : '♡' }}
           </span>
 
-          <h1>{{ response.recipe.title }}</h1>
+          {{ isFavorite() ? 'Remove from Favorites' : 'Add to Favorites' }}
+        </button>
 
-          <p class="recipe-owner">
-            By {{ response.recipe.owner.name }}
-          </p>
+        <button type="button" class="learn-recipe-btn" (click)="learnRecipe()">
+          👨‍🍳 Learn This Recipe
+        </button>
 
-          <!-- Favorite -->
-          <button
-            type="button"
-            class="favorite-btn"
-            [class.active]="isFavorite()"
-            [disabled]="isFavoriteLoading()"
-            (click)="toggleFavorite()"
-            aria-label="Toggle favorite"
-          >
-            <span class="heart">
-              {{ isFavorite() ? '♥' : '♡' }}
-            </span>
+        <!-- Ingredients -->
+        <div class="recipe-section">
+          <h2>Ingredients</h2>
 
-            {{ isFavorite() ? 'Remove from Favorites' : 'Add to Favorites' }}
-          </button>
-
-          <!-- Ingredients -->
-          <div class="recipe-section">
-            <h2>Ingredients</h2>
-
-            <ul>
-              @for (
-                ingredient of response.recipe.ingredients;
-                track $index
-              ) {
-                <li>{{ ingredient }}</li>
-              }
-            </ul>
-          </div>
-
-          <!-- Instructions -->
-          <div class="recipe-section">
-            <h2>Instructions</h2>
-
-            <ol>
-              @for (
-                step of response.recipe.steps;
-                track $index
-              ) {
-                <li>{{ step }}</li>
-              }
-            </ol>
-          </div>
-
+          <ul>
+            @for (
+            ingredient of response.recipe.ingredients;
+            track $index
+            ) {
+            <li>{{ ingredient }}</li>
+            }
+          </ul>
         </div>
-      </article>
+
+        <!-- Instructions -->
+        <div class="recipe-section">
+          <h2>Instructions</h2>
+
+          <ol>
+            @for (
+            step of response.recipe.steps;
+            track $index
+            ) {
+            <li>{{ step }}</li>
+            }
+          </ol>
+        </div>
+
+      </div>
+    </article>
 
     } @else {
 
-  @if (errorMessage()) {
+    @if (errorMessage()) {
 
     <div class="error-state">
       <p>{{ errorMessage() }}</p>
@@ -85,14 +80,14 @@
       </a>
     </div>
 
-  } @else {
+    } @else {
 
     <div class="loading-state">
       <div class="spinner"></div>
       <p>Loading recipe...</p>
     </div>
 
-  }
+    }
 
 
     }

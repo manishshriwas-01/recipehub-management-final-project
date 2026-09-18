@@ -157,6 +157,35 @@ updateRecipe(
     return finalUrl;
   }
 
+
+  getRecipeAvailability(recipeId: string): Observable<{
+  success: boolean;
+  availability: {
+    _id: string;
+    instructor: string;
+    dayOfWeek: string;
+    startTime: string;
+    endTime: string;
+    isActive: boolean;
+  }[];
+}> {
+  const availabilityUrl = `${environment.apiUrl}/availability/recipe/${recipeId}`;
+
+  return this.http.get<{
+    success: boolean;
+    availability: {
+      _id: string;
+      instructor: string;
+      dayOfWeek: string;
+      startTime: string;
+      endTime: string;
+      isActive: boolean;
+    }[];
+  }>(availabilityUrl);
+}
+
+  
+
   
 }
 

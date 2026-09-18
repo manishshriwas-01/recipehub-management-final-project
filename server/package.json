@@ -25,6 +25,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.4",
     "multer": "^2.4.0",
+    "razorpay": "^2.9.8",
     "streamifier": "^0.1.1"
   },
   "devDependencies": {

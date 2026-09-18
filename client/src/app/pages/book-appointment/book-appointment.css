@@ -1,0 +1,373 @@
+/* ================================
+   Booking Page
+================================ */
+
+.booking-page {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f7f7f7;
+}
+
+.booking-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+
+/* ================================
+   Recipe Information
+================================ */
+
+.recipe-info {
+  display: flex;
+  gap: 25px;
+  padding: 24px;
+  margin-bottom: 25px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+}
+
+.recipe-info img {
+  width: 220px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.recipe-details {
+  flex: 1;
+}
+
+.recipe-details > span {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #ff6b35;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recipe-details h1 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  color: #222;
+}
+
+.recipe-details p {
+  margin: 7px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* ================================
+   Instructor Availability
+================================ */
+
+.availability-section {
+  padding: 24px;
+  margin-bottom: 25px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+}
+
+.availability-section h2 {
+  margin: 0 0 18px;
+  color: #222;
+  font-size: 20px;
+}
+
+.availability-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.availability-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.availability-card strong {
+  color: #333;
+  font-size: 14px;
+}
+
+.availability-card span {
+  color: #666;
+  font-size: 14px;
+}
+
+.no-availability {
+  margin: 0;
+  color: #777;
+}
+
+.error-message {
+  margin: 20px 0;
+  color: #c62828;
+}
+
+
+/* ================================
+   Booking Form
+================================ */
+
+.booking-form {
+  padding: 28px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+}
+
+.booking-form h2 {
+  margin: 0 0 25px;
+  color: #222;
+  font-size: 22px;
+}
+
+.booking-form > label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* ================================
+   Date
+================================ */
+
+.booking-form input[type="date"] {
+  width: 100%;
+  max-width: 350px;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-bottom: 25px;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  outline: none;
+}
+
+.booking-form input[type="date"]:focus {
+  border-color: #ff6b35;
+}
+
+
+/* ================================
+   Time Slots
+================================ */
+
+.time-label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.time-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-slot:hover {
+  border-color: #ff6b35;
+  color: #ff6b35;
+  background: #fff8f5;
+}
+
+.time-slot.selected {
+  background: #ff6b35;
+  border-color: #ff6b35;
+  color: #fff;
+}
+
+.clock-icon {
+  font-size: 15px;
+}
+
+
+/* ================================
+   No Slots
+================================ */
+
+.no-time-slots,
+.select-date-message {
+  padding: 18px;
+  margin-bottom: 25px;
+  border: 1px dashed #d8d8d8;
+  border-radius: 8px;
+  background: #fafafa;
+  text-align: center;
+}
+
+.no-time-slots p,
+.select-date-message p {
+  margin: 0;
+  color: #777;
+  font-size: 14px;
+}
+
+
+/* ================================
+   Booking Summary
+================================ */
+
+.booking-summary {
+  padding: 18px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: #f8f8f8;
+}
+
+.booking-summary p {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.booking-summary strong {
+  color: #222;
+}
+
+
+/* ================================
+   Payment Button
+================================ */
+
+.payment-btn {
+  width: 100%;
+  padding: 13px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #ff6b35;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.payment-btn:hover:not(:disabled) {
+  background: #e85a2a;
+}
+
+.payment-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ================================
+   Loading
+================================ */
+
+.loading-state {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-state p {
+  color: #777;
+}
+
+
+/* ================================
+   Responsive
+================================ */
+
+@media (max-width: 750px) {
+
+  .recipe-info {
+    flex-direction: column;
+  }
+
+  .recipe-info img {
+    width: 100%;
+    height: 220px;
+  }
+
+  .availability-list {
+    grid-template-columns: 1fr;
+  }
+
+  .time-slots {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .booking-page {
+    padding: 20px 12px;
+  }
+
+  .recipe-info,
+  .availability-section,
+  .booking-form {
+    padding: 18px;
+  }
+
+  .recipe-details h1 {
+    font-size: 23px;
+  }
+
+  .time-slots {
+    grid-template-columns: 1fr;
+  }
+
+  .time-slot {
+    justify-content: flex-start;
+  }
+
+}
+
+.time-slot.booked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #eee;
+  color: #777;
+}
+
+.time-slot.booked:hover {
+  background: #eee;
+  color: #777;
+}
+
+.time-slot.booked span {
+  display: block;
+  font-size: 11px;
+  margin-top: 3px;
+}

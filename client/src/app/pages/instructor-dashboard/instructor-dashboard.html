@@ -1,0 +1,402 @@
+<section class="instructor-dashboard">
+
+    <div class="dashboard-container">
+
+        <div class="dashboard-header">
+            <h1>Instructor Dashboard</h1>
+            <p>
+                Manage your recipe sessions and view your bookings.
+            </p>
+        </div>
+
+        @if (appointments$ | async; as response) {
+
+        @if (response.success) {
+
+        <!-- Overview -->
+        <div class="overview-grid">
+
+            <div class="overview-card">
+                <span class="overview-icon">💰</span>
+
+                <div>
+                    <p>Total Earnings</p>
+
+                    <h2>
+                        ₹{{ getTotalEarnings(response.appointments) }}
+                    </h2>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <span class="overview-icon">📅</span>
+
+                <div>
+                    <p>Total Bookings</p>
+
+                    <h2>
+                        {{ response.appointments.length }}
+                    </h2>
+                </div>
+            </div>
+
+            <div class="overview-card">
+                <span class="overview-icon">👨‍🎓</span>
+
+                <div>
+                    <p>Students</p>
+
+                    <h2>
+                        {{ getUniqueStudents(response.appointments) }}
+                    </h2>
+                </div>
+            </div>
+
+        </div>
+        <!-- Manage Availability -->
+
+        <div class="section availability-section">
+
+            <div class="section-header">
+                <h2>Manage Availability</h2>
+
+                <p>
+                    Set the days and time slots when students can book your recipe sessions.
+                </p>
+            </div>
+
+            <form [formGroup]="availabilityForm" (ngSubmit)="addAvailability()" class="availability-form">
+
+                <div class="form-group">
+
+                    <label for="dayOfWeek">
+                        Day
+                    </label>
+
+                    <select id="dayOfWeek" formControlName="dayOfWeek">
+                        <option value="">Select a day</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="startTime">
+                        Start Time
+                    </label>
+
+                    <input id="startTime" type="time" formControlName="startTime" />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="endTime">
+                        End Time
+                    </label>
+
+                    <input id="endTime" type="time" formControlName="endTime" />
+
+                </div>
+
+
+                <button type="submit" class="add-availability-btn">
+                    Add Availability
+                </button>
+
+            </form>
+
+        </div>
+        <!-- My Availability -->
+
+        <div class="section">
+
+            <div class="section-header">
+                <h2>My Availability</h2>
+
+                <p>
+                    These are the time slots students can book for your recipe sessions.
+                </p>
+            </div>
+
+            @if (availability$ | async; as response) {
+
+            @if (response.availability.length > 0) {
+
+            <div class="availability-list">
+
+                @for (availability of response.availability; track availability._id) {
+
+                <div class="availability-card">
+
+                    <div class="availability-info">
+                        <h3>
+                            {{ availability.dayOfWeek }}
+                        </h3>
+
+                        <p>
+                            🕐 {{ availability.startTime }} - {{ availability.endTime }}
+                        </p>
+
+                        <span class="availability-status" [class.active]="availability.isActive"
+                            [class.inactive]="!availability.isActive">
+                            {{ availability.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                    </div>
+
+
+                    <div class="availability-actions">
+
+                        <button type="button" class="toggle-btn" (click)="toggleAvailability(
+                availability._id,
+                availability.isActive
+              )">
+                            {{ availability.isActive ? 'Deactivate' : 'Activate' }}
+                        </button>
+
+
+                        <button type="button" class="delete-btn" (click)="deleteAvailability(availability._id)">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
+
+                }
+
+            </div>
+
+            } @else {
+
+            <div class="empty-state">
+                <p>No availability added yet.</p>
+            </div>
+
+            }
+
+            } @else {
+
+            <div class="loading-state">
+                <p>Loading availability...</p>
+            </div>
+
+            }
+
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="section">
+
+            <div class="section-header">
+                <h2>Upcoming Appointments</h2>
+            </div>
+
+            @if (response.appointments.length > 0) {
+
+            <div class="appointments-list">
+
+                @for (
+                appointment of response.appointments;
+                track appointment._id
+                ) {
+
+                <div class="appointment-card">
+
+                    <div class="appointment-image">
+
+                        <img [src]="appointment.recipe.imageUrl" [alt]="appointment.recipe.title" />
+
+                    </div>
+
+                    <div class="appointment-details">
+
+                        <h3>
+                            {{ appointment.recipe.title }}
+                        </h3>
+
+                        <p>
+                            👨‍🎓
+                            <strong>Student:</strong>
+                            {{ appointment.student.name }}
+                        </p>
+
+                        <p>
+                            📧
+                            {{ appointment.student.email }}
+                        </p>
+
+                        <p>
+                            📅
+                            {{ appointment.date | date:'dd MMM yyyy' }}
+                        </p>
+
+                        <p>
+                            🕐
+                            {{ appointment.startTime }}
+                        </p>
+
+                        <p>
+                            ⏱
+                            {{ appointment.duration }} minutes
+                        </p>
+
+                        <div class="appointment-footer">
+
+                            <span class="status" [class.confirmed]="appointment.status === 'confirmed'"
+                                [class.pending]="appointment.status === 'pending'"
+                                [class.completed]="appointment.status === 'completed'"
+                                [class.cancelled]="appointment.status === 'cancelled'">
+                                {{ appointment.status | titlecase }}
+                            </span>
+
+                            <strong class="amount">
+                                ₹{{ appointment.amount }}
+                            </strong>
+
+                        </div>
+                        @if (appointment.status === 'confirmed') {
+                        <div class="meeting-link-form">
+                            <input type="url" [value]="appointment.meetLink || meetingLinks[appointment._id] || ''"
+                                (input)="meetingLinks[appointment._id] = $any($event.target).value"
+                                placeholder="Paste Google Meet link" />
+
+                            <button type="button" class="save-meeting-btn" (click)="saveMeetingLink(appointment._id)">
+                                {{ appointment.meetLink ? 'Update Meeting Link' : 'Save Meeting Link' }}
+                            </button>
+                        </div>
+                        }
+
+                        @if (appointment.meetLink) {
+
+                        <a [href]="appointment.meetLink" target="_blank" rel="noopener noreferrer" class="join-button">
+                            Join Meeting
+                        </a>
+
+                        }
+
+                    </div>
+
+                </div>
+
+                }
+
+            </div>
+
+            } @else {
+
+            <div class="empty-state">
+
+                <h3>No appointments yet</h3>
+
+                <p>
+                    Your booked recipe learning sessions will appear here.
+                </p>
+
+            </div>
+
+            }
+
+        </div>
+
+
+        <!-- Booking History -->
+        <div class="section">
+
+            <div class="section-header">
+                <h2>Booking History</h2>
+            </div>
+
+            @if (response.appointments.length > 0) {
+
+            <div class="history-table-wrapper">
+
+                <table class="history-table">
+
+                    <thead>
+                        <tr>
+                            <th>Recipe</th>
+                            <th>Student</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @for (
+                        appointment of response.appointments;
+                        track appointment._id
+                        ) {
+
+                        <tr>
+
+                            <td>
+                                {{ appointment.recipe.title }}
+                            </td>
+
+                            <td>
+                                {{ appointment.student.name }}
+                            </td>
+
+                            <td>
+                                {{ appointment.date | date:'dd MMM yyyy' }}
+                            </td>
+
+                            <td>
+                                {{ appointment.startTime }}
+                            </td>
+
+                            <td>
+                                ₹{{ appointment.amount }}
+                            </td>
+
+                            <td>
+
+                                <span class="status" [class.confirmed]="appointment.status === 'confirmed'"
+                                    [class.pending]="appointment.status === 'pending'"
+                                    [class.completed]="appointment.status === 'completed'"
+                                    [class.cancelled]="appointment.status === 'cancelled'">
+                                    {{ appointment.status | titlecase }}
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            }
+
+        </div>
+
+        }
+
+        } @else {
+
+        <div class="loading-state">
+            <p>Loading dashboard...</p>
+        </div>
+
+        }
+
+    </div>
+
+</section>
