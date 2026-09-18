@@ -1,232 +1,232 @@
-**# 🍴 RecipeHub — Full-Stack Recipe Management Application**
+# 🍴 RecipeHub — Full-Stack Recipe Management Application
 
-RecipeHub is a full-stack recipe management application built with **\*\*Angular 17+ Standalone Architecture\*\*** on the frontend and **\*\*Node.js, Express.js, and MongoDB\*\*** on the backend.
+RecipeHub is a full-stack recipe management application built with **Angular 17+ Standalone Architecture** on the frontend and **Node.js, Express.js, and MongoDB** on the backend.
 
-The application provides secure authentication, role-based authorization, recipe CRUD operations, search, category filtering, pagination, responsive UI, automated API testing, and an integrated **\*\*AI Recipe Assistant\*\***.
+The application provides secure authentication, role-based authorization, recipe CRUD operations, search, category filtering, pagination, responsive UI, automated API testing, and an integrated **AI Recipe Assistant**.
 
-\---
+---
 
-**## ✨ Features**
+## ✨ Features
 
-**### 🔐 Authentication & Authorization**
+### 🔐 Authentication & Authorization
 
-\* JWT-based authentication
+* JWT-based authentication
 
-\* Secure password hashing using bcrypt
+* Secure password hashing using bcrypt
 
-\* User registration and login
+* User registration and login
 
-\* Protected routes
+* Protected routes
 
-\* Role-based access control
+* Role-based access control
 
-\* User and Admin roles
+* User and Admin roles
 
-\* Owner-based recipe authorization
+* Owner-based recipe authorization
 
-\* Centralized \`401 Unauthorized\` handling
+* Centralized `401 Unauthorized` handling
 
-**### 🍳 Recipe Management**
+### 🍳 Recipe Management
 
-\* Create recipes
+* Create recipes
 
-\* View recipe details
+* View recipe details
 
-\* Update recipes
+* Update recipes
 
-\* Delete recipes
+* Delete recipes
 
-\* Owner-based edit/delete permissions
+* Owner-based edit/delete permissions
 
-\* Admin recipe management
+* Admin recipe management
 
-\* Recipe categories
+* Recipe categories
 
-\* Recipe images
+* Recipe images
 
-\* Ingredients and cooking steps
+* Ingredients and cooking steps
 
-**### 🔍 Search, Filter & Pagination**
+### 🔍 Search, Filter & Pagination
 
-\* Search recipes by title
+* Search recipes by title
 
-\* Filter recipes by category
+* Filter recipes by category
 
-\* Server-side pagination
+* Server-side pagination
 
-\* Reactive search using RxJS
+* Reactive search using RxJS
 
-\* Efficient API requests using:
+* Efficient API requests using:
 
-  \* \`combineLatest\`
+* `combineLatest`
 
-  \* \`debounceTime\`
+* `debounceTime`
 
-  \* \`distinctUntilChanged\`
+* `distinctUntilChanged`
 
-  \* \`switchMap\`
+* `switchMap`
 
-**### 🤖 AI Recipe Assistant**
+### 🤖 AI Recipe Assistant
 
-RecipeHub includes a public AI Recipe Assistant powered by the **\*\*Google Gemini API\*\***.
+RecipeHub includes a public AI Recipe Assistant powered by the **Google Gemini API**.
 
 It can help users with:
 
-\* 🍳 Recipe recommendations
+* 🍳 Recipe recommendations
 
-\* 🥗 Ingredient-based suggestions
+* 🥗 Ingredient-based suggestions
 
-\* 👨‍🍳 Cooking assistance
+* 👨‍🍳 Cooking assistance
 
-\* 💬 Recipe-related questions
+* 💬 Recipe-related questions
 
-**\*\*AI API:\*\***
+**AI API:**
 
-\`\`\`http
+```http
 
 POST /api/ai/chat
 
-\`\`\`
+```
 
 Example request:
 
-\`\`\`json
+```json
 
 {
 
-  "message": "Suggest a simple vegetarian dinner recipe"
+"message": "Suggest a simple vegetarian dinner recipe"
 
 }
 
-\`\`\`
+```
 
-**### 🛡️ API Security**
+### 🛡️ API Security
 
-\* Helmet
+* Helmet
 
-\* CORS configuration
+* CORS configuration
 
-\* Rate limiting
+* Rate limiting
 
-\* Express-validator
+* Express-validator
 
-\* Centralized error handling
+* Centralized error handling
 
-\* MongoDB validation
+* MongoDB validation
 
-\* Invalid MongoDB ID handling
+* Invalid MongoDB ID handling
 
-\* Protected API routes
+* Protected API routes
 
-**### 🧪 Testing**
+### 🧪 Testing
 
-\* Jest
+* Jest
 
-\* Supertest
+* Supertest
 
-\* Authentication API tests
+* Authentication API tests
 
-\* Recipe API tests
+* Recipe API tests
 
-\* Validation and authorization tests
+* Validation and authorization tests
 
-\* Health API tests
+* Health API tests
 
-**### 📱 Responsive UI**
+### 📱 Responsive UI
 
-\* Desktop responsive layout
+* Desktop responsive layout
 
-\* Tablet support
+* Tablet support
 
-\* Mobile-friendly design
+* Mobile-friendly design
 
-\* Responsive recipe cards
+* Responsive recipe cards
 
-\* Loading states
+* Loading states
 
-\* Error states
+* Error states
 
-\* Empty states
+* Empty states
 
-\* Custom 404 page
+* Custom 404 page
 
-\---
+---
 
-**## 🛠️ Tech Stack**
+## 🛠️ Tech Stack
 
-**### Frontend**
+### Frontend
 
-\* Angular 17+
+* Angular 17+
 
-\* TypeScript
+* TypeScript
 
-\* RxJS
+* RxJS
 
-\* Reactive Forms
+* Reactive Forms
 
-\* Angular Signals
+* Angular Signals
 
-\* Angular Router
+* Angular Router
 
-\* HttpClient
+* HttpClient
 
-\* HTTP Interceptors
+* HTTP Interceptors
 
-\* Functional Route Guards
+* Functional Route Guards
 
-\* Standalone Components
+* Standalone Components
 
-\* Lazy Loading
+* Lazy Loading
 
-\* AsyncPipe
+* AsyncPipe
 
-\* Modern \`@if\` / \`@for\` control flow
+* Modern `@if` / `@for` control flow
 
-**### Backend**
+### Backend
 
-\* Node.js
+* Node.js
 
-\* Express.js
+* Express.js
 
-\* MongoDB
+* MongoDB
 
-\* Mongoose
+* Mongoose
 
-\* JWT
+* JWT
 
-\* bcrypt
+* bcrypt
 
-\* Express-validator
+* Express-validator
 
-\* Helmet
+* Helmet
 
-\* CORS
+* CORS
 
-\* express-rate-limit
+* express-rate-limit
 
-**### AI**
+### AI
 
-\* Google Gemini API
+* Google Gemini API
 
-\* Angular
+* Angular
 
-\* TypeScript
+* TypeScript
 
-\* RxJS
+* RxJS
 
-\* Marked
+* Marked
 
-**### Testing**
+### Testing
 
-\* Jest
+* Jest
 
-\* Supertest
+* Supertest
 
-\---
+---
 
-**## 🏗️ Project Architecture**
+## 🏗️ Project Architecture
 
-\`\`\`text
+```text
 
 RecipeHub
 
@@ -263,9 +263,7 @@ RecipeHub
 │       │   │   ├── my-recipes/
 
 │       │   │   ├── manage-recipes/
-│       │   │   ├── book-appointment/
-│       │   │   ├── my-bookings/
-│       │   │   ├── instructor-dashboard/
+
 │       │   │   └── not-found/
 
 │       │   │
@@ -273,10 +271,8 @@ RecipeHub
 │       │   ├── services/
 
 │       │   │   ├── auth.service.ts
-│       │   │   ├── recipe.service.ts
-│       │   │   ├── appointment.service.ts
-│       │   │   ├── availability.service.ts
-│       │   │   └── payment.service.ts
+
+│       │   │   └── recipe.service.ts
 
 │       │   │
 
@@ -316,276 +312,273 @@ RecipeHub
 
 └── server/                         # Node.js Backend
 
-    ├── config/
-    │   ├── db.js
-    │   ├── cloudinary.js
-    │   └── razorpay.js
+├── config/
 
-    │
+│   └── db.js
 
-    ├── controllers/
-    │   ├── authController.js
-    │   ├── recipeController.js
-    │   ├── appointmentController.js
-    │   ├── availabilityController.js
-    │   └── paymentController.js
+│
 
-    │
+├── controllers/
 
-    ├── middleware/
+│   ├── authController.js
 
-    │   ├── authMiddleware.js
+│   └── recipeController.js
 
-    │   ├── validate.js
+│
 
-    │   └── errorMiddleware.js
+├── middleware/
 
-    │
+│   ├── authMiddleware.js
 
-    ├── models/
-    │   ├── User.js
-    │   ├── Recipe.js
-    │   ├── Appointment.js
-    │   └── Availability.js
+│   ├── validate.js
 
-    │
+│   └── errorMiddleware.js
 
-    ├── routes/
-    │   ├── authRoutes.js
-    │   ├── recipeRoutes.js
-    │   ├── appointmentRoutes.js
-    │   ├── availabilityRoutes.js
-    │   └── paymentRoutes.js
+│
 
-    │
+├── models/
 
-    ├── validators/
+│   ├── User.js
 
-    │   ├── authValidator.js
+│   └── Recipe.js
 
-    │   └── recipeValidator.js
+│
 
-    │
+├── routes/
 
-    ├── tests/
+│   ├── authRoutes.js
 
-    │   ├── health.test.js
+│   └── recipeRoutes.js
 
-    │   ├── auth.test.js
+│
 
-    │   └── recipe.test.js
+├── validators/
 
-    │
+│   ├── authValidator.js
 
-    ├── .env.example
+│   └── recipeValidator.js
 
-    ├── server.js
+│
 
-    └── package.json
+├── tests/
 
-\`\`\`
+│   ├── health.test.js
 
-\---
+│   ├── auth.test.js
 
-**## 🔄 Application Flow**
+│   └── recipe.test.js
 
-\`\`\`text
+│
+
+├── .env.example
+
+├── server.js
+
+└── package.json
+
+```
+
+---
+
+## 🔄 Application Flow
+
+```text
 
 Angular Frontend
 
-       │
+   │
 
-       ▼
+   ▼
 
 Angular Service
 
-       │
+   │
 
-       ▼
+   ▼
 
 HTTP Interceptor
 
-       │
+   │
 
-       │ JWT
+   │ JWT
 
-       ▼
+   ▼
 
 Express REST API
 
-       │
+   │
 
-       ├── Authentication
+   ├── Authentication
 
-       ├── Validation
+   ├── Validation
 
-       ├── Authorization
+   ├── Authorization
 
-       ├── Controllers
+   ├── Controllers
 
-       └── Error Handling
+   └── Error Handling
 
-       │
+   │
 
-       ▼
+   ▼
 
 MongoDB Atlas
 
-\`\`\`
+```
 
-\---
+---
 
-**## 🔐 Authentication Flow**
+## 🔐 Authentication Flow
 
-\`\`\`text
+```text
 
 Register / Login
 
-       │
+   │
 
-       ▼
+   ▼
 
 Express API
 
-       │
+   │
 
-       ▼
+   ▼
 
 Validate Input
 
-       │
+   │
 
-       ▼
+   ▼
 
 bcrypt Password Verification
 
-       │
+   │
 
-       ▼
+   ▼
 
 Generate JWT
 
-       │
+   │
 
-       ▼
+   ▼
 
 Angular localStorage
 
-       │
+   │
 
-       ▼
+   ▼
 
 HTTP Interceptor
 
-       │
+   │
 
-       ▼
+   ▼
 
 Protected API Request
 
-\`\`\`
+```
 
-\---
+---
 
-**## 👑 Authorization Flow**
+## 👑 Authorization Flow
 
-\`\`\`text
+```text
 
 Authenticated User
 
-        │
+    │
 
-        ▼
+    ▼
 
-    Recipe Action
+Recipe Action
 
-   View / Edit / Delete
+View / Edit / Delete
 
-        │
+    │
 
-        ▼
+    ▼
 
-     JWT Token
+ JWT Token
 
-        │
+    │
 
-        ▼
+    ▼
 
-  Auth Middleware
+Auth Middleware
 
-        │
+    │
 
-        ▼
+    ▼
 
- ┌──────┴───────┐
+┌──────┴───────┐
 
- │              │
+│              │
 
- ▼              ▼
+▼              ▼
 
 Owner          Admin
 
- │              │
+│              │
 
- ▼              ▼
+▼              ▼
 
 Allowed      Override
 
- │              │
+│              │
 
- └──────┬───────┘
+└──────┬───────┘
 
-        ▼
+    ▼
 
 Recipe Updated / Deleted
 
-\`\`\`
+```
 
-\---
+---
 
-**## 📡 Recipe API**
+## 📡 Recipe API
 
-\| Method | Endpoint           | Access        |
+| Method | Endpoint           | Access        |
 
-\| ------ | ------------------ | ------------- |
+| ------ | ------------------ | ------------- |
 
-\| GET    | \`/api/recipes\`     | Public        |
+| GET    | `/api/recipes`     | Public        |
 
-\| GET    | \`/api/recipes/\:id\` | Public        |
+| GET    | `/api/recipes/:id` | Public        |
 
-\| POST   | \`/api/recipes\`     | Authenticated |
+| POST   | `/api/recipes`     | Authenticated |
 
-\| PUT    | \`/api/recipes/\:id\` | Owner/Admin   |
+| PUT    | `/api/recipes/:id` | Owner/Admin   |
 
-\| DELETE | \`/api/recipes/\:id\` | Owner/Admin   |
+| DELETE | `/api/recipes/:id` | Owner/Admin   |
 
-**### Authentication API**
+### Authentication API
 
-\| Method | Endpoint             | Purpose          |
+| Method | Endpoint             | Purpose          |
 
-\| ------ | -------------------- | ---------------- |
+| ------ | -------------------- | ---------------- |
 
-\| POST   | \`/api/auth/register\` | Register user    |
+| POST   | `/api/auth/register` | Register user    |
 
-\| POST   | \`/api/auth/login\`    | Login user       |
+| POST   | `/api/auth/login`    | Login user       |
 
-\| GET    | \`/api/auth/me\`       | Get current user |
+| GET    | `/api/auth/me`       | Get current user |
 
-**### AI API**
+### AI API
 
-\| Method | Endpoint       | Purpose              |
+| Method | Endpoint       | Purpose              |
 
-\| ------ | -------------- | -------------------- |
+| ------ | -------------- | -------------------- |
 
-\| POST   | \`/api/ai/chat\` | AI recipe assistance |
+| POST   | `/api/ai/chat` | AI recipe assistance |
 
-\---
+---
 
-**## 🗄️ Database Models**
+## 🗄️ Database Models
 
-**### User**
+### User
 
-\`\`\`text
+```text
 
 User
 
@@ -599,11 +592,11 @@ User
 
 └── timestamps
 
-\`\`\`
+```
 
-**### Recipe**
+### Recipe
 
-\`\`\`text
+```text
 
 Recipe
 
@@ -619,131 +612,131 @@ Recipe
 
 └── timestamps
 
-\`\`\`
+```
 
-**### Relationship**
+### Relationship
 
-\`\`\`text
+```text
 
 User
 
-  │
+│
 
-  │ \_id
+│ _id
 
-  ▼
+▼
 
 Recipe.owner
 
-\`\`\`
+```
 
-\---
+---
 
-**## 📸 Screenshots**
+## 📸 Screenshots
 
-**### Home Page**
+### Home Page
 
-![Home Page]\(screenshots/home.png)
+![Home Page](screenshots/home.png)
 
-**### Recipes**
+### Recipes
 
-![Recipes]\(screenshots/allrecipes.png)
+![Recipes](screenshots/allrecipes.png)
 
-**### Recipe Detail**
+### Recipe Detail
 
-![Recipe Detail]\(screenshots/details.png)
+![Recipe Detail](screenshots/details.png)
 
-**### Login**
+### Login
 
-![Login]\(screenshots/login.png)
+![Login](screenshots/login.png)
 
-**### Register**
+### Register
 
-![Register]\(screenshots/register.png)
+![Register](screenshots/register.png)
 
-**### Create Recipe**
+### Create Recipe
 
-![Create Recipe]\(screenshots/create.png)
+![Create Recipe](screenshots/create.png)
 
-**### My Recipes**
+### My Recipes
 
-![My Recipes]\(screenshots/myrecipe.png)
+![My Recipes](screenshots/myrecipe.png)
 
-**### Admin Management**
+### Admin Management
 
-![Admin Management]\(screenshots/admin1.png)
+![Admin Management](screenshots/admin1.png)
 
-**### 404 Page**
+### 404 Page
 
-![Not Found]\(screenshots/notfound.png)
+![Not Found](screenshots/notfound.png)
 
-\---
+---
 
-**## 🚀 Local Setup**
+## 🚀 Local Setup
 
-**### 1. Clone Repository**
+### 1. Clone Repository
 
-\`\`\`bash
+```bash
 
-git clone \<your-repository-url>
+git clone <your-repository-url>
 
 cd RecipeHub
 
-\`\`\`
+```
 
-**### 2. Backend Setup**
+### 2. Backend Setup
 
-\`\`\`bash
+```bash
 
 cd server
 
 npm install
 
-\`\`\`
+```
 
-Create a \`.env\` file inside the \`server/\` directory:
+Create a `.env` file inside the `server/` directory:
 
-\`\`\`env
+```env
 
-MONGODB\_URI=your\_mongodb\_connection\_string
+MONGODB_URI=your_mongodb_connection_string
 
 PORT=3000
 
-JWT\_SECRET=your\_jwt\_secret
+JWT_SECRET=your_jwt_secret
 
-GEMINI\_API\_KEY=your\_gemini\_api\_key
+GEMINI_API_KEY=your_gemini_api_key
 
-MONGODB\_TEST\_URI=your\_test\_mongodb\_connection\_string
+MONGODB_TEST_URI=your_test_mongodb_connection_string
 
-CLOUDINARY\_CLOUD\_NAME=your\_cloud\_name
+CLOUDINARY_CLOUD_NAME=your_cloud_name
 
-CLOUDINARY\_API\_KEY=your\_api\_key
+CLOUDINARY_API_KEY=your_api_key
 
-CLOUDINARY\_API\_SECRET=your\_api\_secret
+CLOUDINARY_API_SECRET=your_api_secret
 
-\`\`\`
+```
 
 Start the backend:
 
-\`\`\`bash
+```bash
 
 npm start
 
-\`\`\`
+```
 
 Backend:
 
-\`\`\`text
+```text
 
-http\://localhost:3000
+http://localhost:3000
 
-\`\`\`
+```
 
-**### 3. Frontend Setup**
+### 3. Frontend Setup
 
 Open another terminal:
 
-\`\`\`bash
+```bash
 
 cd client
 
@@ -751,136 +744,177 @@ npm install
 
 npm start
 
-\`\`\`
+```
 
 Frontend:
 
-\`\`\`text
+```text
 
-http\://localhost:4200
+http://localhost:4200
 
-\`\`\`
+```
 
 Open the application:
 
-\`\`\`text
+```text
 
-http\://localhost:4200
+http://localhost:4200
 
-\`\`\`
+```
 
-\> Never commit \`.env\` files, database credentials, API keys, or other secrets to GitHub.
-
-\---
-
-**## 🧪 Running Tests**
-
-From the \`server/\` directory:
-
-\`\`\`bash
-
-npm test
-
-\`\`\`
-
-Current test result:
-
-\`\`\`text
-
-23 backend tests passed ✅
-
-\`\`\`
-
-\---
-
-**## 🌐 Live Demo**
-
-**### Frontend**
-
-**\*\*RecipeHub Live Application\*\***
-
-https\://recipehub-management-final-project-0kc9.onrender.com/
-
-**### Backend**
-
-**\*\*RecipeHub API\*\***
-
-https\://recipehub-management-final-project.onrender.com/
-
-**### API Health Check**
-
-https\://recipehub-management-final-project.onrender.com/api/health
-
-\---
-
-**## 🔑 Demo Credentials
-
-> Demo credentials are intentionally not published in this repository. Create a local user account using the registration flow.
+> Never commit `.env` files, database credentials, API keys, or other secrets to GitHub.
 
 ---
 
-**## 📚 Key Concepts Demonstrated**
+## 🧪 Running Tests
+
+From the `server/` directory:
+
+```bash
+
+npm test
+
+```
+
+Current test result:
+
+```text
+
+14/14 tests passed ✅
+
+```
+
+---
+
+## 🌐 Live Demo
+
+### Frontend
+
+**RecipeHub Live Application**
+
+https://recipehub-management-final-project-0kc9.onrender.com/
+
+### Backend
+
+**RecipeHub API**
+
+https://recipehub-management-final-project.onrender.com/
+
+### API Health Check
+
+https://recipehub-management-final-project.onrender.com/api/health
+
+---
+
+## 🔑 Demo Credentials
+
+### 👤 Normal User
+
+```text
+
+Email:    alex@gmail.com
+
+Password: qwerty@123
+
+Role:     user
+
+```
+
+### 👑 Admin User
+
+```text
+
+Email:    manish@gmail.com
+
+Password: 12345678
+
+Role:     admin
+
+```
+
+---
+
+## 📚 Key Concepts Demonstrated
 
 This project demonstrates practical implementation of:
 
-\* REST API architecture
+* REST API architecture
 
-\* JWT authentication
+* JWT authentication
 
-\* Password hashing
+* Password hashing
 
-\* Role-based authorization
+* Role-based authorization
 
-\* Ownership-based authorization
+* Ownership-based authorization
 
-\* MongoDB schema design
+* MongoDB schema design
 
-\* Mongoose relationships
+* Mongoose relationships
 
-\* Express middleware
+* Express middleware
 
-\* Server-side validation
+* Server-side validation
 
-\* Centralized error handling
+* Centralized error handling
 
-\* API security
+* API security
 
-\* Rate limiting
+* Rate limiting
 
-\* CORS
+* CORS
 
-\* Angular standalone architecture
+* Angular standalone architecture
 
-\* Angular Signals
+* Angular Signals
 
-\* RxJS operators
+* RxJS operators
 
-\* Reactive Forms
+* Reactive Forms
 
-\* HTTP Interceptors
+* HTTP Interceptors
 
-\* Functional Route Guards
+* Functional Route Guards
 
-\* Lazy Loading
+* Lazy Loading
 
-\* Server-side search
+* Server-side search
 
-\* Filtering
+* Filtering
 
-\* Pagination
+* Pagination
 
-\* Automated API testing
+* Automated API testing
 
-\* Gemini API integration
-* Appointment and availability management
-* Razorpay payment integration
-* Payment signature verification
-* Google Meet link management
+* Gemini API integration
 
-\---
+---
 
-**## 🎯 Project Objective**
+### 📅 Recipe Learning Appointment Booking
+
+- Users can book a recipe learning session with the recipe owner.
+- Instructor availability can be configured by day and time.
+- Available time slots are generated based on instructor availability.
+- Already booked slots are disabled to prevent double booking.
+- Appointment duration is fixed at 60 minutes.
+- Razorpay payment integration for appointment booking.
+- Appointment is confirmed only after successful payment verification.
+- Students can view their booked appointments from My Bookings.
+- Instructors can view their teaching appointments from Instructor Dashboard.
+- Instructors can manually add a Google Meet link to confirmed appointments.
+- Students can join the session using the saved Google Meet link.
+- Users cannot book their own recipes.
+- Only the appointment owner can cancel a pending appointment.
+
+
+### 💳 Payment & Online Learning
+
+- Razorpay
+- Google Meet (manual link integration)
+- Appointment & Availability Management
+
+## 🎯 Project Objective
 
 RecipeHub was developed as a complete full-stack application to demonstrate how a modern Angular frontend can communicate with a secure Node.js/Express REST API and MongoDB database while implementing authentication, authorization, validation, testing, responsive UI, and AI-powered functionality.
 
-\---
+---
