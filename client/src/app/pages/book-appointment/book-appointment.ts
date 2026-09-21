@@ -43,6 +43,10 @@ export class BookAppointment implements OnInit {
   bookedTimeSlots = signal<string[]>([]);
   private availabilityData: Availability[] = [];
   bookingLoading = signal(false);
+  paymentProcessing = false;
+
+
+
 
   recipe$: Observable<{ success: boolean; recipe: Recipe } | null> = this.route.paramMap.pipe(
     switchMap(params => {
@@ -217,7 +221,8 @@ export class BookAppointment implements OnInit {
           order_id: response.order.id,
 
           handler: (paymentResponse: any) => {
-            console.log('Payment response:', paymentResponse);
+            this.paymentProcessing = true;
+            // console.log('Payment response:', paymentResponse);
             this.verifyPayment(appointmentId, paymentResponse);
           },
 
@@ -227,8 +232,8 @@ export class BookAppointment implements OnInit {
 
           modal: {
             ondismiss: () => {
-              console.log('Razorpay checkout closed');
-              this.cancelAppointment(appointmentId);
+              // console.log('Razorpay checkout closed');
+              this.bookingLoading.set(false);
             }
           }
         };
