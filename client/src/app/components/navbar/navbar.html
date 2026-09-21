@@ -1,73 +1,135 @@
 <nav class="navbar">
   <div class="navbar-container">
 
+    <!-- Logo -->
     <a routerLink="/" class="logo" (click)="closeMenu()">
       <span class="logo-icon">🍴</span>
       <span>RecipeHub</span>
     </a>
 
-    <button class="menu-toggle" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+    <!-- Mobile Menu Button -->
+    <button
+      class="menu-toggle"
+      type="button"
+      (click)="toggleMenu()"
+      aria-label="Toggle navigation">
       <span></span>
       <span></span>
       <span></span>
     </button>
 
+    <!-- Navigation -->
     <div class="nav-menu" [class.open]="menuOpen()">
-      <a routerLink="/ai-assistant" (click)="closeMenu()">
-        🤖 AI Assistant
-      </a>
 
-      <a routerLink="/" (click)="closeMenu()">
+      <!-- Home -->
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()">
         Home
       </a>
 
-      <a routerLink="/recipes" (click)="closeMenu()">
+      <!-- Recipes -->
+      <a
+        routerLink="/recipes"
+        routerLinkActive="active"
+        (click)="closeMenu()">
         Recipes
+      </a>
+
+      <!-- AI Assistant -->
+      <a
+        routerLink="/ai-assistant"
+        routerLinkActive="active"
+        (click)="closeMenu()">
+        🤖 AI Assistant
       </a>
 
       @if (user()) {
 
-      <a routerLink="/my-recipes" (click)="closeMenu()">
-        My Recipes
-      </a>
-      <button type="button" routerLink="/my-bookings" class="bookings-link" (click)="closeMenu()">
-        📅 My Bookings
-      </button>
-      <a routerLink="/instructor-dashboard" class="instructor-dashboard-link" (click)="closeMenu()">
-        👨‍🍳 Instructor Dashboard
-      </a>
+        <!-- My Recipes -->
+        <a
+          routerLink="/my-recipes"
+          routerLinkActive="active"
+          (click)="closeMenu()">
+          My Recipes
+        </a>
 
-      <!-- Favorites -->
-      <a routerLink="/favorites" (click)="closeMenu()" class="favorite-link" aria-label="Favorites">
-        <span class="heart">♥</span>
-        <span>Favorites</span>
-      </a>
+        <!-- My Bookings -->
+        <a
+          routerLink="/my-bookings"
+          routerLinkActive="active"
+          (click)="closeMenu()">
+          📅 My Bookings
+        </a>
 
-      <a routerLink="/create-recipe" (click)="closeMenu()" class="create-btn">
-        Create Recipe
-      </a>
+        <!-- Instructor Dashboard -->
+        <a
+          routerLink="/instructor-dashboard"
+          routerLinkActive="active"
+          (click)="closeMenu()">
+          👨‍🍳 Instructor
+        </a>
 
-      @if (user()?.role === 'admin') {
+        <!-- Favorites -->
+        <a
+          routerLink="/favorites"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+          class="favorite-link"
+          aria-label="Favorites">
+          <span class="heart">♥</span>
+          <span>Favorites</span>
+        </a>
 
-      <a routerLink="/manage-recipes" (click)="closeMenu()">
-        Manage Recipes
-      </a>
+        <!-- Create Recipe -->
+        <a
+          routerLink="/create-recipe"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+          class="create-btn">
+          + Create Recipe
+        </a>
 
-      }
+        <!-- Admin -->
+        @if (user()?.role === 'admin') {
 
-      <button type="button" class="logout-btn" (click)="logout()">
-        Logout
-      </button>
+          <a
+            routerLink="/manage-recipes"
+            routerLinkActive="active"
+            (click)="closeMenu()">
+            Manage Recipes
+          </a>
+
+        }
+
+        <!-- Logout -->
+        <button
+          type="button"
+          class="logout-btn"
+          (click)="logout()">
+          Logout
+        </button>
 
       } @else {
 
-      <a routerLink="/login" (click)="closeMenu()">
-        Login
-      </a>
+        <!-- Login -->
+        <a
+          routerLink="/login"
+          routerLinkActive="active"
+          (click)="closeMenu()">
+          Login
+        </a>
 
-      <a routerLink="/register" class="register-btn" (click)="closeMenu()">
-        Get Started
-      </a>
+        <!-- Register -->
+        <a
+          routerLink="/register"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+          class="register-btn">
+          Get Started
+        </a>
 
       }
 
