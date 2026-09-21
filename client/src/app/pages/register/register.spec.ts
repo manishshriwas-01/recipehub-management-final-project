@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { provideToastr } from 'ngx-toastr';
 
 import { Register } from './register';
@@ -12,6 +13,7 @@ describe('Register', () => {
       imports: [Register],
       providers: [
         provideToastr(),
+        provideRouter([]),
       ],
     }).compileComponents();
 
