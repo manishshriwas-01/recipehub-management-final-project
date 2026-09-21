@@ -19,10 +19,27 @@ describe('CreateRecipe', () => {
 
     fixture = TestBed.createComponent(CreateRecipe);
     component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should have an invalid form when required fields are empty', () => {
+    component.recipeForm.reset({
+      title: '',
+      ingredients: '',
+      steps: '',
+      category: 'Other'
+    });
+
+    expect(component.recipeForm.invalid).toBe(true);
+  });
+
+  it('should have a valid form when required fields are filled', () => {
+    component.recipeForm.setValue({
+      title: 'Paneer Recipe',
+      ingredients: 'Paneer\nTomato',
+      steps: 'Cut paneer\nCook ingredients',
+      category: 'Other'
+    });
+
+    expect(component.recipeForm.valid).toBe(true);
   });
 });
