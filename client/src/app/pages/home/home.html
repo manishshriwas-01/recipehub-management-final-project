@@ -26,10 +26,8 @@
 
     <div class="hero-image">
       <div class="image-card">
-        <img
-          src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80"
-          alt="Delicious food"
-        />
+        <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80"
+          alt="Delicious food" />
       </div>
 
       <div class="floating-card">
@@ -59,34 +57,31 @@
 
     @if (recipes$ | async; as response) {
 
-      <div class="recipe-grid">
+    <div class="recipe-grid">
 
-        @for (recipe of response.recipes; track recipe._id) {
+      @for (recipe of response.recipes; track recipe._id) {
 
-          <article class="recipe-card">
-            <img
-              [src]="recipeService.getImageUrl(recipe.imageUrl)"
-              [alt]="recipe.title"
-            />
+      <article class="recipe-card">
+        <img [src]="recipeService.getImageUrl(recipe.imageUrl)" [alt]="recipe.title" />
 
-            <div class="recipe-info">
-              <span class="category">
-                {{ recipe.category }}
-              </span>
+        <div class="recipe-info">
+          <span class="category">
+            {{ recipe.category }}
+          </span>
 
-              <h3>{{ recipe.title }}</h3>
+          <h3>{{ recipe.title }}</h3>
 
-              <p>
-                By {{ recipe.owner.name }}
-              </p>
+          <p>
+            By {{ recipe.owner?.name || 'Unknown User' }}
+          </p>
 
-              <a [routerLink]="['/recipes', recipe._id]" class="view-btn" > View Recipe </a>
-            </div>
-          </article>
+          <a [routerLink]="['/recipes', recipe._id]" class="view-btn"> View Recipe </a>
+        </div>
+      </article>
 
-        }
+      }
 
-      </div>
+    </div>
 
     }
   </div>

@@ -21,7 +21,7 @@
         </label>
         <input id="search" type="text" [formControl]="searchControl" placeholder="Search recipes..." />
       </div>
-      
+
       <div class="filter-group">
         <label for="category">
           Category
@@ -89,7 +89,7 @@
             </h2>
 
             <p>
-              By {{ recipe.owner.name }}
+              By {{ recipe.owner?.name || 'Unknown User' }}
             </p>
 
             <div class="recipe-actions">

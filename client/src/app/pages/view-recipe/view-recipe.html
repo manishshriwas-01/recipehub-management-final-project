@@ -21,7 +21,7 @@
         <h1>{{ response.recipe.title }}</h1>
 
         <p class="recipe-owner">
-          By {{ response.recipe.owner.name }}
+          By {{ response.recipe.owner?.name || 'Unknown User' }}
         </p>
 
         <!-- Favorite -->

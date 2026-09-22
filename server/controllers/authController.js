@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
-
+import Recipe from '../models/Recipe.js'
 
 export const register = async (req, res, next) => {
     try {
@@ -135,7 +135,7 @@ export const deleteUserByAdmin = async (req, res, next) => {
         message: "Admin user cannot be deleted",
       });
     }
-
+    await Recipe.deleteMany({ owner: id });
     await User.findByIdAndDelete(id);
 
     return res.status(200).json({
