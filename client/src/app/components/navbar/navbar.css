@@ -1,15 +1,15 @@
 .navbar {
   width: 100%;
-  height: 72px;
+  height: 70px;
   background: #ffffff;
-  border-bottom: 1px solid #f1eee9;
+  border-bottom: 1px solid #eee;
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: 1400px;
   height: 100%;
   margin: 0 auto;
   padding: 0 24px;
@@ -17,68 +17,134 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
 
-  color: #2d2a26;
   text-decoration: none;
-  font-size: 22px;
-  font-weight: 750;
-  letter-spacing: -0.5px;
+  color: #222;
+  font-size: 21px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #fff0e8;
-  font-size: 19px;
+  font-size: 25px;
 }
 
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 30px;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 1;
 }
 
-.nav-menu a {
-  color: #625d57;
+.nav-menu a,
+.nav-menu button {
+  border: 0;
+  background: transparent;
+  color: #333;
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   text-decoration: none;
-  font-size: 15px;
-  font-weight: 550;
-
-  transition: color 0.2s ease;
-}
-
-.nav-menu a:hover {
-  color: #e85d25;
-}
-
-.register-btn {
-  padding: 11px 20px;
-  border-radius: 9px;
-
-  background: #e85d25;
-  color: #ffffff !important;
+  white-space: nowrap;
+  cursor: pointer;
 
   transition:
     background 0.2s ease,
-    transform 0.2s ease;
+    color 0.2s ease;
 }
 
-.register-btn:hover {
-  background: #d94f1b !important;
-  transform: translateY(-1px);
+.nav-menu a:hover {
+  background: #f7f7f7;
 }
+
+.nav-menu a.active {
+  color: #222;
+  background: #f1f1f1;
+  font-weight: 700;
+  box-shadow: inset 0 -2px 0 #ff6b35;
+}
+
+/* Create & Register buttons */
+
+.create-btn,
+.register-btn {
+  background: #ff6b35 !important;
+  color: #fff !important;
+  padding: 10px 15px !important;
+  font-weight: 600 !important;
+}
+
+.create-btn:hover,
+.register-btn:hover {
+  background: #e85b2b !important;
+}
+
+.nav-menu a.create-btn.active,
+.nav-menu a.register-btn.active {
+  color: #fff !important;
+  background: #e85b2b !important;
+  box-shadow: none;
+}
+
+/* Favorites */
+
+.favorite-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.heart {
+  color: #e85d25;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Bookings & Instructor */
+
+.bookings-link,
+.instructor-dashboard-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.bookings-link:hover,
+.instructor-dashboard-link:hover {
+  background: #f1f1f1;
+  color: #ff6b35;
+}
+
+/* Logout */
+
+.logout-btn {
+  border: 1px solid #ddd !important;
+  padding: 10px 17px !important;
+  background: #ffffff !important;
+}
+
+.logout-btn:hover {
+  background: #f5f5f5 !important;
+  color: #e85d25 !important;
+}
+
+/* Mobile menu button */
 
 .menu-toggle {
   display: none;
@@ -87,7 +153,7 @@
   height: 42px;
   padding: 8px;
 
-  border: none;
+  border: 0;
   border-radius: 8px;
   background: #fff4ed;
 
@@ -96,11 +162,11 @@
 
 .menu-toggle span {
   display: block;
-  width: 22px;
+  width: 24px;
   height: 2px;
-  margin: 4px auto;
+  margin: 5px auto;
 
-  background: #e85d25;
+  background: #222;
   border-radius: 2px;
 }
 
@@ -139,13 +205,20 @@
     background: #ffffff;
     border-bottom: 1px solid #eee8e2;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+
+    /* Keep the mobile menu above page content */
+    z-index: 999;
   }
 
+  /* Menu opens only when Angular adds the open class */
   .nav-menu.open {
     display: flex;
   }
 
-  .nav-menu a {
+  .nav-menu a,
+  .nav-menu button {
+    width: 100%;
+    box-sizing: border-box;
     padding: 13px 12px;
     border-radius: 8px;
   }
@@ -154,213 +227,28 @@
     background: #fff5ef;
   }
 
+  .nav-menu a.active {
+    background: #fff5ef;
+    box-shadow: inset 3px 0 0 #ff6b35;
+  }
+
+  .create-btn,
   .register-btn {
     text-align: center;
     margin-top: 5px;
   }
-}
 
+  .logout-btn {
+    text-align: center;
+    margin-top: 5px;
+  }
 
-.create-btn {
-  padding: 11px 18px;
-  border-radius: 9px;
-  background: #fff0e8;
-  color: #e85d25 !important;
-}
+  .favorite-link {
+    justify-content: flex-start;
+  }
 
-.create-btn:hover {
-  background: #ffe3d4 !important;
-  color: #d94f1b !important;
-}
-
-.logout-btn {
-  padding: 10px 17px;
-  border: 1px solid #eadfd7;
-  border-radius: 9px;
-  background: #ffffff;
-  color: #625d57;
-  font-size: 15px;
-  font-weight: 550;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.logout-btn:hover {
-  background: #fff5ef;
-  color: #e85d25;
-}
-
-
-.favorite-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.heart {
-  color: #e85d25;
-  font-size: 18px;
-}
-.bookings-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #333;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.bookings-link:hover {
-  background: #f1f1f1;
-  color: #ff6b35;
-}
-.instructor-dashboard-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #333;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.instructor-dashboard-link:hover {
-  background: #f1f1f1;
-  color: #ff6b35;
-}
-.navbar {
-  width: 100%;
-  background: #ffffff;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.navbar-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  min-height: 70px;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: #222;
-  font-size: 21px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.logo-icon {
-  font-size: 25px;
-}
-
-.nav-menu {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  flex: 1;
-}
-
-.nav-menu a,
-.nav-menu button {
-  border: 0;
-  background: transparent;
-  color: #333;
-  padding: 9px 11px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.nav-menu a:hover {
-  background: #f7f7f7;
-}
-
-.create-btn,
-.register-btn {
-  background: #ff6b35 !important;
-  color: #fff !important;
-  padding: 10px 15px !important;
-  font-weight: 600 !important;
-}
-
-.create-btn:hover,
-.register-btn:hover {
-  background: #e85b2b !important;
-}
-
-.logout-btn {
-  border: 1px solid #ddd !important;
-}
-
-.logout-btn:hover {
-  background: #f5f5f5 !important;
-}
-
-.favorite-link {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.heart {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.menu-toggle {
-  display: none;
-  border: 0;
-  background: transparent;
-  padding: 8px;
-  cursor: pointer;
-}
-
-.menu-toggle span {
-  display: block;
-  width: 24px;
-  height: 2px;
-  margin: 5px 0;
-  background: #222;
-}
-.nav-menu a.active {
-  color: #222;
-  background: #f1f1f1;
-  font-weight: 700;
-  box-shadow: inset 0 -2px 0 #ff6b35;
-}
-
-.nav-menu a.create-btn.active {
-  color: #fff !important;
-  background: #e85b2b !important;
-  box-shadow: none;
-}
-
-.nav-menu a.register-btn.active {
-  color: #fff !important;
-  background: #e85b2b !important;
-  box-shadow: none;
+  .bookings-link,
+  .instructor-dashboard-link {
+    width: 100%;
+  }
 }
