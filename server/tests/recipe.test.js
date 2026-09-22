@@ -3,7 +3,6 @@ import connectDB from "../config/db.js";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
-
 import { app } from "../server.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -19,9 +18,9 @@ beforeAll(async () => {
     await connectDB();
 });
 
-afterAll(async () => {
-    await mongoose.connection.close();
-});
+// afterAll(async () => {
+//     await mongoose.connection.close();
+// });
 
 describe("Recipe API", () => {
 
@@ -48,7 +47,6 @@ describe("Recipe API", () => {
             "Authentication required"
         );
     });
-
 
     test("should reject recipe creation with invalid data", async () => {
         const email = `recipeinvalid${Date.now()}@example.com`;
@@ -85,8 +83,9 @@ describe("Recipe API", () => {
         expect(response.body.errors).toBeDefined();
     });
 
-
     test("should create a recipe with valid data", async () => {
+        console.log("1. Starting recipe create test");
+
         const email = `recipecreate${Date.now()}@example.com`;
         const password = "12345678";
 
@@ -98,6 +97,8 @@ describe("Recipe API", () => {
                 password,
             });
 
+        console.log("2. Register completed");
+
         const loginResponse = await request(app)
             .post("/api/auth/login")
             .send({
@@ -105,7 +106,11 @@ describe("Recipe API", () => {
                 password,
             });
 
+        console.log("3. Login completed");
+
         const token = loginResponse.body.token;
+
+        console.log("4. Sending recipe request");
 
         const response = await request(app)
             .post("/api/recipes")
@@ -130,6 +135,9 @@ describe("Recipe API", () => {
             .field("category", "Indian")
             .attach("image", testImage);
 
+        console.log("5. Recipe request completed");
+        console.log("Recipe response:", response.statusCode, response.body);
+
         expect(response.statusCode).toBe(201);
         expect(response.body.success).toBe(true);
 
@@ -143,7 +151,6 @@ describe("Recipe API", () => {
             "Indian"
         );
     });
-
 
     test("should get all recipes", async () => {
         const email = `get${Date.now()}@example.com`;
@@ -205,7 +212,6 @@ describe("Recipe API", () => {
         ).toBeGreaterThan(0);
     });
 
-
     test("should search recipes by title", async () => {
         const response = await request(app)
             .get("/api/recipes?search=paneer");
@@ -215,7 +221,6 @@ describe("Recipe API", () => {
         expect(response.body.recipes).toBeDefined();
     });
 
-
     test("should filter recipes by category", async () => {
         const response = await request(app)
             .get("/api/recipes?category=Indian");
@@ -224,7 +229,6 @@ describe("Recipe API", () => {
         expect(response.body.success).toBe(true);
         expect(response.body.recipes).toBeDefined();
     });
-
 
     test("should paginate recipes", async () => {
         const response = await request(app)
@@ -238,7 +242,6 @@ describe("Recipe API", () => {
             response.body.recipes.length
         ).toBeLessThanOrEqual(2);
     });
-
 
     test("should search and filter recipes with pagination", async () => {
         const response = await request(app)
@@ -255,6 +258,130 @@ describe("Recipe API", () => {
         ).toBeLessThanOrEqual(2);
     });
 
+    test("should filter recipes by ownerId", async () => {
+        const email = `ownerfilter${Date.now()}@example.com`;
+        const password = "12345678";
+
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Owner Filter User",
+                email,
+                password,
+            });
+
+        const loginResponse = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email,
+                password,
+            });
+
+        const token = loginResponse.body.token;
+
+        const recipeResponse = await request(app)
+            .post("/api/recipes")
+            .set("Authorization", `Bearer ${token}`)
+            .field("title", "Owner Filter Recipe")
+            .field(
+                "ingredients",
+                JSON.stringify(["Paneer"])
+            )
+            .field(
+                "steps",
+                JSON.stringify(["Cook paneer"])
+            )
+            .field("category", "Indian")
+            .attach("image", testImage);
+
+        expect(recipeResponse.statusCode).toBe(201);
+
+        const ownerId = recipeResponse.body.recipe.owner;
+
+        const response = await request(app)
+            .get(`/api/recipes?ownerId=${ownerId}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.recipes.length).toBeGreaterThan(0);
+
+        expect(
+            response.body.recipes.every(
+                recipe => recipe.owner?._id === ownerId
+            )
+        ).toBe(true);
+    });
+
+    test("should return only owner name on public recipe list", async () => {
+        const response = await request(app)
+            .get("/api/recipes");
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(true);
+
+        if (response.body.recipes.length > 0) {
+            const owner = response.body.recipes[0].owner;
+
+            if (owner) {
+                expect(owner).toHaveProperty("name");
+                expect(owner).not.toHaveProperty("email");
+            }
+        }
+    });
+
+    test("should return only owner name on public recipe detail", async () => {
+        const email = `detailowner${Date.now()}@example.com`;
+        const password = "12345678";
+
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Detail Owner",
+                email,
+                password,
+            });
+
+        const loginResponse = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email,
+                password,
+            });
+
+        const token = loginResponse.body.token;
+
+        const recipeResponse = await request(app)
+            .post("/api/recipes")
+            .set("Authorization", `Bearer ${token}`)
+            .field("title", "Detail Owner Recipe")
+            .field(
+                "ingredients",
+                JSON.stringify(["Paneer"])
+            )
+            .field(
+                "steps",
+                JSON.stringify(["Cook paneer"])
+            )
+            .field("category", "Indian")
+            .attach("image", testImage);
+
+        expect(recipeResponse.statusCode).toBe(201);
+
+        const recipeId = recipeResponse.body.recipe._id;
+
+        const response = await request(app)
+            .get(`/api/recipes/${recipeId}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(true);
+
+        const owner = response.body.recipe.owner;
+
+        if (owner) {
+            expect(owner).toHaveProperty("name");
+            expect(owner).not.toHaveProperty("email");
+        }
+    });
 
     test("should prevent another user from updating a recipe", async () => {
         const ownerEmail = `owner${Date.now()}@example.com`;
@@ -330,7 +457,6 @@ describe("Recipe API", () => {
         expect(response.body.success).toBe(false);
     });
 
-
     test("should allow the recipe owner to update their recipe", async () => {
         const email = `updateowner${Date.now()}@example.com`;
         const password = "12345678";
@@ -388,7 +514,6 @@ describe("Recipe API", () => {
             "Updated Recipe"
         );
     });
-
 
     test("should prevent another user from deleting a recipe", async () => {
         const password = "12345678";
@@ -463,7 +588,6 @@ describe("Recipe API", () => {
         expect(response.statusCode).toBe(403);
         expect(response.body.success).toBe(false);
     });
-
 
     test("should allow the recipe owner to delete their recipe", async () => {
         const email = `deleteown${Date.now()}@example.com`;

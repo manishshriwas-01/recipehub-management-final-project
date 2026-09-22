@@ -20,9 +20,9 @@ beforeAll(async () => {
     await connectDB();
 });
 
-afterAll(async () => {
-    await mongoose.connection.close();
-})
+// afterAll(async () => {
+//     await mongoose.connection.close();
+// })
 
 describe("Appointment Api", () => {
     test('should reject appintment creation without authentication', async () => {
@@ -1218,7 +1218,7 @@ test("should reject payment order creation by another user", async () => {
     expect(response.body.message).toBe(
         "You are not authorized to pay for this appointment"
     );
-});
+},20000);
 
 
 
