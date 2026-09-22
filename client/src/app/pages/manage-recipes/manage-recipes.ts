@@ -46,11 +46,9 @@ export class ManageRecipes {
 
   totalUsers = signal(0);
 
-  selectedUserEmail = signal<string | null>(null);
-
   selectedUserName = signal('All Recipes');
-
-  selectedUserEmail$ = new BehaviorSubject<string | null>(null);
+  selectedUserId = signal<string | null>(null);
+  selectedUserId$ = new BehaviorSubject<string | null>(null);
 
   isDeleting = false;
   errorMessage = '';
@@ -61,11 +59,11 @@ export class ManageRecipes {
       debounceTime(400),
       distinctUntilChanged()
     ),
-    this.selectedUserEmail$,
+    this.selectedUserId$,
   ]).pipe(
-    switchMap(([search, email]) => {
-      const request$ = email
-        ? this.recipeService.getRecipesByUser(email, search.trim())
+    switchMap(([search, userId]) => {
+      const request$ = userId
+        ? this.recipeService.getRecipesByUser(userId, search.trim())
         : this.recipeService.getRecipes(1, 50, search.trim());
 
       this.errorMessage = '';
@@ -74,6 +72,7 @@ export class ManageRecipes {
         catchError(error => {
           console.error('Failed to load recipes:', error);
           this.errorMessage = 'Failed to load recipes';
+
           return of({
             success: false,
             recipes: [],
@@ -104,18 +103,16 @@ export class ManageRecipes {
     });
   }
 
-  selectUser(email: string, name: string): void {
-    this.selectedUserEmail.set(email);
+  selectUser(userId: string, name: string): void {
+    this.selectedUserId.set(userId);
     this.selectedUserName.set(name);
-
-    this.selectedUserEmail$.next(email);
+    this.selectedUserId$.next(userId);
   }
 
   showAllRecipes(): void {
-    this.selectedUserEmail.set(null);
+    this.selectedUserId.set(null);
     this.selectedUserName.set('All Recipes');
-
-    this.selectedUserEmail$.next(null);
+    this.selectedUserId$.next(null);
   }
 
   viewRecipe(id: string): void {
@@ -146,9 +143,7 @@ export class ManageRecipes {
         );
 
         // Refresh current recipe list
-        this.selectedUserEmail$.next(
-          this.selectedUserEmail()
-        );
+        this.selectedUserId$.next(this.selectedUserId());
       },
 
       error: () => {
@@ -159,10 +154,7 @@ export class ManageRecipes {
     });
   }
 
-  deleteUser(
-    userId: string,
-    userName: string
-  ): void {
+  deleteUser(userId: string, userName: string): void {
     const confirmed = confirm(
       `Are you sure you want to delete "${userName}"?`
     );
@@ -174,32 +166,22 @@ export class ManageRecipes {
     this.authService.deleteUser(userId).subscribe({
       next: (response) => {
         this.users.update((users) =>
-          users.filter(
-            (user) => user._id !== userId
-          )
+          users.filter(user => user._id !== userId)
         );
 
-        this.totalUsers.update(
-          (count) => count - 1
-        );
+        this.totalUsers.update(count => count - 1);
 
         this.toastr.success(
           response.message || 'User deleted successfully!'
         );
 
-        const selectedEmail =
-          this.selectedUserEmail();
+        const selectedUserId = this.selectedUserId();
 
-        const deletedUserStillExists =
-          this.users().some(
-            (user) =>
-              user.email === selectedEmail
-          );
+        const selectedUserStillExists = this.users().some(
+          user => user._id === selectedUserId
+        );
 
-        if (
-          selectedEmail &&
-          !deletedUserStillExists
-        ) {
+        if (selectedUserId && !selectedUserStillExists) {
           this.showAllRecipes();
         }
       },

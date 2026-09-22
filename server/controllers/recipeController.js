@@ -56,7 +56,7 @@ export const getRecipes = async (req, res, next) => {
         const {
             search,
             category,
-            ownerEmail,
+            ownerId,
             page = 1,
             limit = 9,
         } = req.query;
@@ -105,30 +105,15 @@ export const getRecipes = async (req, res, next) => {
             filter.category = category;
         }
 
-        // Filter by user email
-        if (ownerEmail) {
-            const user = await User.findOne({
-                email: ownerEmail,
-            });
-
-            if (!user) {
-                return res.status(200).json({
-                    success: true,
-                    count: 0,
-                    total: 0,
-                    page: pageNumber,
-                    pages: 0,
-                    recipes: [],
-                });
-            }
-
-            filter.owner = user._id;
+        // Filter by user id
+        if (ownerId) {
+            filter.owner = ownerId;
         }
 
         const skip = (pageNumber - 1) * safeLimit;
 
         const recipes = await Recipe.find(filter)
-            .populate("owner", "name email")
+            .populate("owner", "name")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(safeLimit);
@@ -155,7 +140,7 @@ export const getRecipe = async (req, res, next) => {
         const { id } = req.params;
 
         const recipe = await Recipe.findById(id)
-            .populate("owner", "name email");
+            .populate("owner", "name");
 
         if (!recipe) {
             return res.status(404).json({
@@ -315,43 +300,9 @@ export const updateRecipe = async (req, res, next) => {
     }
 };
 
-// export const deleteRecipe = async (req, res, next) => {
-//     try {
-//         const { id } = req.params;
 
-//         const recipe = await Recipe.findById(id);
 
-//         if (!recipe) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: "Recipe not found",
-//             });
-//         }
 
-//         const isOwner =
-//             recipe.owner.toString() === req.user.userId;
-
-//         const isAdmin =
-//             req.user.role === "admin";
-
-//         if (!isOwner && !isAdmin) {
-//             return res.status(403).json({
-//                 success: false,
-//                 message: "You are not authorized to delete this recipe",
-//             });
-//         }
-
-//         await Recipe.findByIdAndDelete(id);
-
-//         return res.status(200).json({
-//             success: true,
-//             message: "Recipe deleted successfully",
-//         });
-
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 export const deleteRecipe = async (req, res, next) => {
     try {
         const { id } = req.params;

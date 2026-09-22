@@ -51,20 +51,20 @@ export class RecipeService {
   }
 
 
-updateRecipe(
-  id: string,
-  data: FormData
-): Observable<{
-  success: boolean;
-  message: string;
-  recipe: Recipe;
-}> {
-  return this.http.put<{
+  updateRecipe(
+    id: string,
+    data: FormData
+  ): Observable<{
     success: boolean;
     message: string;
     recipe: Recipe;
-  }>(`${this.apiUrl}/${id}`, data);
-}
+  }> {
+    return this.http.put<{
+      success: boolean;
+      message: string;
+      recipe: Recipe;
+    }>(`${this.apiUrl}/${id}`, data);
+  }
 
 
   getMyRecipes(): Observable<{
@@ -127,12 +127,13 @@ updateRecipe(
   }
 
 
-  getRecipesByUser(email: string, search: string = ''): Observable<RecipeResponse> {
-    let url = `${this.apiUrl}?ownerEmail=${encodeURIComponent(email)}`;
+  getRecipesByUser(ownerId: string, search: string = ''): Observable<RecipeResponse> {
+    let url = `${this.apiUrl}?ownerId=${encodeURIComponent(ownerId)}`;
 
     if (search.trim()) {
       url += `&search=${encodeURIComponent(search.trim())}`;
     }
+
     console.log('User Recipe API:', url);
     return this.http.get<RecipeResponse>(url);
   }
@@ -159,19 +160,6 @@ updateRecipe(
 
 
   getRecipeAvailability(recipeId: string): Observable<{
-  success: boolean;
-  availability: {
-    _id: string;
-    instructor: string;
-    dayOfWeek: string;
-    startTime: string;
-    endTime: string;
-    isActive: boolean;
-  }[];
-}> {
-  const availabilityUrl = `${environment.apiUrl}/availability/recipe/${recipeId}`;
-
-  return this.http.get<{
     success: boolean;
     availability: {
       _id: string;
@@ -181,12 +169,25 @@ updateRecipe(
       endTime: string;
       isActive: boolean;
     }[];
-  }>(availabilityUrl);
-}
+  }> {
+    const availabilityUrl = `${environment.apiUrl}/availability/recipe/${recipeId}`;
 
-  
+    return this.http.get<{
+      success: boolean;
+      availability: {
+        _id: string;
+        instructor: string;
+        dayOfWeek: string;
+        startTime: string;
+        endTime: string;
+        isActive: boolean;
+      }[];
+    }>(availabilityUrl);
+  }
 
-  
+
+
+
 }
 
 

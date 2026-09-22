@@ -23,7 +23,6 @@
       </div>
     </div>
 
-
     <!-- Users -->
     <section class="users-section">
 
@@ -36,20 +35,22 @@
           </p>
         </div>
 
-        @if (selectedUserEmail()) {
+        @if (selectedUserId()) {
         <button type="button" class="all-recipes-btn" (click)="showAllRecipes()">
           ← All Recipes
         </button>
         }
       </div>
 
-
       <div class="users-grid">
 
-        @for (user of users(); track user.email) {
+        @for (user of users(); track user._id) {
 
-        <div class="user-card" [class.selected]="selectedUserEmail() === user.email"
-          (click)="selectUser(user.email, user.name)">
+        <div
+          class="user-card"
+          [class.selected]="selectedUserId() === user._id"
+          (click)="selectUser(user._id, user.name)"
+        >
 
           <div class="user-avatar">
             {{ user.name.charAt(0).toUpperCase() }}
@@ -77,13 +78,13 @@
 
           </div>
 
-
           @if (user.role !== 'admin') {
 
-          <button type="button" class="user-delete-btn" (click)="
-                  $event.stopPropagation();
-                  deleteUser(user._id, user.name)
-                ">
+          <button
+            type="button"
+            class="user-delete-btn"
+            (click)="$event.stopPropagation(); deleteUser(user._id, user.name)"
+          >
             🗑️
           </button>
 
@@ -97,18 +98,13 @@
 
     </section>
 
-
     <!-- Recipe Heading -->
     <div class="recipe-heading">
 
       <div>
 
         <span class="section-label">
-          {{
-          selectedUserEmail()
-          ? 'USER RECIPES'
-          : 'ALL RECIPES'
-          }}
+          {{ selectedUserId() ? 'USER RECIPES' : 'ALL RECIPES' }}
         </span>
 
         <h2>{{ selectedUserName() }}</h2>
@@ -117,7 +113,6 @@
 
     </div>
 
-
     <!-- Search -->
     <div class="search-section">
 
@@ -125,10 +120,14 @@
         Search Recipes
       </label>
 
-      <input id="recipe-search" type="text" [formControl]="searchControl" placeholder="Search by recipe name..." />
+      <input
+        id="recipe-search"
+        type="text"
+        [formControl]="searchControl"
+        placeholder="Search by recipe name..."
+      />
 
     </div>
-
 
     <!-- Recipes -->
     @if (recipes$ | async; as response) {
@@ -143,7 +142,10 @@
 
         <div class="recipe-image">
 
-          <img [src]="recipeService.getImageUrl(recipe.imageUrl)" [alt]="recipe.title" />
+          <img
+            [src]="recipeService.getImageUrl(recipe.imageUrl)"
+            [alt]="recipe.title"
+          />
 
           <span class="recipe-category">
             {{ recipe.category }}
@@ -151,40 +153,50 @@
 
         </div>
 
-
         <div class="recipe-content">
 
           <h2>{{ recipe.title }}</h2>
-
 
           <div class="recipe-owner">
 
             <strong>Created by</strong>
 
             <span>
-              {{ recipe.owner.name }}
+              {{ recipe.owner?.name || 'Unknown User' }}
             </span>
 
+            @if (recipe.owner?.email) {
             <small>
               {{ recipe.owner.email }}
             </small>
+            }
 
           </div>
 
-
           <div class="recipe-actions">
 
-            <button class="view-btn" type="button" (click)="viewRecipe(recipe._id)">
+            <button
+              class="view-btn"
+              type="button"
+              (click)="viewRecipe(recipe._id)"
+            >
               View
             </button>
 
-
-            <button class="edit-btn" type="button" (click)="editRecipe(recipe._id)">
+            <button
+              class="edit-btn"
+              type="button"
+              (click)="editRecipe(recipe._id)"
+            >
               Edit
             </button>
 
-
-            <button class="delete-btn" type="button" (click)="deleteRecipe(recipe._id)" [disabled]="isDeleting">
+            <button
+              class="delete-btn"
+              type="button"
+              (click)="deleteRecipe(recipe._id)"
+              [disabled]="isDeleting"
+            >
               Delete
             </button>
 
@@ -208,7 +220,7 @@
 
       <p>
 
-        @if (selectedUserEmail()) {
+        @if (selectedUserId()) {
 
         This user has not created any recipes yet.
 
@@ -230,7 +242,9 @@
 
     <div class="error-state">
       <span>⚠️</span>
+
       <h2>Something went wrong</h2>
+
       <p>{{ errorMessage }}</p>
     </div>
 
@@ -238,6 +252,7 @@
 
     <div class="loading-state">
       <div class="spinner"></div>
+
       <p>Loading recipes...</p>
     </div>
 
