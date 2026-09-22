@@ -666,6 +666,23 @@ Recipe.owner
 
 ![Admin Management](screenshots/admin1.png)
 
+### Ai Assistant
+
+![ Ai Assistant](screenshots/ai_assitant.png)
+
+### Book  Recipe Learn
+
+![ Book recipe](screenshots/book%20recipe.png)
+
+
+### My Bookings
+
+![ My Bookings](screenshots/my%20bookings.png)
+
+### Instructor
+
+![  Instructor](screenshots/instructor.png)
+
 ### 404 Page
 
 ![Not Found](screenshots/notfound.png)
@@ -816,9 +833,9 @@ https://recipehub-management-final-project.onrender.com/api/health
 
 ```text
 
-Email:    alex@gmail.com
+Email:    bob@gmail.com
 
-Password: qwerty@123
+Password: 12345678
 
 Role:     user
 
