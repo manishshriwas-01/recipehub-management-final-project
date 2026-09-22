@@ -8,6 +8,8 @@ import {
   debounceTime,
   distinctUntilChanged,
   switchMap,
+  catchError,
+  of
 } from 'rxjs';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
@@ -51,6 +53,7 @@ export class ManageRecipes {
   selectedUserEmail$ = new BehaviorSubject<string | null>(null);
 
   isDeleting = false;
+  errorMessage = '';
 
   recipes$ = combineLatest([
     this.searchControl.valueChanges.pipe(
@@ -58,21 +61,28 @@ export class ManageRecipes {
       debounceTime(400),
       distinctUntilChanged()
     ),
-
     this.selectedUserEmail$,
   ]).pipe(
     switchMap(([search, email]) => {
-      if (email) {
-        return this.recipeService.getRecipesByUser(
-          email,
-          search.trim()
-        );
-      }
+      const request$ = email
+        ? this.recipeService.getRecipesByUser(email, search.trim())
+        : this.recipeService.getRecipes(1, 50, search.trim());
 
-      return this.recipeService.getRecipes(
-        1,
-        50,
-        search.trim()
+      this.errorMessage = '';
+
+      return request$.pipe(
+        catchError(error => {
+          console.error('Failed to load recipes:', error);
+          this.errorMessage = 'Failed to load recipes';
+          return of({
+            success: false,
+            recipes: [],
+            count: 0,
+            total: 0,
+            page: 1,
+            pages: 0
+          });
+        })
       );
     })
   );

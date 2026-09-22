@@ -20,6 +20,8 @@ export class CreateRecipe {
   private router = inject(Router);
   private toastr = inject(ToastrService);
 
+  
+
   selectedImage: File | null = null;
 
   recipeForm = new FormGroup({
@@ -117,8 +119,9 @@ export class CreateRecipe {
         ]);
       },
 
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
+         this.errorMessage = error?.error?.message || 'Failed to create recipe. Please try again.';
       },
     });
   }

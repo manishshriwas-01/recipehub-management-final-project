@@ -4,7 +4,6 @@
 
   <div class="booking-container">
 
-
     <!-- ================================
            Recipe Information
       ================================= -->
@@ -13,24 +12,20 @@
 
       <img [src]="recipeService.getImageUrl(response.recipe.imageUrl)" [alt]="response.recipe.title" />
 
-
       <div class="recipe-details">
 
         <span>
           Learn This Recipe
         </span>
 
-
         <h1>
           {{ response.recipe.title }}
         </h1>
-
 
         <p>
           👨‍🍳 By
           {{ response.recipe.owner.name }}
         </p>
-
 
         <p>
           Book a personal session with the recipe owner
@@ -41,34 +36,43 @@
 
     </div>
 
-
-
     <!-- ================================
            Instructor Availability
       ================================= -->
 
-    @if (
-    availability$ | async;
-    as availabilityResponse
-    ) {
+    @if (availabilityLoading()) {
 
     <div class="availability-section">
 
-      <h2>
-        Instructor Availability
-      </h2>
+      <h2>Instructor Availability</h2>
 
+      <p class="loading-state">
+        Loading instructor availability...
+      </p>
 
-      @if (
-      availabilityResponse.availability.length > 0
-      ) {
+    </div>
+
+    } @else if (availabilityError) {
+
+    <div class="availability-section">
+
+      <h2>Instructor Availability</h2>
+
+      <p class="error-message">
+        {{ availabilityError }}
+      </p>
+
+    </div>
+
+    } @else if (availabilityData.length > 0) {
+
+    <div class="availability-section">
+
+      <h2>Instructor Availability</h2>
 
       <div class="availability-list">
 
-        @for (
-        slot of availabilityResponse.availability;
-        track slot._id
-        ) {
+        @for (slot of availabilityData; track slot._id) {
 
         <div class="availability-card">
 
@@ -76,11 +80,8 @@
             {{ slot.dayOfWeek }}
           </strong>
 
-
           <span>
-            {{ slot.startTime }}
-            -
-            {{ slot.endTime }}
+            {{ slot.startTime }} - {{ slot.endTime }}
           </span>
 
         </div>
@@ -89,25 +90,21 @@
 
       </div>
 
-      } @else {
+    </div>
+
+    } @else {
+
+    <div class="availability-section">
+
+      <h2>Instructor Availability</h2>
 
       <p class="no-availability">
         Instructor has no available slots.
       </p>
 
-      }
-
     </div>
 
-    } @else {
-
-    <p class="error-message">
-      Unable to load instructor availability.
-    </p>
-
     }
-
-
 
     <!-- ================================
            Booking Form
@@ -119,54 +116,67 @@
         Select Your Session
       </h2>
 
-
       <!-- ================================
              Date
         ================================= -->
 
       <label for="date">
-
         Select Date
-
       </label>
 
-
-      <input id="date" type="date" [value]="selectedDate" (change)="onDateChange($event)" />
-
-
+      <input
+        id="date"
+        type="date"
+        [value]="selectedDate"
+        (change)="onDateChange($event)"
+      />
 
       <!-- ================================
              Time Slots
         ================================= -->
 
       <label class="time-label">
-
         Select Time Slot
-
       </label>
-
 
       @if (selectedDate) {
 
       @if (availableTimeSlots.length > 0) {
+
       <div class="time-slots">
+
         @for (slot of availableTimeSlots; track slot) {
-        <button type="button" class="time-slot" [class.selected]="selectedTimeSlot() === slot"
-          [class.booked]="isSlotBooked(slot)" [disabled]="isSlotBooked(slot)" (click)="selectTimeSlot(slot)">
+
+        <button
+          type="button"
+          class="time-slot"
+          [class.selected]="selectedTimeSlot() === slot"
+          [class.booked]="isSlotBooked(slot)"
+          [disabled]="isSlotBooked(slot)"
+          (click)="selectTimeSlot(slot)"
+        >
+
           {{ slot }}
+
           @if (isSlotBooked(slot)) {
           <span>Booked</span>
           }
-        </button>
-        }
-      </div>
-      } @else if (selectedDate) {
-      <p class="no-slots">No available time slots for this date.</p>
-      }
 
+        </button>
+
+        }
+
+      </div>
 
       } @else {
 
+      <p class="no-slots">
+        No available time slots for this date.
+      </p>
+
+      }
+
+      } @else {
 
       <div class="select-date-message">
 
@@ -176,10 +186,7 @@
 
       </div>
 
-
       }
-
-
 
       <!-- ================================
              Booking Summary
@@ -188,35 +195,31 @@
       <div class="booking-summary">
 
         <p>
-
           Duration:
-
           <strong>
             60 minutes
           </strong>
-
         </p>
 
-
         <p>
-
           Price:
-
           <strong>
             ₹299
           </strong>
-
         </p>
 
       </div>
-
-
 
       <!-- ================================
              Payment Button
         ================================= -->
 
-      <button type="button" class="payment-btn" [disabled]="bookingLoading()" (click)="bookAppointment()">
+      <button
+        type="button"
+        class="payment-btn"
+        [disabled]="bookingLoading()"
+        (click)="bookAppointment()"
+      >
 
         @if (bookingLoading()) {
 
@@ -236,6 +239,21 @@
 
   } @else {
 
+  @if (recipeError) {
+
+  <div class="error-state">
+
+    <h2>
+      Something went wrong
+    </h2>
+
+    <p>
+      {{ recipeError }}
+    </p>
+
+  </div>
+
+  } @else {
 
   <div class="loading-state">
 
@@ -245,6 +263,7 @@
 
   </div>
 
+  }
 
   }
 

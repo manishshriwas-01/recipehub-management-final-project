@@ -41,9 +41,12 @@ export class BookAppointment implements OnInit {
   availableTimeSlots: string[] = [];
   selectedTimeSlot = signal<string | null>(null);
   bookedTimeSlots = signal<string[]>([]);
-  private availabilityData: Availability[] = [];
+  availabilityData: Availability[] = [];
   bookingLoading = signal(false);
   paymentProcessing = false;
+  recipeError = '';
+  availabilityError = '';
+  availabilityLoading = signal(true);
 
 
 
@@ -54,6 +57,7 @@ export class BookAppointment implements OnInit {
       return this.recipeService.getRecipe(this.recipeId).pipe(
         catchError(error => {
           console.error('Failed to load recipe:', error);
+          this.recipeError = 'Failed to load recipe';
           return of(null);
         })
       );
@@ -66,15 +70,19 @@ export class BookAppointment implements OnInit {
       return this.recipeService.getRecipeAvailability(recipeId).pipe(
         catchError(error => {
           console.error('Failed to load availability:', error);
+          this.availabilityError = 'Unable to load instructor availability';
           return of(null);
         })
       );
     })
   );
 
+
   ngOnInit(): void {
     this.availability$.subscribe({
       next: response => {
+        this.availabilityLoading.set(false);
+
         if (!response) {
           this.availabilityData = [];
           return;
@@ -84,8 +92,10 @@ export class BookAppointment implements OnInit {
         console.log('Availability loaded:', this.availabilityData);
       },
       error: error => {
+        this.availabilityLoading.set(false);
         console.error('Availability loading error:', error);
         this.availabilityData = [];
+        this.availabilityError = 'Unable to load instructor availability';
       }
     });
   }

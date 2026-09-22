@@ -17,20 +17,24 @@ export class Favorites {
 
   favorites = signal<Recipe[]>([]);
   loading = signal(true);
+  errorMessage = signal('');
 
   constructor() {
     this.loadFavorites();
   }
 
   private loadFavorites(): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
+
     this.recipeService.getFavorites().subscribe({
       next: (response) => {
         this.favorites.set(response.recipes);
         this.loading.set(false);
       },
-
       error: () => {
         this.loading.set(false);
+        this.errorMessage.set('Failed to load your favorite recipes');
       },
     });
   }

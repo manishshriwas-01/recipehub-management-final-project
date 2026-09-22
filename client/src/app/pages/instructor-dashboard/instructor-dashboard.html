@@ -186,9 +186,20 @@
 
             } @else {
 
+            @if (availabilityError) {
+
+            <div class="error-state">
+                <h3>Something went wrong</h3>
+                <p>{{ availabilityError }}</p>
+            </div>
+
+            } @else {
+
             <div class="loading-state">
                 <p>Loading availability...</p>
             </div>
+
+            }
 
             }
 
@@ -391,9 +402,20 @@
 
         } @else {
 
+        @if (appointmentError) {
+
+        <div class="error-state">
+            <h2>Something went wrong</h2>
+            <p>{{ appointmentError }}</p>
+        </div>
+
+        } @else {
+
         <div class="loading-state">
             <p>Loading dashboard...</p>
         </div>
+
+        }
 
         }
 

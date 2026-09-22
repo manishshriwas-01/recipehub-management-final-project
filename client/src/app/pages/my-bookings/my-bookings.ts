@@ -41,10 +41,12 @@ interface MyAppointmentsResponse {
 export class MyBookings {
   private appointmentService = inject(AppointmentService);
 
+  errorMessage = '';
+
   appointments$: Observable<MyAppointmentsResponse | null> =
     this.appointmentService.getMyAppointments().pipe(
       catchError(error => {
-        console.error('Failed to load appointments:', error);
+        this.errorMessage = 'Failed to load bookings';
         return of(null);
       })
     );

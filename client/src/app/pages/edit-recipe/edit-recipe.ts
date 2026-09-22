@@ -17,12 +17,13 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class EditRecipe {
   private route = inject(ActivatedRoute);
-   recipeService = inject(RecipeService);
+  recipeService = inject(RecipeService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private toastr = inject(ToastrService);
 
   recipeId = '';
+  errorMessage = '';
 
   // New image selected by user
   selectedImage: File | null = null;
@@ -85,8 +86,10 @@ export class EditRecipe {
         this.cdr.detectChanges();
       },
 
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
+        this.errorMessage =
+          error?.error?.message || 'Failed to load recipe. Please try again.';
       },
     });
   }
@@ -147,10 +150,9 @@ export class EditRecipe {
 
       error: (error) => {
         this.isSaving = false;
-
-        this.toastr.error(
-          error.error?.message || 'Failed to update recipe.'
-        );
+        this.errorMessage =
+          error?.error?.message || 'Failed to update recipe.';
+        this.toastr.error(this.errorMessage);
       },
     });
   }

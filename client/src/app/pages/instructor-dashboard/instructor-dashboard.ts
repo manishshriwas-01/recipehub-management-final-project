@@ -87,6 +87,9 @@ export class InstructorDashboard {
 
   meetingLinks: Record<string, string> = {};
 
+  appointmentError = '';
+availabilityError = '';
+
 
   // -----------------------------
   // Teaching Appointments
@@ -102,6 +105,8 @@ export class InstructorDashboard {
             'Failed to load teaching appointments:',
             error
           );
+          this.appointmentError = 'Failed to load appointments';
+
 
           return of(null);
         })
@@ -122,6 +127,7 @@ export class InstructorDashboard {
             'Failed to load availability:',
             error
           );
+           this.availabilityError = 'Failed to load availability';
 
           return of(null);
         })
