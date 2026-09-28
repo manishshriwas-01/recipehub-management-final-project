@@ -1,14 +1,9 @@
 import Review from "../models/Review.js";
 import Recipe from "../models/Recipe.js";
-import { analyzeSentiment } from "../utils/sentiment.js";
-import { isToxic } from "../utils/toxicity.js";
-
-
-
 
 export const createReview = async (req, res, next) => {
     try {
-        const { recipeId, rating, comment } = req.body;
+        const { recipeId, rating, comment, sentiment } = req.body;
 
         const recipe = await Recipe.findById(recipeId);
 
@@ -29,22 +24,6 @@ export const createReview = async (req, res, next) => {
                 success: false,
                 message: "You have already reviewed this recipe",
             });
-        }
-        const toxic = await isToxic(comment);
-
-        if (toxic) {
-            return res.status(400).json({
-                success: false,
-                message: "Your review contains inappropriate content",
-            });
-        }
-
-        let sentiment;
-
-        try {
-            sentiment = await analyzeSentiment(comment);
-        } catch (error) {
-            console.error("Sentiment analysis failed:", error.message);
         }
 
         const review = await Review.create({
@@ -71,6 +50,7 @@ export const createReview = async (req, res, next) => {
         next(error);
     }
 };
+
 export const getReviewsByRecipe = async (req, res, next) => {
     try {
         const { recipeId } = req.params;
@@ -155,6 +135,7 @@ export const getReviewsByRecipe = async (req, res, next) => {
         next(error);
     }
 };
+
 export const deleteReview = async (req, res, next) => {
     try {
         const { id } = req.params;

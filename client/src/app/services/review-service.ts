@@ -39,16 +39,17 @@ export class ReviewService {
     );
   }
 
-  createReview(data: {
-    recipeId: string;
-    rating: number;
-    comment: string;
-  }): Observable<{ success: boolean; message: string }> {
-    return this.http.post<{ success: boolean; message: string }>(
-      this.apiUrl,
-      data
-    );
-  }
+ createReview(data: {
+  recipeId: string;
+  rating: number;
+  comment: string;
+  sentiment: 'positive' | 'neutral' | 'negative';
+}): Observable<{ success: boolean; message: string }> {
+  return this.http.post<{ success: boolean; message: string }>(
+    this.apiUrl,
+    data
+  );
+}
 
   deleteReview(reviewId: string): Observable<{ success: boolean; message: string }> {
     return this.http.delete<{ success: boolean; message: string }>(
