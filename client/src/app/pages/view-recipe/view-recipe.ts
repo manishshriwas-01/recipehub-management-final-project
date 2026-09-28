@@ -8,6 +8,8 @@ import { RecipeService } from '../../services/recipe.service';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service/auth.service';
 import { Review, ReviewService } from '../../services/review-service';
+import { ToxicityService } from '../../services/toxicity';
+import { SentimentService } from '../../services/sentiment';
 
 @Component({
   selector: 'app-view-recipe',
@@ -16,6 +18,8 @@ import { Review, ReviewService } from '../../services/review-service';
   styleUrl: './view-recipe.css',
 })
 export class ViewRecipe {
+  private sentimentService = inject(SentimentService);
+  private toxicityService = inject(ToxicityService);
   private reviewService = inject(ReviewService);
   private route = inject(ActivatedRoute);
   recipeService = inject(RecipeService);
@@ -37,7 +41,7 @@ export class ViewRecipe {
   averageRating = signal(0);
   reviewCount = signal(0);
 
-   Math = Math;
+  Math = Math;
 
   helpfulLoading = signal<string | null>(null);
 
@@ -57,22 +61,21 @@ export class ViewRecipe {
     recipe: Recipe;
     averageRating: number;
     reviewCount: number;
-  } | null> =
-    this.route.paramMap.pipe(
-      switchMap((params) => {
-        this.recipeId = params.get('id')!;
+  } | null> = this.route.paramMap.pipe(
+    switchMap((params) => {
+      this.recipeId = params.get('id')!;
 
-        this.errorMessage.set('');
-        this.loadReviews();
+      this.errorMessage.set('');
+      this.loadReviews();
 
-        return this.recipeService.getRecipe(this.recipeId).pipe(
-          catchError(() => {
-            this.errorMessage.set('Recipe not found');
-            return of(null);
-          })
-        );
-      })
-    );
+      return this.recipeService.getRecipe(this.recipeId).pipe(
+        catchError(() => {
+          this.errorMessage.set('Recipe not found');
+          return of(null);
+        })
+      );
+    })
+  );
 
   loadReviews(): void {
     if (!this.recipeId) return;
@@ -160,7 +163,7 @@ export class ViewRecipe {
     this.router.navigate(['/book-appointment', this.recipeId]);
   }
 
-  submitReview(): void {
+  async submitReview(): Promise<void> {
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -173,7 +176,9 @@ export class ViewRecipe {
       return;
     }
 
-    if (this.reviewComment().trim().length < 3) {
+    const comment = this.reviewComment().trim();
+
+    if (comment.length < 3) {
       this.toastr.error('Review must be at least 3 characters');
       return;
     }
@@ -182,33 +187,53 @@ export class ViewRecipe {
 
     this.reviewSubmitting.set(true);
 
-    this.reviewService
-      .createReview({
-        recipeId: this.recipeId,
-        rating: this.selectedRating(),
-        comment: this.reviewComment().trim(),
-      })
-      .subscribe({
-        next: (response) => {
-          this.toastr.success(
-            response.message || 'Review added successfully'
-          );
+    try {
+      const toxic = await this.toxicityService.isToxic(comment);
 
-          this.reviewComment.set('');
-          this.selectedRating.set(0);
-          this.reviewSubmitting.set(false);
+      if (toxic) {
+        this.toastr.error('Your review contains inappropriate content');
+        this.reviewSubmitting.set(false);
+        return;
+      }
 
-          this.loadReviews();
-        },
+      const sentiment =
+        await this.sentimentService.analyzeSentiment(comment);
 
-        error: (error) => {
-          this.toastr.error(
-            error.error?.message || 'Unable to add review'
-          );
+      this.reviewService
+        .createReview({
+          recipeId: this.recipeId,
+          rating: this.selectedRating(),
+          comment,
+          sentiment,
+        })
+        .subscribe({
+          next: (response) => {
+            this.toastr.success(
+              response.message || 'Review added successfully'
+            );
 
-          this.reviewSubmitting.set(false);
-        },
-      });
+            this.reviewComment.set('');
+            this.selectedRating.set(0);
+            this.reviewSubmitting.set(false);
+
+            this.loadReviews();
+          },
+
+          error: (error) => {
+            this.toastr.error(
+              error.error?.message || 'Unable to add review'
+            );
+
+            this.reviewSubmitting.set(false);
+          },
+        });
+    } catch (error) {
+      console.error('AI analysis failed:', error);
+
+      this.toastr.error('Unable to analyze the review');
+
+      this.reviewSubmitting.set(false);
+    }
   }
 
   canDeleteReview(
@@ -221,17 +246,14 @@ export class ViewRecipe {
       return false;
     }
 
-    // Admin can delete any review
     if (currentUser.role === 'admin') {
       return true;
     }
 
-    // Review creator can delete their own review
     if (String(currentUser.id) === String(review.user._id)) {
       return true;
     }
 
-    // Recipe owner can delete reviews on their recipe
     if (
       recipeOwnerId &&
       String(currentUser.id) === String(recipeOwnerId)
@@ -279,8 +301,8 @@ export class ViewRecipe {
         review.helpfulBy = response.helpful
           ? [...review.helpfulBy, this.user()?.id || '']
           : review.helpfulBy.filter(
-            userId => String(userId) !== String(this.user()?.id)
-          );
+              (userId) => String(userId) !== String(this.user()?.id)
+            );
 
         this.helpfulLoading.set(null);
       },

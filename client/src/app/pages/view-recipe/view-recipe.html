@@ -10,7 +10,10 @@
     <article class="recipe-detail">
 
       <div class="recipe-detail-image">
-        <img [src]="recipeService.getImageUrl(response.recipe.imageUrl)" [alt]="response.recipe.title" />
+        <img
+          [src]="recipeService.getImageUrl(response.recipe.imageUrl)"
+          [alt]="response.recipe.title"
+        />
       </div>
 
       <div class="recipe-detail-content">
@@ -20,6 +23,7 @@
         </span>
 
         <h1>{{ response.recipe.title }}</h1>
+
         <div class="recipe-rating-summary">
           <span class="rating-stars">
             {{ '★'.repeat(Math.round(averageRating())) }}{{ '☆'.repeat(5 - Math.round(averageRating())) }}
@@ -40,8 +44,14 @@
 
         <!-- Favorite -->
 
-        <button type="button" class="favorite-btn" [class.active]="isFavorite()" [disabled]="isFavoriteLoading()"
-          (click)="toggleFavorite()" aria-label="Toggle favorite">
+        <button
+          type="button"
+          class="favorite-btn"
+          [class.active]="isFavorite()"
+          [disabled]="isFavoriteLoading()"
+          (click)="toggleFavorite()"
+          aria-label="Toggle favorite"
+        >
           <span class="heart">
             {{ isFavorite() ? '♥' : '♡' }}
           </span>
@@ -51,7 +61,11 @@
 
         <!-- Learn Recipe -->
 
-        <button type="button" class="learn-recipe-btn" (click)="learnRecipe()">
+        <button
+          type="button"
+          class="learn-recipe-btn"
+          (click)="learnRecipe()"
+        >
           👨‍🍳 Learn This Recipe
         </button>
 
@@ -62,10 +76,7 @@
           <h2>Ingredients</h2>
 
           <ul>
-            @for (
-            ingredient of response.recipe.ingredients;
-            track $index
-            ) {
+            @for (ingredient of response.recipe.ingredients; track $index) {
             <li>
               {{ ingredient }}
             </li>
@@ -81,10 +92,7 @@
           <h2>Instructions</h2>
 
           <ol>
-            @for (
-            step of response.recipe.steps;
-            track $index
-            ) {
+            @for (step of response.recipe.steps; track $index) {
             <li>
               {{ step }}
             </li>
@@ -98,13 +106,20 @@
         <div class="recipe-section reviews-section">
 
           <h2>Reviews</h2>
+
+          <!-- Review Sorting -->
+
           <div class="review-sort">
 
             <label for="reviewSort">
               Sort reviews:
             </label>
 
-            <select id="reviewSort" [value]="reviewSort()" (change)="changeReviewSort($any($event.target).value)">
+            <select
+              id="reviewSort"
+              [value]="reviewSort()"
+              (change)="changeReviewSort($any($event.target).value)"
+            >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
               <option value="highest">Highest Rating</option>
@@ -125,13 +140,16 @@
 
             <div class="star-picker">
 
-              @for (
-              star of [1, 2, 3, 4, 5];
-              track star
-              ) {
+              @for (star of [1, 2, 3, 4, 5]; track star) {
 
-              <button type="button" class="star-btn" [class.selected]="star <= selectedRating()"
-                (click)="selectedRating.set(star)" [attr.aria-label]="star + ' stars'">
+              <button
+                type="button"
+                class="star-btn"
+                [class.selected]="star <= selectedRating()"
+                (click)="selectedRating.set(star)"
+                [attr.aria-label]="star + ' stars'"
+                [disabled]="reviewSubmitting()"
+              >
                 ★
               </button>
 
@@ -141,18 +159,40 @@
 
             <!-- Comment -->
 
-            <textarea [ngModel]="reviewComment()" (ngModelChange)="reviewComment.set($event)"
-              placeholder="Write your review..." maxlength="1000"></textarea>
+            <textarea
+              [ngModel]="reviewComment()"
+              (ngModelChange)="reviewComment.set($event)"
+              placeholder="Write your review..."
+              maxlength="1000"
+              [disabled]="reviewSubmitting()"
+            ></textarea>
 
+            <!-- AI Loading State -->
 
+            @if (reviewSubmitting()) {
+
+            <div class="ai-analysis-loading">
+              <div class="spinner"></div>
+
+              <span>
+                Analyzing your review with AI...
+              </span>
+            </div>
+
+            }
 
             <!-- Submit Review -->
 
-            <button type="button" class="submit-review-btn" [disabled]="reviewSubmitting()" (click)="submitReview()">
+            <button
+              type="button"
+              class="submit-review-btn"
+              [disabled]="reviewSubmitting()"
+              (click)="submitReview()"
+            >
               {{
-              reviewSubmitting()
-              ? 'Submitting...'
-              : 'Submit Review'
+                reviewSubmitting()
+                ? 'Analyzing...'
+                : 'Submit Review'
               }}
             </button>
 
@@ -160,7 +200,7 @@
 
           }
 
-          <!-- Loading -->
+          <!-- Reviews Loading -->
 
           @if (reviewsLoading()) {
 
@@ -170,7 +210,7 @@
 
           }
 
-          <!-- Error -->
+          <!-- Reviews Error -->
 
           @else if (reviewsError()) {
 
@@ -196,10 +236,7 @@
 
           <div class="reviews-list">
 
-            @for (
-            review of reviews();
-            track review._id
-            ) {
+            @for (review of reviews(); track review._id) {
 
             <article class="review-card">
 
@@ -222,31 +259,39 @@
               <p class="review-comment">
                 {{ review.comment }}
               </p>
+
+              <!-- Helpful -->
+
               <div class="review-helpful">
 
-                <button type="button" class="helpful-btn" [class.active]="review.helpfulBy.includes(user()?.id || '')"
-                  [disabled]="helpfulLoading() === review._id" (click)="toggleHelpfulReview(review)">
+                <button
+                  type="button"
+                  class="helpful-btn"
+                  [class.active]="review.helpfulBy.includes(user()?.id || '')"
+                  [disabled]="helpfulLoading() === review._id"
+                  (click)="toggleHelpfulReview(review)"
+                >
                   👍
-                  {{
-                  review.helpfulBy.includes(user()?.id || '')
-                  ? 'Helpful'
-                  : 'Helpful'
-                  }}
-
+                  Helpful
                   ({{ review.helpfulBy.length }})
                 </button>
 
               </div>
+
               <!-- Delete Review -->
 
               @if (
-              canDeleteReview(
-              review,
-              response.recipe.owner?._id
-              )
+                canDeleteReview(
+                  review,
+                  response.recipe.owner?._id
+                )
               ) {
 
-              <button type="button" class="delete-review-btn" (click)="deleteReview(review._id)">
+              <button
+                type="button"
+                class="delete-review-btn"
+                (click)="deleteReview(review._id)"
+              >
                 Delete
               </button>
 
