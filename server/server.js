@@ -8,6 +8,7 @@ import availabilityRoutes from "./routes/availabilityRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import reviewRoutes from './routes/reviewRoutes.js'
 import helmet from "helmet";
 import cors from "cors";
 
@@ -51,6 +52,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/availability", availabilityRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Handle unknown API routes
 app.use("/api", (req, res) => {

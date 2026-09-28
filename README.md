@@ -939,3 +939,58 @@ This project demonstrates practical implementation of:
 RecipeHub was developed as a complete full-stack application to demonstrate how a modern Angular frontend can communicate with a secure Node.js/Express REST API and MongoDB database while implementing authentication, authorization, validation, testing, responsive UI, and AI-powered functionality.
 
 ---
+
+
+## Ratings & Reviews
+
+RecipeHub now supports ratings and reviews for recipes.
+
+### Features
+
+- Users can rate a recipe from 1 to 5 stars.
+- Users can write a review for a recipe.
+- A user can submit only one review per recipe.
+- Recipe details show the average rating and total review count.
+- Reviews can be sorted by:
+  - Newest
+  - Oldest
+  - Highest Rating
+  - Lowest Rating
+- Users can mark reviews as helpful.
+- Review owners, recipe owners, and admins can delete reviews.
+- Toxic reviews are automatically blocked using an AI toxicity model.
+- Reviews are analyzed for sentiment and classified as positive, neutral, or negative.
+- Sentiment is displayed as a badge with each review.
+
+### AI Features
+
+#### 1. Sentiment Analysis
+
+**Model:** `Xenova/distilbert-base-uncased-finetuned-sst-2-english`
+
+The model analyzes the review text and identifies its sentiment. The application uses the model's confidence score to map low-confidence predictions to `neutral`.
+
+#### 2. Toxicity Detection
+
+**Model:** TensorFlow.js Toxicity Model
+
+The toxicity model checks reviews for inappropriate content. If a toxic category is detected, the review is rejected and is not stored in the database.
+
+### Review Flow
+
+```text
+User submits review
+        ↓
+Validate review
+        ↓
+Check recipe
+        ↓
+Check duplicate review
+        ↓
+Toxicity detection
+        ↓
+Sentiment analysis
+        ↓
+Save review
+        ↓
+Display review + sentiment
