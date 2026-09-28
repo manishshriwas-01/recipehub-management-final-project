@@ -1218,7 +1218,7 @@ test("should reject payment order creation by another user", async () => {
     expect(response.body.message).toBe(
         "You are not authorized to pay for this appointment"
     );
-},20000);
+},2000);
 
 
 

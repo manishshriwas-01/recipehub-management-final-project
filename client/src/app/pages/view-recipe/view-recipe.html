@@ -6,6 +6,7 @@
     </a>
 
     @if (recipe$ | async; as response) {
+
     <article class="recipe-detail">
 
       <div class="recipe-detail-image">
@@ -19,12 +20,26 @@
         </span>
 
         <h1>{{ response.recipe.title }}</h1>
+        <div class="recipe-rating-summary">
+          <span class="rating-stars">
+            {{ '★'.repeat(Math.round(averageRating())) }}{{ '☆'.repeat(5 - Math.round(averageRating())) }}
+          </span>
+
+          <span class="rating-value">
+            {{ averageRating().toFixed(1) }}
+          </span>
+
+          <span class="review-count">
+            ({{ reviewCount() }} {{ reviewCount() === 1 ? 'review' : 'reviews' }})
+          </span>
+        </div>
 
         <p class="recipe-owner">
           By {{ response.recipe.owner?.name || 'Unknown User' }}
         </p>
 
         <!-- Favorite -->
+
         <button type="button" class="favorite-btn" [class.active]="isFavorite()" [disabled]="isFavoriteLoading()"
           (click)="toggleFavorite()" aria-label="Toggle favorite">
           <span class="heart">
@@ -34,12 +49,16 @@
           {{ isFavorite() ? 'Remove from Favorites' : 'Add to Favorites' }}
         </button>
 
+        <!-- Learn Recipe -->
+
         <button type="button" class="learn-recipe-btn" (click)="learnRecipe()">
           👨‍🍳 Learn This Recipe
         </button>
 
         <!-- Ingredients -->
+
         <div class="recipe-section">
+
           <h2>Ingredients</h2>
 
           <ul>
@@ -47,13 +66,18 @@
             ingredient of response.recipe.ingredients;
             track $index
             ) {
-            <li>{{ ingredient }}</li>
+            <li>
+              {{ ingredient }}
+            </li>
             }
           </ul>
+
         </div>
 
         <!-- Instructions -->
+
         <div class="recipe-section">
+
           <h2>Instructions</h2>
 
           <ol>
@@ -61,34 +85,232 @@
             step of response.recipe.steps;
             track $index
             ) {
-            <li>{{ step }}</li>
+            <li>
+              {{ step }}
+            </li>
             }
           </ol>
+
+        </div>
+
+        <!-- Reviews -->
+
+        <div class="recipe-section reviews-section">
+
+          <h2>Reviews</h2>
+          <div class="review-sort">
+
+            <label for="reviewSort">
+              Sort reviews:
+            </label>
+
+            <select id="reviewSort" [value]="reviewSort()" (change)="changeReviewSort($any($event.target).value)">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="highest">Highest Rating</option>
+              <option value="lowest">Lowest Rating</option>
+            </select>
+
+          </div>
+
+          <!-- Review Form -->
+
+          @if (isLoggedIn()) {
+
+          <div class="review-form">
+
+            <h3>Write a Review</h3>
+
+            <!-- Rating -->
+
+            <div class="star-picker">
+
+              @for (
+              star of [1, 2, 3, 4, 5];
+              track star
+              ) {
+
+              <button type="button" class="star-btn" [class.selected]="star <= selectedRating()"
+                (click)="selectedRating.set(star)" [attr.aria-label]="star + ' stars'">
+                ★
+              </button>
+
+              }
+
+            </div>
+
+            <!-- Comment -->
+
+            <textarea [ngModel]="reviewComment()" (ngModelChange)="reviewComment.set($event)"
+              placeholder="Write your review..." maxlength="1000"></textarea>
+
+
+
+            <!-- Submit Review -->
+
+            <button type="button" class="submit-review-btn" [disabled]="reviewSubmitting()" (click)="submitReview()">
+              {{
+              reviewSubmitting()
+              ? 'Submitting...'
+              : 'Submit Review'
+              }}
+            </button>
+
+          </div>
+
+          }
+
+          <!-- Loading -->
+
+          @if (reviewsLoading()) {
+
+          <p>
+            Loading reviews...
+          </p>
+
+          }
+
+          <!-- Error -->
+
+          @else if (reviewsError()) {
+
+          <p class="review-error">
+            {{ reviewsError() }}
+          </p>
+
+          }
+
+          <!-- No Reviews -->
+
+          @else if (reviews().length === 0) {
+
+          <p>
+            No reviews yet. Be the first to review this recipe!
+          </p>
+
+          }
+
+          <!-- Reviews List -->
+
+          @else {
+
+          <div class="reviews-list">
+
+            @for (
+            review of reviews();
+            track review._id
+            ) {
+
+            <article class="review-card">
+
+              <!-- Review Header -->
+
+              <div class="review-header">
+
+                <strong>
+                  {{ review.user.name }}
+                </strong>
+
+                <span class="review-rating">
+                  {{ '⭐'.repeat(review.rating) }}
+                </span>
+
+              </div>
+
+              <!-- Review Comment -->
+
+              <p class="review-comment">
+                {{ review.comment }}
+              </p>
+              <div class="review-helpful">
+
+                <button type="button" class="helpful-btn" [class.active]="review.helpfulBy.includes(user()?.id || '')"
+                  [disabled]="helpfulLoading() === review._id" (click)="toggleHelpfulReview(review)">
+                  👍
+                  {{
+                  review.helpfulBy.includes(user()?.id || '')
+                  ? 'Helpful'
+                  : 'Helpful'
+                  }}
+
+                  ({{ review.helpfulBy.length }})
+                </button>
+
+              </div>
+              <!-- Delete Review -->
+
+              @if (
+              canDeleteReview(
+              review,
+              response.recipe.owner?._id
+              )
+              ) {
+
+              <button type="button" class="delete-review-btn" (click)="deleteReview(review._id)">
+                Delete
+              </button>
+
+              }
+
+              <!-- Sentiment -->
+
+              @if (review.sentiment) {
+
+              <span class="sentiment-badge">
+                {{ review.sentiment }}
+              </span>
+
+              }
+
+            </article>
+
+            }
+
+          </div>
+
+          }
+
         </div>
 
       </div>
+
     </article>
 
-    } @else {
+    }
+
+    <!-- Recipe Error / Loading -->
+
+    @else {
 
     @if (errorMessage()) {
 
     <div class="error-state">
-      <p>{{ errorMessage() }}</p>
+
+      <p>
+        {{ errorMessage() }}
+      </p>
+
       <a routerLink="/recipes" class="back-btn">
         Back to Recipes
       </a>
-    </div>
 
-    } @else {
-
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading recipe...</p>
     </div>
 
     }
 
+    @else {
+
+    <div class="loading-state">
+
+      <div class="spinner"></div>
+
+      <p>
+        Loading recipe...
+      </p>
+
+    </div>
+
+    }
 
     }
 

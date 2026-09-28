@@ -1,6 +1,7 @@
 import Recipe from '../models/Recipe.js';
 import User from '../models/User.js';
 import cloudinary from "../config/cloudinary.js";
+import Review from '../models/Review.js';
 
 export const createRecipe = async (req, res, next) => {
     try {
@@ -148,6 +149,23 @@ export const getRecipe = async (req, res, next) => {
                 message: "Recipe not found",
             });
         }
+          const ratingStats = await Review.aggregate([
+            {
+                $match: {
+                    recipe: recipe._id,
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    averageRating: { $avg: "$rating" },
+                    reviewCount: { $sum: 1 },
+                },
+            },
+        ]);
+
+        const averageRating = ratingStats[0]?.averageRating || 0;
+        const reviewCount = ratingStats[0]?.reviewCount || 0;
 
         return res.status(200).json({
             success: true,

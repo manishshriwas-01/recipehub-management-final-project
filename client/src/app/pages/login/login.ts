@@ -54,6 +54,7 @@ export class Login {
 
         this.authService.getMe().subscribe({
           next: (meResponse) => {
+            // Store logged-in user
             this.authService.setUser(meResponse.user);
 
             this.isLoading.set(false);
@@ -77,8 +78,12 @@ export class Login {
         });
       },
 
-      error: () => {
+      error: (error) => {
         this.isLoading.set(false);
+
+        this.toastr.error(
+          error.error?.message || 'Login failed'
+        );
       },
     });
   }

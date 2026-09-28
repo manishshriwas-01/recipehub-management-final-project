@@ -33,10 +33,18 @@ export class RecipeService {
     return this.http.get<RecipeResponse>(url);
   }
 
-  getRecipe(id: string): Observable<{ success: boolean; recipe: Recipe }> {
-    return this.http.get<{ success: boolean; recipe: Recipe }>(
-      `${this.apiUrl}/${id}`
-    );
+  getRecipe(id: string): Observable<{
+    success: boolean;
+    recipe: Recipe;
+    averageRating: number;
+    reviewCount: number;
+  }> {
+    return this.http.get<{
+      success: boolean;
+      recipe: Recipe;
+      averageRating: number;
+      reviewCount: number;
+    }>(`${this.apiUrl}/${id}`);
   }
   createRecipe(data: FormData): Observable<{
     success: boolean;

@@ -10,7 +10,7 @@ interface AuthResponse {
 }
 
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: 'user' | 'admin';
@@ -22,9 +22,6 @@ export interface User {
 export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/auth`;
-
-  // private apiUrl =
-  // 'https://recipehub-management-final-project.onrender.com/api/auth';
 
   user = signal<User | null>(null);
 
@@ -71,7 +68,6 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
-
 
   getAllUsers(): Observable<{
     success: boolean;
