@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { FoodDetectionService } from '../../services/food-detection-service';
 import {
   FormControl,
   FormGroup,
@@ -16,11 +17,17 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './edit-recipe.css',
 })
 export class EditRecipe {
+
   private route = inject(ActivatedRoute);
   recipeService = inject(RecipeService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private toastr = inject(ToastrService);
+  private foodDetectionService = inject(FoodDetectionService);
+
+  isAnalyzingImage = false;
+  imageValidationMessage = '';
+  isFoodImage = false;
 
   recipeId = '';
   errorMessage = '';
@@ -94,11 +101,42 @@ export class EditRecipe {
     });
   }
 
-  onImageSelected(event: Event): void {
+  async onImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
-    if (input.files && input.files.length > 0) {
-      this.selectedImage = input.files[0];
+    if (!file) return;
+
+    this.selectedImage = null;
+    this.isAnalyzingImage = true;
+    this.imageValidationMessage = '';
+    this.isFoodImage = false;
+
+    try {
+      const predictions =
+        await this.foodDetectionService.classifyImage(file);
+
+      console.log('MobileNet predictions:', predictions);
+
+      const isFood = this.foodDetectionService.isFood(predictions);
+
+      if (isFood) {
+        this.selectedImage = file;
+        this.isFoodImage = true;
+        this.imageValidationMessage = 'Food image detected.';
+      } else {
+        this.toastr.warning(
+          'Please upload an image related to food or a recipe.'
+        );
+        this.imageValidationMessage =
+          'This image does not appear to be food.';
+      }
+    } catch (error) {
+      console.error('Image analysis failed:', error);
+      this.toastr.error('Unable to analyze the image.');
+      this.imageValidationMessage = 'Image analysis failed.';
+    } finally {
+      this.isAnalyzingImage = false;
     }
   }
 

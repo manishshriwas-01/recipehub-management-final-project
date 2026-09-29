@@ -994,3 +994,70 @@ Sentiment analysis
 Save review
         ↓
 Display review + sentiment
+
+
+
+## Day 2 — Favourites, Collections & Free AI
+
+### Favourites & Collections
+
+Implemented a complete favourites and collections system for RecipeHub.
+
+#### Features
+- Users can save recipes to favourites.
+- Users can create named recipe collections.
+- Users can add recipes to collections.
+- Users can remove recipes from collections.
+- Collections support server-side pagination.
+- Collection recipes are populated using MongoDB references.
+- Collection cover images can be uploaded.
+- Collections can be shared through a public link.
+- Collection owners can enable or disable public sharing.
+- Users can open and manage their collections from the Favourites page.
+
+#### Technical Implementation
+- Used MongoDB ObjectId references for the many-to-many relationship between collections and recipes.
+- Used Mongoose `populate()` to retrieve collection recipes.
+- Implemented server-side pagination for collections.
+- Added Cloudinary integration for collection cover image uploads.
+- Added owner-based authorization for collection management.
+- Added unique collection names per user.
+
+---
+
+### Free AI — Recipe Image Food Detection
+
+Added AI-based image validation when creating or editing recipes.
+
+#### Features
+- Recipe images are analyzed using TensorFlow.js MobileNet.
+- Image analysis runs in the browser before uploading the image.
+- Food-related images are allowed.
+- Non-food images, such as buildings, are rejected with a warning.
+- The same validation is applied when uploading a new image while editing a recipe.
+- Existing recipe images are not re-analyzed unless the user selects a new image.
+- Invalid images are not added to the recipe submission.
+
+#### Technical Implementation
+- Created a reusable `FoodDetectionService`.
+- MobileNet analyzes the uploaded image and returns the top predictions.
+- Added food-related prediction matching with a confidence threshold.
+- Used the same service for both Create Recipe and Edit Recipe.
+- Existing Ratings & Reviews toxicity detection was preserved without modifying the existing feature.
+
+#### Image Validation Flow
+
+```text
+User selects recipe image
+        ↓
+MobileNet analyzes image
+        ↓
+Top predictions generated
+        ↓
+Food-related prediction found?
+       / \
+     Yes  No
+      ↓    ↓
+   Accept  Reject
+      ↓    ↓
+Upload   Show warning

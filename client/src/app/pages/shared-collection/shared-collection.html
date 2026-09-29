@@ -1,0 +1,92 @@
+<section class="shared-collection-page">
+
+  @if (loading()) {
+
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading collection...</p>
+    </div>
+
+  } @else if (errorMessage()) {
+
+    <div class="error-state">
+      <h2>Collection not found</h2>
+      <p>{{ errorMessage() }}</p>
+    </div>
+
+  } @else if (collection()) {
+
+    <div class="collection-container">
+
+      @if (collection().coverImage) {
+        <div class="collection-cover">
+          <img
+            [src]="collection().coverImage"
+            [alt]="collection().name"
+          />
+        </div>
+      }
+
+      <div class="collection-header">
+
+        <span>Shared Collection</span>
+
+        <h1>
+          {{ collection().name }}
+        </h1>
+
+        @if (collection().owner?.name) {
+          <p>
+            Created by {{ collection().owner.name }}
+          </p>
+        }
+
+      </div>
+
+      @if (collection().recipes?.length > 0) {
+
+        <div class="recipe-list">
+
+          @for (recipe of collection().recipes; track recipe._id) {
+
+            <article class="recipe-card">
+
+              @if (recipe.image) {
+                <img
+                  [src]="recipeService.getImageUrl(recipe.image)"
+                  [alt]="recipe.title"
+                />
+              }
+
+              <div class="recipe-content">
+
+                <h2>
+                  {{ recipe.title }}
+                </h2>
+
+                <span>
+                  {{ recipe.category }}
+                </span>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+          <h2>No recipes yet</h2>
+          <p>This collection doesn't contain any recipes.</p>
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</section>

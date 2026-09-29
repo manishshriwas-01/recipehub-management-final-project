@@ -1,95 +1,633 @@
 <section class="favorites-page">
   <div class="favorites-container">
 
-    <div class="favorites-header">
-      <div>
-        <h1>My Favorites ❤️</h1>
-        <p>Recipes you have saved for later.</p>
+    <!-- ================= FAVORITES ================= -->
+
+    <header class="favorites-header">
+      <div class="header-content">
+        <span class="eyebrow">Your kitchen</span>
+
+        <h1>
+          Favorites <span>♥</span>
+        </h1>
+
+        <p>
+          Recipes you've saved for your next delicious moment.
+        </p>
       </div>
 
       <a routerLink="/recipes" class="browse-btn">
-        Browse Recipes
+        <span>Explore Recipes</span>
+        <span>→</span>
       </a>
-    </div>
+    </header>
 
-    @if (loading()) {
+    <section class="section-block">
 
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading your favorites...</p>
-    </div>
+      <div class="section-heading">
+        <div>
+          <h2>Saved Recipes</h2>
+          <p>{{ favorites().length }} recipes saved</p>
+        </div>
+      </div>
 
-    } @else if (errorMessage()) {
+      @if (loading()) {
 
-    <div class="error-state">
-      <span>⚠️</span>
-      <h2>Something went wrong</h2>
-      <p>{{ errorMessage() }}</p>
-    </div>
-
-    } @else if (favorites().length > 0) {
-
-    <div class="favorites-grid">
-
-      @for (recipe of favorites(); track recipe._id) {
-
-      <article class="recipe-card">
-
-        <div class="recipe-image">
-          <img [src]="recipeService.getImageUrl(recipe.imageUrl)" [alt]="recipe.title" />
-
-          <span class="category">
-            {{ recipe.category }}
-          </span>
-
-          <!-- Remove Favorite -->
-          <button type="button" class="favorite-btn" (click)="removeFavorite(recipe._id)"
-            aria-label="Remove from favorites">
-            ♥
-          </button>
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading your favorites...</p>
         </div>
 
-        <div class="recipe-content">
+      } @else if (errorMessage()) {
 
-          <h2>{{ recipe.title }}</h2>
+        <div class="error-state">
+          <div class="state-icon">!</div>
 
-          <p class="recipe-owner">
-            By {{ recipe.owner.name }}
+          <div>
+            <h3>Unable to load favorites</h3>
+            <p>{{ errorMessage() }}</p>
+          </div>
+        </div>
+
+      } @else if (favorites().length > 0) {
+
+        <div class="favorites-grid">
+
+          @for (recipe of favorites(); track recipe._id) {
+
+            <article class="recipe-card">
+
+              <div class="recipe-image">
+
+                <img
+                  [src]="recipeService.getImageUrl(recipe.imageUrl)"
+                  [alt]="recipe.title"
+                />
+
+                <span class="category">
+                  {{ recipe.category }}
+                </span>
+
+                <button
+                  type="button"
+                  class="favorite-btn"
+                  (click)="removeFavorite(recipe._id)"
+                  aria-label="Remove from favorites"
+                >
+                  ♥
+                </button>
+
+              </div>
+
+              <div class="recipe-content">
+
+                <h3>{{ recipe.title }}</h3>
+
+                <p class="recipe-owner">
+                  By {{ recipe.owner?.name || 'Unknown User' }}
+                </p>
+
+                <div class="recipe-actions">
+
+                  <a
+                    [routerLink]="['/recipes', recipe._id]"
+                    class="view-btn"
+                  >
+                    View Recipe
+                    <span>→</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    class="add-to-collection-btn"
+                    (click)="openCollectionSelector(recipe)"
+                  >
+                    + Collection
+                  </button>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+
+          <div class="empty-icon">♡</div>
+
+          <h2>Your recipe box is empty</h2>
+
+          <p>
+            Save recipes you love and they'll appear here for easy access later.
           </p>
 
-          <a [routerLink]="['/recipes', recipe._id]" class="view-btn">
-            View Recipe →
+          <a routerLink="/recipes" class="browse-btn">
+            Discover Recipes
+            <span>→</span>
           </a>
 
         </div>
 
-      </article>
+      }
+
+    </section>
+
+
+    <!-- ================= COLLECTIONS ================= -->
+
+    <section class="section-block collections-section">
+
+      <div class="section-heading">
+
+        <div>
+          <span class="eyebrow">Organize your kitchen</span>
+
+          <h2>My Collections</h2>
+
+          <p>
+            Create personal cookbooks from your favorite recipes.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="create-collection-btn"
+          (click)="openCollectionForm()"
+        >
+          + Create Collection
+        </button>
+
+      </div>
+
+
+      <!-- CREATE COLLECTION -->
+
+      @if (showCollectionForm()) {
+
+        <div class="collection-form-card">
+
+          <div class="collection-form-header">
+
+            <div class="collection-form-icon">
+              📚
+            </div>
+
+            <div>
+              <span class="eyebrow">New cookbook</span>
+
+              <h3>Create Collection</h3>
+
+              <p>
+                Give your collection a name and cover image.
+              </p>
+            </div>
+
+          </div>
+
+          <input
+            type="text"
+            placeholder="e.g. Breakfast Favorites"
+            [value]="collectionName()"
+            (input)="collectionName.set($any($event.target).value)"
+            maxlength="50"
+          />
+
+          <label for="collection-cover">
+            Cover Image
+          </label>
+
+          <input
+            id="collection-cover"
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            (change)="onCollectionImageSelected($event)"
+          />
+
+          @if (collectionImagePreview()) {
+
+            <div class="collection-image-preview">
+
+              <img
+                [src]="collectionImagePreview()"
+                alt="Collection cover preview"
+              />
+
+            </div>
+
+          }
+
+          <div class="collection-form-actions">
+
+            <button
+              type="button"
+              class="cancel-btn"
+              (click)="closeCollectionForm()"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              class="create-btn"
+              (click)="createCollection()"
+            >
+              Create Collection
+            </button>
+
+          </div>
+
+        </div>
 
       }
 
-    </div>
 
-    } @else {
+      @if (collectionsLoading()) {
 
-    <div class="empty-state">
+        <div class="collection-loading">
+          <div class="spinner"></div>
+          <p>Loading your collections...</p>
+        </div>
 
-      <div class="empty-icon">
-        ♡
-      </div>
+      } @else if (collectionsError()) {
 
-      <h2>No Favorite Recipes Yet</h2>
+        <div class="error-state">
 
-      <p>
-        Start exploring recipes and save your favorites here.
-      </p>
+          <div class="state-icon">!</div>
 
-      <a routerLink="/recipes" class="browse-btn">
-        Explore Recipes
-      </a>
+          <div>
+            <h3>Unable to load collections</h3>
+            <p>{{ collectionsError() }}</p>
+          </div>
 
-    </div>
+        </div>
 
-    }
+      } @else if (collections().length > 0) {
+
+        <div class="collections-grid">
+
+          @for (collection of collections(); track collection._id) {
+
+            <article class="collection-card">
+
+              @if (collection.coverImage) {
+
+                <div class="collection-cover">
+                  <img
+                    [src]="collection.coverImage"
+                    [alt]="collection.name"
+                  />
+                </div>
+
+              }
+
+              <div class="collection-content">
+
+                <h3>
+                  {{ collection.name }}
+                </h3>
+
+                <div class="collection-actions">
+
+                  <button
+                    type="button"
+                    class="open-collection-btn"
+                    (click)="openCollection(collection)"
+                  >
+                    Open Collection
+                    <span>→</span>
+                  </button>
+
+                  @if (collection.isPublic) {
+
+                    <button
+                      type="button"
+                      (click)="unshareCollection(collection)"
+                    >
+                      Unshare
+                    </button>
+
+                  } @else {
+
+                    <button
+                      type="button"
+                      (click)="shareCollection(collection)"
+                    >
+                      Share
+                    </button>
+
+                  }
+
+                  <button
+                    type="button"
+                    class="delete-collection-btn"
+                    (click)="deleteCollection(collection._id)"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+
+        <!-- PAGINATION -->
+
+        @if (collectionTotalPages() > 1) {
+
+          <div class="collection-pagination">
+
+            <button
+              type="button"
+              [disabled]="currentCollectionPage() === 1"
+              (click)="previousCollectionPage()"
+            >
+              ← Previous
+            </button>
+
+            <span>
+              Page {{ currentCollectionPage() }}
+              of {{ collectionTotalPages() }}
+            </span>
+
+            <button
+              type="button"
+              [disabled]="currentCollectionPage() === collectionTotalPages()"
+              (click)="nextCollectionPage()"
+            >
+              Next →
+            </button>
+
+          </div>
+
+        }
+
+      } @else {
+
+        <div class="collections-empty">
+
+          <div class="collections-empty-icon">
+            📚
+          </div>
+
+          <div>
+
+            <h3>
+              Create your first collection
+            </h3>
+
+            <p>
+              Organize your favorite recipes into cookbooks like
+              Breakfast, Dinner, Desserts or Weekend Specials.
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="create-collection-btn"
+            (click)="openCollectionForm()"
+          >
+            Create Collection
+            <span>+</span>
+          </button>
+
+        </div>
+
+      }
+
+    </section>
 
   </div>
+
+
+  <!-- ================= COLLECTION SELECTOR MODAL ================= -->
+
+  @if (showCollectionSelector()) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeCollectionSelector()"
+    >
+
+      <div
+        class="collection-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="modal-header">
+
+          <div>
+
+            <span class="eyebrow">
+              Save recipe
+            </span>
+
+            <h2>
+              Add to Collection
+            </h2>
+
+            @if (selectedRecipe()) {
+
+              <p>
+                {{ selectedRecipe()?.title }}
+              </p>
+
+            }
+
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            (click)="closeCollectionSelector()"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <div class="collection-selector">
+
+          <label for="collection">
+            Select Collection
+          </label>
+
+          <select
+            id="collection"
+            [value]="selectedCollectionId()"
+            (change)="
+              selectedCollectionId.set(
+                $any($event.target).value
+              )
+            "
+          >
+
+            <option value="">
+              Choose a collection
+            </option>
+
+            @for (collection of collections(); track collection._id) {
+
+              <option [value]="collection._id">
+                {{ collection.name }}
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="cancel-btn"
+            (click)="closeCollectionSelector()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="create-btn"
+            [disabled]="!selectedCollectionId()"
+            (click)="addRecipeToCollection()"
+          >
+            Add Recipe
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- ================= OPEN COLLECTION ================= -->
+
+  @if (selectedCollection()) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeCollection()"
+    >
+
+      <div
+        class="collection-detail-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="modal-header">
+
+          <div>
+
+            <span class="eyebrow">
+              My Collection
+            </span>
+
+            <h2>
+              {{ selectedCollection().name }}
+            </h2>
+
+            <p>
+              {{ selectedCollection().recipes?.length || 0 }}
+              recipes
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            (click)="closeCollection()"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        @if (selectedCollection().recipes?.length > 0) {
+
+          <div class="collection-recipe-list">
+
+            @for (
+              recipe of selectedCollection().recipes;
+              track recipe._id
+            ) {
+
+              <div class="collection-recipe-item">
+
+                <div class="collection-recipe-info">
+
+                  <h3>
+                    {{ recipe.title }}
+                  </h3>
+
+                  <span>
+                    {{ recipe.category }}
+                  </span>
+
+                </div>
+
+                <button
+                  type="button"
+                  class="remove-recipe-btn"
+                  (click)="
+                    removeRecipeFromCollection(
+                      selectedCollection()._id,
+                      recipe._id
+                    )
+                  "
+                >
+                  Remove
+                </button>
+
+              </div>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div class="collection-empty-detail">
+
+            <div>🍽️</div>
+
+            <h3>
+              No recipes yet
+            </h3>
+
+            <p>
+              Add recipes from your favorite recipes above.
+            </p>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  }
+
 </section>

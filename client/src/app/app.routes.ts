@@ -62,6 +62,13 @@ export const routes: Routes = [
         (m) => m.Favorites
       ),
   },
+  {
+  path: 'shared-collection/:shareToken',
+  loadComponent: () =>
+    import('./pages/shared-collection/shared-collection')
+      .then(m => m.SharedCollection)
+},
+
   // Admin only
   {
     path: 'manage-recipes',
@@ -97,6 +104,11 @@ export const routes: Routes = [
     import('./pages/instructor-dashboard/instructor-dashboard')
       .then((m) => m.InstructorDashboard),
 },
+// {
+//   path: 'my-collections',
+//   component: MyCollections,
+//   canActivate: [authGuard]
+// }
   {
     path: '**',
     loadComponent: () =>
