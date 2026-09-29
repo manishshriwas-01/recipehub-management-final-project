@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RecipeService } from '../../services/recipe.service';
+import { FoodDetectionService } from '../../services/food-detection-service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import {
@@ -17,12 +18,14 @@ import {
 })
 export class CreateRecipe {
   private recipeService = inject(RecipeService);
+  private foodDetectionService = inject(FoodDetectionService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
 
-  
-
   selectedImage: File | null = null;
+  isAnalyzingImage = false;
+  imageValidationMessage = '';
+  isFoodImage = false;
 
   recipeForm = new FormGroup({
     title: new FormControl('', {
@@ -53,11 +56,42 @@ export class CreateRecipe {
   isLoading = false;
   errorMessage = '';
 
-  onImageSelected(event: Event): void {
+  async onImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
-    if (input.files && input.files.length > 0) {
-      this.selectedImage = input.files[0];
+    if (!file) return;
+
+    this.selectedImage = null;
+    this.isAnalyzingImage = true;
+    this.imageValidationMessage = '';
+    this.isFoodImage = false;
+
+    try {
+      const predictions =
+        await this.foodDetectionService.classifyImage(file);
+
+      console.log('MobileNet predictions:', predictions);
+
+      const isFood = this.foodDetectionService.isFood(predictions);
+
+      if (isFood) {
+        this.selectedImage = file;
+        this.isFoodImage = true;
+        this.imageValidationMessage = 'Food image detected.';
+      } else {
+        this.toastr.warning(
+          'Please upload an image related to food or a recipe.'
+        );
+        this.imageValidationMessage =
+          'This image does not appear to be food.';
+      }
+    } catch (error) {
+      console.error('Image analysis failed:', error);
+      this.toastr.error('Unable to analyze the image.');
+      this.imageValidationMessage = 'Image analysis failed.';
+    } finally {
+      this.isAnalyzingImage = false;
     }
   }
 
@@ -121,7 +155,9 @@ export class CreateRecipe {
 
       error: (error) => {
         this.isLoading = false;
-         this.errorMessage = error?.error?.message || 'Failed to create recipe. Please try again.';
+        this.errorMessage =
+          error?.error?.message ||
+          'Failed to create recipe. Please try again.';
       },
     });
   }
