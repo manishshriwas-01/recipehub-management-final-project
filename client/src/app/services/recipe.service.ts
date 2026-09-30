@@ -5,30 +5,57 @@ import { Observable } from 'rxjs';
 import { RecipeResponse, Recipe } from '../models/Recipe';
 import { environment } from '../../environments/environment';
 
-
-
-
 @Injectable({
   providedIn: 'root',
 })
 export class RecipeService {
   private http = inject(HttpClient);
-
-  // private apiUrl =
-  //   'https://recipehub-management-final-project.onrender.com/api/recipes';
-
   private apiUrl = `${environment.apiUrl}/recipes`;
 
-  getRecipes(page: number = 1, limit: number = 9, search: string = '', category: string = ''): Observable<RecipeResponse> {
-    let url = `${this.apiUrl}?page=${page}&limit=${limit}`;
+  // Get Recipes
+  // Updated for Day 3:
+  // - maxCookTime
+  // - minRating
+  // - sort
+  getRecipes(
+    page: number = 1,
+    limit: number = 9,
+    search: string = '',
+    category: string = '',
+    maxCookTime?: number,
+    minRating?: number,
+    sort: string = 'newest',
+    ingredients: string[] = []
+  ): Observable<RecipeResponse> {
 
-    if (search) {
-      url += `&search=${encodeURIComponent(search)}`;
+    let url =
+      `${this.apiUrl}?page=${page}&limit=${limit}`;
+
+    if (search.trim()) {
+      url += `&search=${encodeURIComponent(search.trim())}`;
     }
 
     if (category) {
       url += `&category=${encodeURIComponent(category)}`;
     }
+
+    if (maxCookTime !== undefined) {
+      url += `&maxCookTime=${maxCookTime}`;
+    }
+
+    if (minRating !== undefined) {
+      url += `&minRating=${minRating}`;
+    }
+
+    // Backend already defaults to newest
+    if (sort && sort !== 'newest') {
+      url += `&sort=${encodeURIComponent(sort)}`;
+    }
+    if (ingredients.length > 0) {
+      url += `&ingredients=${encodeURIComponent(ingredients.join(','))}`;
+    }
+
+    console.log('Recipe API URL:', url);
 
     return this.http.get<RecipeResponse>(url);
   }
@@ -46,7 +73,10 @@ export class RecipeService {
       reviewCount: number;
     }>(`${this.apiUrl}/${id}`);
   }
-  createRecipe(data: FormData): Observable<{
+
+  createRecipe(
+    data: FormData
+  ): Observable<{
     success: boolean;
     message: string;
     recipe: Recipe;
@@ -57,7 +87,6 @@ export class RecipeService {
       recipe: Recipe;
     }>(this.apiUrl, data);
   }
-
 
   updateRecipe(
     id: string,
@@ -74,7 +103,6 @@ export class RecipeService {
     }>(`${this.apiUrl}/${id}`, data);
   }
 
-
   getMyRecipes(): Observable<{
     success: boolean;
     count: number;
@@ -87,10 +115,7 @@ export class RecipeService {
     }>(`${this.apiUrl}/my-recipes`);
   }
 
-
-  deleteRecipe(
-    id: string
-  ): Observable<{
+  deleteRecipe(id: string): Observable<{
     success: boolean;
     message: string;
   }> {
@@ -99,7 +124,6 @@ export class RecipeService {
       message: string;
     }>(`${this.apiUrl}/${id}`);
   }
-
 
   addFavorite(id: string): Observable<{
     success: boolean;
@@ -121,7 +145,6 @@ export class RecipeService {
     }>(`${this.apiUrl}/${id}/favorite`);
   }
 
-
   getFavorites(): Observable<{
     success: boolean;
     count: number;
@@ -134,8 +157,10 @@ export class RecipeService {
     }>(`${this.apiUrl}/favorites`);
   }
 
-
-  getRecipesByUser(ownerId: string, search: string = ''): Observable<RecipeResponse> {
+  getRecipesByUser(
+    ownerId: string,
+    search: string = ''
+  ): Observable<RecipeResponse> {
     let url = `${this.apiUrl}?ownerId=${encodeURIComponent(ownerId)}`;
 
     if (search.trim()) {
@@ -143,59 +168,41 @@ export class RecipeService {
     }
 
     console.log('User Recipe API:', url);
+
     return this.http.get<RecipeResponse>(url);
   }
-
 
   getImageUrl(imageUrl: string): string {
     if (!imageUrl) {
       return '';
     }
 
-    if (imageUrl.startsWith('http')) {
+    if (
+      imageUrl.startsWith('http://') ||
+      imageUrl.startsWith('https://')
+    ) {
       return imageUrl;
     }
 
-    const serverUrl = this.apiUrl.split('/api/recipes')[0];
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
 
-    const finalUrl = `${serverUrl}${imageUrl}`;
-
-    // console.log('Original imageUrl:', imageUrl);
-    // console.log('Final image URL:', finalUrl);
-
-    return finalUrl;
+    return `${baseUrl}/${imageUrl.replace(/^\/+/, '')}`;
   }
 
-
-  getRecipeAvailability(recipeId: string): Observable<{
-    success: boolean;
-    availability: {
-      _id: string;
-      instructor: string;
-      dayOfWeek: string;
-      startTime: string;
-      endTime: string;
-      isActive: boolean;
-    }[];
-  }> {
-    const availabilityUrl = `${environment.apiUrl}/availability/recipe/${recipeId}`;
-
-    return this.http.get<{
-      success: boolean;
-      availability: {
-        _id: string;
-        instructor: string;
-        dayOfWeek: string;
-        startTime: string;
-        endTime: string;
-        isActive: boolean;
-      }[];
-    }>(availabilityUrl);
+  getRecipeAvailability(
+    recipeId: string
+  ): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}/${recipeId}/availability`
+    );
   }
 
-
-
-
+  // Day 3 - Trending Recipes
+  getTrendingRecipes(
+    type: 'mostReviewed' | 'highestRated' = 'mostReviewed'
+  ): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}/trending?type=${type}`
+    );
+  }
 }
-
-

@@ -51,6 +51,13 @@ export class CreateRecipe {
       nonNullable: true,
       validators: [Validators.required],
     }),
+
+    cookTime: new FormControl<number | null>(null, {
+      validators: [
+        Validators.required,
+        Validators.min(1),
+      ],
+    }),
   });
 
   isLoading = false;
@@ -83,44 +90,63 @@ export class CreateRecipe {
         this.toastr.warning(
           'Please upload an image related to food or a recipe.'
         );
+
         this.imageValidationMessage =
           'This image does not appear to be food.';
       }
     } catch (error) {
       console.error('Image analysis failed:', error);
-      this.toastr.error('Unable to analyze the image.');
-      this.imageValidationMessage = 'Image analysis failed.';
+
+      this.toastr.error(
+        'Unable to analyze the image.'
+      );
+
+      this.imageValidationMessage =
+        'Image analysis failed.';
     } finally {
       this.isAnalyzingImage = false;
     }
   }
 
   onSubmit(): void {
-    if (this.recipeForm.invalid || !this.selectedImage) {
+    if (
+      this.recipeForm.invalid ||
+      !this.selectedImage
+    ) {
       this.recipeForm.markAllAsTouched();
 
       if (!this.selectedImage) {
-        this.toastr.error('Recipe image is required.');
+        this.toastr.error(
+          'Recipe image is required.'
+        );
       }
 
       return;
     }
 
-    const formValue = this.recipeForm.getRawValue();
+    const formValue =
+      this.recipeForm.getRawValue();
 
     const ingredients = formValue.ingredients
       .split('\n')
       .map((item) => item.trim())
-      .filter((item) => item.length > 0);
+      .filter(
+        (item) => item.length > 0
+      );
 
     const steps = formValue.steps
       .split('\n')
       .map((step) => step.trim())
-      .filter((step) => step.length > 0);
+      .filter(
+        (step) => step.length > 0
+      );
 
     const formData = new FormData();
 
-    formData.append('title', formValue.title.trim());
+    formData.append(
+      'title',
+      formValue.title.trim()
+    );
 
     formData.append(
       'ingredients',
@@ -132,33 +158,50 @@ export class CreateRecipe {
       JSON.stringify(steps)
     );
 
-    formData.append('category', formValue.category);
+    formData.append(
+      'category',
+      formValue.category
+    );
 
-    formData.append('image', this.selectedImage);
+    formData.append(
+      'cookTime',
+      String(formValue.cookTime)
+    );
+
+    formData.append(
+      'image',
+      this.selectedImage
+    );
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.recipeService.createRecipe(formData).subscribe({
-      next: (response) => {
-        this.isLoading = false;
+    this.recipeService
+      .createRecipe(formData)
+      .subscribe({
 
-        this.toastr.success(
-          response.message || 'Recipe created successfully!'
-        );
+        next: (response) => {
+          this.isLoading = false;
 
-        this.router.navigate([
-          '/recipes',
-          response.recipe._id,
-        ]);
-      },
+          this.toastr.success(
+            response.message ||
+              'Recipe created successfully!'
+          );
 
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to create recipe. Please try again.';
-      },
-    });
+          this.router.navigate([
+            '/recipes',
+            response.recipe._id,
+          ]);
+        },
+
+        error: (error) => {
+          this.isLoading = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to create recipe. Please try again.';
+        },
+
+      });
   }
 }

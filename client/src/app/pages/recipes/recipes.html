@@ -1,65 +1,353 @@
 <section class="recipes-page">
+
   <div class="recipes-container">
 
     <div class="page-header">
-      <div>
-        <span class="section-label">EXPLORE</span>
 
-        <h1>All Recipes</h1>
+      <div>
+        <span class="section-label">
+          EXPLORE
+        </span>
+
+        <h1>
+          All Recipes
+        </h1>
 
         <p>
           Discover delicious recipes from the RecipeHub community.
         </p>
       </div>
+
     </div>
 
+
+    <!-- FILTERS -->
     <div class="filters-section">
 
+      <!-- Search -->
       <div class="filter-group">
+
         <label for="search">
           Search Recipes
         </label>
-        <input id="search" type="text" [formControl]="searchControl" placeholder="Search recipes..." />
+
+        <!-- Voice Search -->
+        <div class="search-input-wrapper">
+          <input id="search" type="text" [formControl]="searchControl" placeholder="Search recipes..." />
+
+          <button type="button" class="voice-search-btn" [class.listening]="isListening()" (click)="startVoiceSearch()"
+            [title]="isListening() ? 'Listening...' : 'Search by voice'"
+            [attr.aria-label]="isListening() ? 'Listening...' : 'Search by voice'">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+        </div>
+
+        @if (voiceError()) {
+        <div class="voice-error">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>{{ voiceError() }}</span>
+        </div>
+        }
+
       </div>
 
+
+      <!-- Category -->
       <div class="filter-group">
+
         <label for="category">
           Category
         </label>
 
         <select id="category" [formControl]="categoryControl">
 
-          <option value="">All Categories</option>
-          <option value="Indian">Indian</option>
-          <option value="Italian">Italian</option>
-          <option value="Chinese">Chinese</option>
-          <option value="Mexican">Mexican</option>
-          <option value="Dessert">Dessert</option>
-          <option value="Healthy">Healthy</option>
-          <option value="Breakfast">Breakfast</option>
-          <option value="Other">Other</option>
+          <option value="">
+            All Categories
+          </option>
+
+          <option value="Indian">
+            Indian
+          </option>
+
+          <option value="Italian">
+            Italian
+          </option>
+
+          <option value="Chinese">
+            Chinese
+          </option>
+
+          <option value="Mexican">
+            Mexican
+          </option>
+
+          <option value="Dessert">
+            Dessert
+          </option>
+
+          <option value="Healthy">
+            Healthy
+          </option>
+
+          <option value="Breakfast">
+            Breakfast
+          </option>
+
+          <option value="Other">
+            Other
+          </option>
 
         </select>
+
+      </div>
+
+
+      <!-- Maximum Cook Time -->
+      <div class="filter-group">
+
+        <label for="cookTime">
+          Cook Time
+        </label>
+
+        <select id="cookTime" [formControl]="maxCookTimeControl">
+
+          <option [ngValue]="null">
+            Any Time
+          </option>
+
+          <option [ngValue]="15">
+            Under 15 min
+          </option>
+
+          <option [ngValue]="30">
+            Under 30 min
+          </option>
+
+          <option [ngValue]="60">
+            Under 60 min
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- Minimum Rating -->
+      <div class="filter-group">
+
+        <label for="rating">
+          Minimum Rating
+        </label>
+
+        <select id="rating" [formControl]="minRatingControl">
+
+          <option [ngValue]="null">
+            Any Rating
+          </option>
+
+          <option [ngValue]="4">
+            4+ ⭐
+          </option>
+
+          <option [ngValue]="3">
+            3+ ⭐
+          </option>
+
+          <option [ngValue]="2">
+            2+ ⭐
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- Sort -->
+      <div class="filter-group">
+
+        <label for="sort">
+          Sort By
+        </label>
+
+        <select id="sort" [formControl]="sortControl">
+
+          <option value="newest">
+            Newest
+          </option>
+
+          <option value="cookTime">
+            Quickest
+          </option>
+
+          <option value="rating">
+            Highest Rated
+          </option>
+
+          <option value="reviews">
+            Most Reviewed
+          </option>
+
+        </select>
+
       </div>
 
     </div>
 
+
+    @if (
+    searchControl.value ||
+    categoryControl.value ||
+    maxCookTimeControl.value !== null ||
+    minRatingControl.value !== null ||
+    sortControl.value !== 'newest'
+    ) {
+
+    <div class="filter-chips">
+
+      @if (searchControl.value) {
+
+      <button type="button" class="filter-chip" (click)="clearSearch()">
+        Search: {{ searchControl.value }}
+        <span>×</span>
+      </button>
+
+      }
+
+
+      @if (categoryControl.value) {
+
+      <button type="button" class="filter-chip" (click)="clearCategory()">
+        Category: {{ categoryControl.value }}
+        <span>×</span>
+      </button>
+
+      }
+
+
+      @if (maxCookTimeControl.value !== null) {
+
+      <button type="button" class="filter-chip" (click)="clearCookTime()">
+        Cook Time: {{ maxCookTimeControl.value }} min
+        <span>×</span>
+      </button>
+
+      }
+
+
+      @if (minRatingControl.value !== null) {
+
+      <button type="button" class="filter-chip" (click)="clearRating()">
+        Rating: {{ minRatingControl.value }}+ ⭐
+        <span>×</span>
+      </button>
+
+      }
+
+
+      @if (sortControl.value !== 'newest') {
+
+      <button type="button" class="filter-chip" (click)="clearSort()">
+        Sort: {{ getSortLabel() }}
+        <span>×</span>
+      </button>
+
+      }
+
+
+      <button type="button" class="clear-filters-btn" (click)="clearAllFilters()">
+        Clear All
+      </button>
+
+    </div>
+
+    }
+
+
+    <!-- COOK WITH WHAT I HAVE -->
+    <div class="ingredient-picker">
+
+      <div class="ingredient-picker-header">
+
+        <div>
+
+          <span class="section-label">
+            SMART DISCOVERY
+          </span>
+
+          <h3>
+            Cook with what I have
+          </h3>
+
+          <p>
+            Select ingredients you have at home.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="ingredient-input-row">
+
+        <input type="text" [formControl]="ingredientControl" placeholder="e.g. paneer, tomato, onion"
+          (keyup.enter)="addIngredient()" />
+
+        <button type="button" (click)="addIngredient()">
+          Add
+        </button>
+
+      </div>
+
+
+      @if (selectedIngredients().length > 0) {
+
+      <div class="selected-ingredients">
+
+        @for (
+        ingredient of selectedIngredients();
+        track ingredient
+        ) {
+
+        <button type="button" class="ingredient-chip" (click)="removeIngredient(ingredient)">
+          {{ ingredient }}
+          <span>×</span>
+        </button>
+
+        }
+
+
+        <button type="button" class="clear-ingredients-btn" (click)="clearIngredients()">
+          Clear
+        </button>
+
+      </div>
+
+      }
+
+    </div>
+
+
+    <!-- ERROR -->
     @if (errorMessage$ | async; as errorMessage) {
 
     @if (errorMessage) {
 
     <div class="error-state">
+
       <span>⚠️</span>
 
       <p>
         {{ errorMessage }}
       </p>
+
     </div>
 
     }
 
     }
 
+
+    <!-- RECIPES -->
     <div class="recipes-content">
 
       @if (recipes$ | async; as response) {
@@ -68,7 +356,10 @@
 
       <div class="recipe-grid">
 
-        @for (recipe of response.recipes; track recipe._id) {
+        @for (
+        recipe of response.recipes;
+        track recipe._id
+        ) {
 
         <article class="recipe-card">
 
@@ -77,6 +368,7 @@
             <img [src]="recipeService.getImageUrl(recipe.imageUrl)" [alt]="recipe.title" />
 
           </div>
+
 
           <div class="recipe-info">
 
@@ -92,37 +384,23 @@
               By {{ recipe.owner?.name || 'Unknown User' }}
             </p>
 
+
             <div class="recipe-actions">
 
               <button class="view-btn" type="button" (click)="viewRecipe(recipe._id)">
-
                 View Recipe
-
               </button>
 
-              <button class="share-btn" type="button" (click)="shareRecipe(recipe)" title="Share recipe">
 
-                <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
+              <!-- MODERN SHARE BUTTON -->
+              <button class="share-btn" type="button" (click)="shareRecipe(recipe)" title="Share recipe"
+                aria-label="Share recipe">
 
-                  <circle cx="18" cy="5" r="3">
-                  </circle>
+                <i class="fa-solid fa-share-nodes"></i>
 
-                  <circle cx="6" cy="12" r="3">
-                  </circle>
-
-                  <circle cx="18" cy="19" r="3">
-                  </circle>
-
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49">
-                  </line>
-
-                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49">
-                  </line>
-
-                </svg>
-
-                <span>Share</span>
+                <span>
+                  Share
+                </span>
 
               </button>
 
@@ -136,15 +414,16 @@
 
       </div>
 
+
+      <!-- PAGINATION -->
       @if (response.pages > 1) {
 
       <div class="pagination">
 
         <button type="button" class="page-btn" [disabled]="response.page === 1" (click)="previousPage(response.page)">
-
           ← Previous
-
         </button>
+
 
         <div class="page-numbers">
 
@@ -155,20 +434,19 @@
 
           <button type="button" class="page-number" [class.active]="response.page === $index + 1"
             (click)="goToPage($index + 1)">
-
             {{ $index + 1 }}
-
           </button>
 
           }
 
         </div>
 
-        <button type="button" class="page-btn" [disabled]="response.page === response.pages"
-          (click)="nextPage(response.page, response.pages)">
 
+        <button type="button" class="page-btn" [disabled]="response.page === response.pages" (click)="nextPage(
+                  response.page,
+                  response.pages
+                )">
           Next →
-
         </button>
 
       </div>
@@ -210,8 +488,11 @@
     </div>
 
   </div>
+
 </section>
 
+
+<!-- SHARE MODAL -->
 
 @if (selectedRecipe) {
 
@@ -233,19 +514,20 @@
 
       </div>
 
+
       <button type="button" class="close-btn" (click)="closeShare()" aria-label="Close share popup">
-
         ×
-
       </button>
 
     </div>
 
+
     <div class="share-recipe-preview">
 
-      <img [src]="selectedRecipe.imageUrl" [alt]="selectedRecipe.title" />
+      <img [src]="recipeService.getImageUrl(selectedRecipe.imageUrl)" [alt]="selectedRecipe.title" />
 
       <div>
+
         <h4>
           {{ selectedRecipe.title }}
         </h4>
@@ -253,30 +535,42 @@
         <span>
           {{ selectedRecipe.category }}
         </span>
+
       </div>
 
     </div>
+
 
     <p class="share-description">
       Share this delicious recipe with your friends and family.
     </p>
 
+
     <div class="share-options">
 
       <button type="button" class="share-option whatsapp" (click)="shareOnWhatsApp(selectedRecipe)">
+
         <span class="option-icon">
           <i class="fa-brands fa-whatsapp"></i>
         </span>
 
-        <span>WhatsApp</span>
+        <span>
+          WhatsApp
+        </span>
+
       </button>
 
+
       <button type="button" class="share-option copy" (click)="copyRecipeLink(selectedRecipe)">
+
         <span class="option-icon">
           <i class="fa-solid fa-link"></i>
         </span>
 
-        <span>{{ copied ? 'Copied!' : 'Copy Link' }}</span>
+        <span>
+          {{ copied ? 'Copied!' : 'Copy Link' }}
+        </span>
+
       </button>
 
     </div>

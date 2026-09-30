@@ -8,7 +8,8 @@ import {
     getRecipe,
     getRecipes,
     getMyRecipes,
-    updateRecipe
+    updateRecipe,
+    getTrendingRecipes,
 } from '../controllers/recipeController.js';
 import { parseRecipeFields } from '../middleware/parseRecipeFields.js';
 
@@ -56,6 +57,11 @@ router.get(
     '/favorites',
     authMiddleware,
     getFavorites
+);
+
+router.get(
+    '/trending',
+    getTrendingRecipes
 );
 
 

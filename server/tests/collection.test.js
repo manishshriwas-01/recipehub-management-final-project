@@ -17,9 +17,10 @@ const createToken = (user) =>
   );
 
 describe("Collection API", () => {
-     beforeAll(async () => {
+  beforeAll(async () => {
     await connectDB();
   });
+
   let user;
   let otherUser;
   let recipe;
@@ -52,6 +53,7 @@ describe("Collection API", () => {
     token = createToken(user);
     otherToken = createToken(otherUser);
 
+    // Create test recipe for collection tests.
     recipe = await Recipe.create({
       owner: user._id,
       title: "Test Recipe",
@@ -59,8 +61,10 @@ describe("Collection API", () => {
       steps: ["Cut vegetables", "Cook vegetables"],
       category: "Indian",
       imageUrl: "https://example.com/recipe.jpg",
+      cookTime: 30,
     });
 
+    // Create another test recipe for collection tests.
     otherRecipe = await Recipe.create({
       owner: otherUser._id,
       title: "Other Recipe",
@@ -68,6 +72,7 @@ describe("Collection API", () => {
       steps: ["Cook rice"],
       category: "Chinese",
       imageUrl: "https://example.com/other.jpg",
+      cookTime: 30,
     });
 
     collection = await Collection.create({
