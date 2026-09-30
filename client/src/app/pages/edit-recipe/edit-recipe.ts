@@ -62,47 +62,74 @@ export class EditRecipe {
       nonNullable: true,
       validators: [Validators.required],
     }),
+
+    // Added today
+    cookTime: new FormControl<number | null>(null, {
+      validators: [
+        Validators.required,
+        Validators.min(1),
+      ],
+    }),
   });
 
   isLoading = false;
   isSaving = false;
 
   ngOnInit(): void {
-    this.recipeId = this.route.snapshot.paramMap.get('id')!;
+    this.recipeId =
+      this.route.snapshot.paramMap.get('id')!;
+
     this.loadRecipe();
   }
 
   private loadRecipe(): void {
     this.isLoading = true;
 
-    this.recipeService.getRecipe(this.recipeId).subscribe({
-      next: (response) => {
-        const recipe = response.recipe;
+    this.recipeService
+      .getRecipe(this.recipeId)
+      .subscribe({
 
-        this.recipeForm.patchValue({
-          title: recipe.title,
-          ingredients: recipe.ingredients.join('\n'),
-          steps: recipe.steps.join('\n'),
-          category: recipe.category,
-        });
+        next: (response) => {
 
-        // Store existing image path
-        this.currentImageUrl = recipe.imageUrl;
+          const recipe = response.recipe;
 
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
+          this.recipeForm.patchValue({
+            title: recipe.title,
+            ingredients: recipe.ingredients.join('\n'),
+            steps: recipe.steps.join('\n'),
+            category: recipe.category,
 
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage =
-          error?.error?.message || 'Failed to load recipe. Please try again.';
-      },
-    });
+            // Added today
+            cookTime: (recipe as any).cookTime,
+          });
+
+          // Store existing image path
+          this.currentImageUrl = recipe.imageUrl;
+
+          this.isLoading = false;
+
+          this.cdr.detectChanges();
+        },
+
+        error: (error) => {
+
+          this.isLoading = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to load recipe. Please try again.';
+        },
+
+      });
   }
 
-  async onImageSelected(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
+  async onImageSelected(
+    event: Event
+  ): Promise<void> {
+
+    const input =
+      event.target as HTMLInputElement;
+
     const file = input.files?.[0];
 
     if (!file) return;
@@ -113,85 +140,166 @@ export class EditRecipe {
     this.isFoodImage = false;
 
     try {
+
       const predictions =
-        await this.foodDetectionService.classifyImage(file);
+        await this.foodDetectionService.classifyImage(
+          file
+        );
 
-      console.log('MobileNet predictions:', predictions);
+      console.log(
+        'MobileNet predictions:',
+        predictions
+      );
 
-      const isFood = this.foodDetectionService.isFood(predictions);
+      const isFood =
+        this.foodDetectionService.isFood(
+          predictions
+        );
 
       if (isFood) {
+
         this.selectedImage = file;
         this.isFoodImage = true;
-        this.imageValidationMessage = 'Food image detected.';
+
+        this.imageValidationMessage =
+          'Food image detected.';
+
       } else {
+
         this.toastr.warning(
           'Please upload an image related to food or a recipe.'
         );
+
         this.imageValidationMessage =
           'This image does not appear to be food.';
       }
+
     } catch (error) {
-      console.error('Image analysis failed:', error);
-      this.toastr.error('Unable to analyze the image.');
-      this.imageValidationMessage = 'Image analysis failed.';
+
+      console.error(
+        'Image analysis failed:',
+        error
+      );
+
+      this.toastr.error(
+        'Unable to analyze the image.'
+      );
+
+      this.imageValidationMessage =
+        'Image analysis failed.';
+
     } finally {
+
       this.isAnalyzingImage = false;
+
     }
   }
 
   onSubmit(): void {
+
     if (this.recipeForm.invalid) {
+
       this.recipeForm.markAllAsTouched();
+
       return;
     }
 
-    const formValue = this.recipeForm.getRawValue();
+    const formValue =
+      this.recipeForm.getRawValue();
 
-    const ingredients = formValue.ingredients
-      .split('\n')
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
+    const ingredients =
+      formValue.ingredients
+        .split('\n')
+        .map((item) => item.trim())
+        .filter(
+          (item) => item.length > 0
+        );
 
-    const steps = formValue.steps
-      .split('\n')
-      .map((step) => step.trim())
-      .filter((step) => step.length > 0);
+    const steps =
+      formValue.steps
+        .split('\n')
+        .map((step) => step.trim())
+        .filter(
+          (step) => step.length > 0
+        );
 
     const formData = new FormData();
 
-    formData.append('title', formValue.title.trim());
-    formData.append('ingredients', JSON.stringify(ingredients));
-    formData.append('steps', JSON.stringify(steps));
-    formData.append('category', formValue.category);
+    formData.append(
+      'title',
+      formValue.title.trim()
+    );
+
+    formData.append(
+      'ingredients',
+      JSON.stringify(ingredients)
+    );
+
+    formData.append(
+      'steps',
+      JSON.stringify(steps)
+    );
+
+    formData.append(
+      'category',
+      formValue.category
+    );
+
+    // Added today
+    formData.append(
+      'cookTime',
+      String(formValue.cookTime)
+    );
 
     // Only send image if user selected a new one
     if (this.selectedImage) {
-      formData.append('image', this.selectedImage);
+
+      formData.append(
+        'image',
+        this.selectedImage
+      );
+
     }
 
     this.isSaving = true;
 
-    this.recipeService.updateRecipe(this.recipeId, formData).subscribe({
-      next: (response) => {
-        this.isSaving = false;
+    this.recipeService
+      .updateRecipe(
+        this.recipeId,
+        formData
+      )
+      .subscribe({
 
-        this.toastr.success(
-          response.message || 'Recipe updated successfully!'
-        );
+        next: (response) => {
 
-        this.router.navigate([
-          '/recipes',
-          this.recipeId,
-        ]);
-      },
+          this.isSaving = false;
 
-      error: (error) => {
-        this.isSaving = false;
-        this.errorMessage =
-          error?.error?.message || 'Failed to update recipe.';
-        this.toastr.error(this.errorMessage);
-      },
-    });
+          this.toastr.success(
+            response.message ||
+            'Recipe updated successfully!'
+          );
+
+          this.router.navigate([
+            '/recipes',
+            this.recipeId,
+          ]);
+
+        },
+
+        error: (error) => {
+
+          this.isSaving = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to update recipe.';
+
+          this.toastr.error(
+            this.errorMessage
+          );
+
+        },
+
+      });
   }
 }

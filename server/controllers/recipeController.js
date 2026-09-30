@@ -2,6 +2,7 @@ import Recipe from '../models/Recipe.js';
 import User from '../models/User.js';
 import cloudinary from "../config/cloudinary.js";
 import Review from '../models/Review.js';
+import mongoose from "mongoose";
 
 export const createRecipe = async (req, res, next) => {
     try {
@@ -12,7 +13,7 @@ export const createRecipe = async (req, res, next) => {
             });
         }
 
-        const { title, ingredients, steps, category } = req.body;
+        const { title, ingredients, steps, category, cookTime } = req.body;
 
         const uploadResult = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
@@ -39,6 +40,7 @@ export const createRecipe = async (req, res, next) => {
             ingredients,
             steps,
             category,
+            cookTime
         });
 
         return res.status(201).json({
@@ -51,18 +53,24 @@ export const createRecipe = async (req, res, next) => {
     }
 };
 
-
 export const getRecipes = async (req, res, next) => {
     try {
         const {
             search,
             category,
             ownerId,
+            maxCookTime,
+            minRating,
+            sort = "newest",
+            ingredients,
             page = 1,
             limit = 9,
         } = req.query;
 
-        // Validate pagination
+        // ========================================
+        // VALIDATE PAGINATION
+        // ========================================
+
         const pageNumber = Number(page);
         const limitNumber = Number(limit);
 
@@ -80,8 +88,11 @@ export const getRecipes = async (req, res, next) => {
             });
         }
 
-        // Prevent excessively large requests
         const safeLimit = Math.min(limitNumber, 50);
+
+        // ========================================
+        // BASE FILTER
+        // ========================================
 
         const filter = {};
 
@@ -90,44 +101,300 @@ export const getRecipes = async (req, res, next) => {
             return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         };
 
-        // Search by recipe title
+        // ========================================
+        // SEARCH
+        // ========================================
+
         if (search) {
-            const safeSearch = escapeRegex(search);
+            const trimmedSearch = search.trim();
 
-            const searchRegex = new RegExp(safeSearch, "i");
-
-            filter.title = {
-                $regex: searchRegex,
-            };
+            if (mongoose.Types.ObjectId.isValid(trimmedSearch)) {
+                filter._id = trimmedSearch;
+            } else {
+                filter.$text = {
+                    $search: trimmedSearch,
+                };
+            }
         }
 
-        // Filter by category
+        // ========================================
+        // CATEGORY
+        // ========================================
+
         if (category) {
             filter.category = category;
         }
 
-        // Filter by user id
+        // ========================================
+        // OWNER
+        // ========================================
+
         if (ownerId) {
             filter.owner = ownerId;
         }
 
+        // ========================================
+        // INGREDIENTS
+        // ========================================
+
+        if (ingredients) {
+            const ingredientList = ingredients
+                .split(',')
+                .map(item => item.trim())
+                .filter(Boolean);
+
+            if (ingredientList.length > 0) {
+                filter.ingredients = {
+                    $all: ingredientList.map(
+                        ingredient =>
+                            new RegExp(
+                                escapeRegex(ingredient),
+                                'i'
+                            )
+                    ),
+                };
+            }
+        }
+
+        // ========================================
+        // MAX COOK TIME
+        // ========================================
+
+        if (maxCookTime) {
+            const cookTime = Number(maxCookTime);
+
+            if (!Number.isFinite(cookTime) || cookTime < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "maxCookTime must be a positive number",
+                });
+            }
+
+            filter.cookTime = {
+                $lte: cookTime,
+            };
+        }
+
+        // ========================================
+        // MINIMUM RATING
+        // ========================================
+
+        let rating;
+
+        if (minRating) {
+            rating = Number(minRating);
+
+            if (
+                !Number.isFinite(rating) ||
+                rating < 1 ||
+                rating > 5
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "minRating must be a number between 1 and 5",
+                });
+            }
+        }
+
+        // ========================================
+        // SORT VALIDATION
+        // ========================================
+
+        const allowedSorts = [
+            "newest",
+            "rating",
+            "reviews",
+            "cookTime",
+        ];
+
+        if (!allowedSorts.includes(sort)) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid sort option. Allowed values: ${allowedSorts.join(", ")}`,
+            });
+        }
+
+        // ========================================
+        // PAGINATION
+        // ========================================
+
         const skip = (pageNumber - 1) * safeLimit;
+
+        // ========================================
+        // REVIEW BASED SORTING
+        // ========================================
+
+        if (sort === "rating" || sort === "reviews") {
+
+            const reviewSort =
+                sort === "rating"
+                    ? { averageRating: -1 }
+                    : { reviewCount: -1 };
+
+            const reviewPipeline = [
+                {
+                    $group: {
+                        _id: "$recipe",
+
+                        averageRating: {
+                            $avg: "$rating",
+                        },
+
+                        reviewCount: {
+                            $sum: 1,
+                        },
+                    },
+                },
+                {
+                    $sort: reviewSort,
+                },
+            ];
+
+            // Minimum rating filter
+            if (rating) {
+                reviewPipeline.push({
+                    $match: {
+                        averageRating: {
+                            $gte: rating,
+                        },
+                    },
+                });
+            }
+
+            const ratingResults =
+                await Review.aggregate(reviewPipeline);
+
+            const recipeIds = ratingResults.map(
+                (item) => item._id
+            );
+
+            if (recipeIds.length === 0) {
+                return res.status(200).json({
+                    success: true,
+                    count: 0,
+                    total: 0,
+                    page: pageNumber,
+                    pages: 0,
+                    recipes: [],
+                });
+            }
+
+            filter._id = {
+                $in: recipeIds,
+            };
+
+            const recipes = await Recipe.find(filter)
+                .populate("owner", "name");
+
+            // Preserve Review aggregation order
+            const recipeMap = new Map(
+                recipes.map((recipe) => [
+                    recipe._id.toString(),
+                    recipe,
+                ])
+            );
+
+            const sortedRecipes = recipeIds
+                .map((id) =>
+                    recipeMap.get(id.toString())
+                )
+                .filter(Boolean);
+
+            const totalRecipes =
+                sortedRecipes.length;
+
+            const paginatedRecipes =
+                sortedRecipes.slice(
+                    skip,
+                    skip + safeLimit
+                );
+
+            return res.status(200).json({
+                success: true,
+                count: paginatedRecipes.length,
+                total: totalRecipes,
+                page: pageNumber,
+                pages: Math.ceil(
+                    totalRecipes / safeLimit
+                ),
+                recipes: paginatedRecipes,
+            });
+        }
+
+        // ========================================
+        // NORMAL RECIPE SORTING
+        // ========================================
+
+        let sortOption = {
+            createdAt: -1,
+        };
+
+        if (sort === "cookTime") {
+            sortOption = {
+                cookTime: 1,
+            };
+        }
+
+        // ========================================
+        // MINIMUM RATING WITHOUT REVIEW SORT
+        // ========================================
+
+        if (rating) {
+
+            const ratingResults =
+                await Review.aggregate([
+                    {
+                        $group: {
+                            _id: "$recipe",
+
+                            averageRating: {
+                                $avg: "$rating",
+                            },
+                        },
+                    },
+                    {
+                        $match: {
+                            averageRating: {
+                                $gte: rating,
+                            },
+                        },
+                    },
+                ]);
+
+            const recipeIds = ratingResults.map(
+                (item) => item._id
+            );
+
+            filter._id = {
+                $in: recipeIds,
+            };
+        }
+
+        // ========================================
+        // GET RECIPES
+        // ========================================
 
         const recipes = await Recipe.find(filter)
             .populate("owner", "name")
-            .sort({ createdAt: -1 })
+            .sort(sortOption)
             .skip(skip)
             .limit(safeLimit);
 
         const totalRecipes =
             await Recipe.countDocuments(filter);
 
+        // ========================================
+        // RESPONSE
+        // ========================================
+
         return res.status(200).json({
             success: true,
             count: recipes.length,
             total: totalRecipes,
             page: pageNumber,
-            pages: Math.ceil(totalRecipes / safeLimit),
+            pages: Math.ceil(
+                totalRecipes / safeLimit
+            ),
             recipes,
         });
 
@@ -149,7 +416,7 @@ export const getRecipe = async (req, res, next) => {
                 message: "Recipe not found",
             });
         }
-          const ratingStats = await Review.aggregate([
+        const ratingStats = await Review.aggregate([
             {
                 $match: {
                     recipe: recipe._id,
@@ -247,6 +514,7 @@ export const updateRecipe = async (req, res, next) => {
             ingredients,
             steps,
             category,
+            cookTime
         } = req.body;
 
         const recipe = await Recipe.findById(id);
@@ -275,6 +543,7 @@ export const updateRecipe = async (req, res, next) => {
             ingredients,
             steps,
             category,
+            cookTime
         };
 
         if (req.file) {
@@ -381,6 +650,145 @@ export const getMyRecipes = async (req, res, next) => {
             count: recipes.length,
             recipes,
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
+// ========================================
+// TRENDING RECIPES
+// ========================================
+
+export const getTrendingRecipes = async (req, res, next) => {
+    try {
+        const { type = "mostReviewed" } = req.query;
+
+        const allowedTypes = [
+            "mostReviewed",
+            "highestRated",
+        ];
+
+        if (!allowedTypes.includes(type)) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Invalid trending type. Use mostReviewed or highestRated",
+            });
+        }
+
+        // Start of current week: Sunday 00:00
+        const now = new Date();
+
+        const startOfWeek = new Date(now);
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const day = startOfWeek.getDay();
+
+        startOfWeek.setDate(
+            startOfWeek.getDate() - day
+        );
+
+        const sortStage =
+            type === "mostReviewed"
+                ? { reviewCount: -1 }
+                : { averageRating: -1 };
+
+        const trending = await Review.aggregate([
+            // 1. Only reviews created this week
+            {
+                $match: {
+                    createdAt: {
+                        $gte: startOfWeek,
+                    },
+                },
+            },
+
+            // 2. Group reviews by recipe
+            {
+                $group: {
+                    _id: "$recipe",
+
+                    averageRating: {
+                        $avg: "$rating",
+                    },
+
+                    reviewCount: {
+                        $sum: 1,
+                    },
+                },
+            },
+
+            // 3. Sort according to requested type
+            {
+                $sort: sortStage,
+            },
+
+            // 4. Limit trending results
+            {
+                $limit: 10,
+            },
+        ]);
+
+        const recipeIds = trending.map(
+            (item) => item._id
+        );
+
+        if (recipeIds.length === 0) {
+            return res.status(200).json({
+                success: true,
+                type,
+                count: 0,
+                recipes: [],
+            });
+        }
+
+        const recipes = await Recipe.find({
+            _id: {
+                $in: recipeIds,
+            },
+        }).populate("owner", "name");
+
+        // Create lookup map
+        const recipeMap = new Map(
+            recipes.map((recipe) => [
+                recipe._id.toString(),
+                recipe,
+            ])
+        );
+
+        // Preserve aggregation order
+        const result = trending
+            .map((item) => {
+                const recipe =
+                    recipeMap.get(
+                        item._id.toString()
+                    );
+
+                if (!recipe) {
+                    return null;
+                }
+
+                return {
+                    recipe,
+                    averageRating:
+                        Number(
+                            item.averageRating.toFixed(1)
+                        ),
+                    reviewCount:
+                        item.reviewCount,
+                };
+            })
+            .filter(Boolean);
+
+        return res.status(200).json({
+            success: true,
+            type,
+            count: result.length,
+            recipes: result,
+        });
+
     } catch (error) {
         next(error);
     }

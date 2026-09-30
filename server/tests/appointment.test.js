@@ -5,8 +5,6 @@ import connectDB from "../config/db";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// import Appointment from "../models/Appointment.js";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,23 +18,24 @@ beforeAll(async () => {
     await connectDB();
 });
 
-// afterAll(async () => {
-//     await mongoose.connection.close();
-// })
+// Close MongoDB connection after all tests.
+afterAll(async () => {
+    await mongoose.connection.close();
+});
 
 describe("Appointment Api", () => {
-    test('should reject appintment creation without authentication', async () => {
+
+    test("should reject appintment creation without authentication", async () => {
         const response = await request(app)
-            .post('/api/appointments')
+            .post("/api/appointments")
             .send({
                 recipeId: "507f1f77bcf86cd799439011",
                 date: "2026-09-25",
                 startTime: "10:00",
             });
+
         expect(response.statusCode).toBe(401);
-
         expect(response.body.success).toBe(false);
-
         expect(response.body.message).toBe("Authentication required");
     });
 
@@ -44,8 +43,6 @@ describe("Appointment Api", () => {
         const password = "12345678";
         const instructorEmail = `instructor${Date.now()}@example.com`;
         const studentEmail = `student${Date.now()}@example.com`;
-        // 
-        // console.log("1. Register instructor");
 
         await request(app)
             .post("/api/auth/register")
@@ -55,16 +52,12 @@ describe("Appointment Api", () => {
                 password,
             });
 
-        // console.log("2. Instructor registered");
-
         const instructorLogin = await request(app)
             .post("/api/auth/login")
             .send({
                 email: instructorEmail,
                 password,
             });
-
-        // console.log("3. Instructor logged in");
 
         const instructorToken = instructorLogin.body.token;
 
@@ -75,10 +68,11 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer", "Tomato"]))
             .field("steps", JSON.stringify(["Cook tomato", "Add paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
-        // console.log("4. Recipe created");
-        // 
+        expect(recipeResponse.statusCode).toBe(201);
+
         const recipeId = recipeResponse.body.recipe._id;
 
         await request(app)
@@ -89,16 +83,12 @@ describe("Appointment Api", () => {
                 password,
             });
 
-        // console.log("5. Student registered");
-
         const studentLogin = await request(app)
             .post("/api/auth/login")
             .send({
                 email: studentEmail,
                 password,
             });
-
-        // console.log("6. Student logged in");
 
         const studentToken = studentLogin.body.token;
 
@@ -111,8 +101,6 @@ describe("Appointment Api", () => {
                 endTime: "12:00",
             });
 
-        // console.log("7. Availability created");
-
         const response = await request(app)
             .post("/api/appointments")
             .set("Authorization", `Bearer ${studentToken}`)
@@ -122,7 +110,7 @@ describe("Appointment Api", () => {
                 startTime: "10:00",
             });
 
-        // console.log("8. Appointment created");
+        expect(response.statusCode).toBe(201);
     }, 15000);
 
     test("should reject booking own recipe", async () => {
@@ -130,55 +118,54 @@ describe("Appointment Api", () => {
         const email = `owner${Date.now()}@example.com`;
 
         await request(app)
-            .post('/api/auth/register')
+            .post("/api/auth/register")
             .send({
                 name: "Recipe Owner",
                 email,
-                password
+                password,
             });
+
         const login = await request(app)
             .post("/api/auth/login")
             .send({
                 email,
-                password
+                password,
             });
-
-        // console.log("Login response:", login.statusCode, login.body);
 
         expect(login.statusCode).toBe(200);
         expect(login.body.success).toBe(true);
         expect(login.body.token).toBeDefined();
 
         const token = login.body.token;
+
         const recipeResponse = await request(app)
-            .post('/api/recipes')
+            .post("/api/recipes")
             .set("Authorization", `Bearer ${token}`)
             .field("title", "My Own Recipe")
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
-        // console.log("Recipe response:", recipeResponse.statusCode, recipeResponse.body);
 
         expect(recipeResponse.statusCode).toBe(201);
         expect(recipeResponse.body.success).toBe(true);
 
-
         const recipeId = recipeResponse.body.recipe._id;
+
         const response = await request(app)
             .post("/api/appointments")
             .set("Authorization", `Bearer ${token}`)
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(response.statusCode).toBe(400);
         expect(response.body.success).toBe(false);
         expect(response.body.message).toBe("You cannot book your own recipe");
     }, 15000);
-
 
     test("should reject appointment outside instructor availability", async () => {
         const password = "12345678";
@@ -187,11 +174,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         const instructorToken = instructorLogin.body.token;
 
@@ -202,6 +196,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -214,16 +209,23 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student User", email: studentEmail, password });
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
         const studentLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentEmail, password });
+            .send({
+                email: studentEmail,
+                password,
+            });
 
         const studentToken = studentLogin.body.token;
 
@@ -233,13 +235,16 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "13:00"
+                startTime: "13:00",
             });
 
         expect(response.statusCode).toBe(400);
         expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("Selected time slot is not available");
+        expect(response.body.message).toBe(
+            "Selected time slot is not available"
+        );
     }, 15000);
+
     test("should reject double booking of the same slot", async () => {
         const password = "12345678";
         const instructorEmail = `instructor${Date.now()}@example.com`;
@@ -248,11 +253,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         const instructorToken = instructorLogin.body.token;
 
@@ -263,6 +275,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -275,18 +288,25 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         expect(availabilityResponse.statusCode).toBe(201);
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student One", email: studentOneEmail, password });
+            .send({
+                name: "Student One",
+                email: studentOneEmail,
+                password,
+            });
 
         const studentOneLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentOneEmail, password });
+            .send({
+                email: studentOneEmail,
+                password,
+            });
 
         const studentOneToken = studentOneLogin.body.token;
 
@@ -296,18 +316,25 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(firstBooking.statusCode).toBe(201);
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student Two", email: studentTwoEmail, password });
+            .send({
+                name: "Student Two",
+                email: studentTwoEmail,
+                password,
+            });
 
         const studentTwoLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentTwoEmail, password });
+            .send({
+                email: studentTwoEmail,
+                password,
+            });
 
         const studentTwoToken = studentTwoLogin.body.token;
 
@@ -317,13 +344,16 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(secondBooking.statusCode).toBe(409);
         expect(secondBooking.body.success).toBe(false);
-        expect(secondBooking.body.message).toBe("This appointment slot is already booked");
+        expect(secondBooking.body.message).toBe(
+            "This appointment slot is already booked"
+        );
     }, 15000);
+
     test("should return booked slots for a recipe", async () => {
         const password = "12345678";
         const instructorEmail = `instructor${Date.now()}@example.com`;
@@ -331,11 +361,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         const instructorToken = instructorLogin.body.token;
 
@@ -346,6 +383,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -358,16 +396,23 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student User", email: studentEmail, password });
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
         const studentLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentEmail, password });
+            .send({
+                email: studentEmail,
+                password,
+            });
 
         const studentToken = studentLogin.body.token;
 
@@ -377,7 +422,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -386,7 +431,7 @@ describe("Appointment Api", () => {
             .get("/api/appointments/booked-slots")
             .query({
                 recipeId,
-                date: "2026-09-25"
+                date: "2026-09-25",
             });
 
         expect(response.statusCode).toBe(200);
@@ -401,11 +446,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         expect(instructorLogin.statusCode).toBe(200);
         expect(instructorLogin.body.success).toBe(true);
@@ -420,6 +472,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -432,16 +485,23 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student User", email: studentEmail, password });
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
         const studentLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentEmail, password });
+            .send({
+                email: studentEmail,
+                password,
+            });
 
         const studentToken = studentLogin.body.token;
 
@@ -451,7 +511,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -475,6 +535,7 @@ describe("Appointment Api", () => {
         expect(response.body.success).toBe(false);
         expect(response.body.message).toBe("Authentication required");
     });
+
     test("should return teaching appointments for authenticated instructor", async () => {
         const password = "12345678";
         const instructorEmail = `instructor${Date.now()}@example.com`;
@@ -482,11 +543,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         expect(instructorLogin.statusCode).toBe(200);
         expect(instructorLogin.body.token).toBeDefined();
@@ -500,6 +568,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -512,18 +581,25 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         expect(availabilityResponse.statusCode).toBe(201);
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student User", email: studentEmail, password });
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
         const studentLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentEmail, password });
+            .send({
+                email: studentEmail,
+                password,
+            });
 
         expect(studentLogin.statusCode).toBe(200);
         expect(studentLogin.body.token).toBeDefined();
@@ -536,7 +612,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -559,11 +635,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         expect(instructorLogin.statusCode).toBe(200);
 
@@ -576,6 +659,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -588,18 +672,25 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         expect(availabilityResponse.statusCode).toBe(201);
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student User", email: studentEmail, password });
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
         const studentLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentEmail, password });
+            .send({
+                email: studentEmail,
+                password,
+            });
 
         expect(studentLogin.statusCode).toBe(200);
 
@@ -611,7 +702,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -635,11 +726,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         expect(instructorLogin.statusCode).toBe(200);
 
@@ -652,6 +750,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -664,18 +763,25 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         expect(availabilityResponse.statusCode).toBe(201);
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student One", email: studentOneEmail, password });
+            .send({
+                name: "Student One",
+                email: studentOneEmail,
+                password,
+            });
 
         const studentOneLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentOneEmail, password });
+            .send({
+                email: studentOneEmail,
+                password,
+            });
 
         expect(studentOneLogin.statusCode).toBe(200);
 
@@ -687,7 +793,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -696,11 +802,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student Two", email: studentTwoEmail, password });
+            .send({
+                name: "Student Two",
+                email: studentTwoEmail,
+                password,
+            });
 
         const studentTwoLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentTwoEmail, password });
+            .send({
+                email: studentTwoEmail,
+                password,
+            });
 
         expect(studentTwoLogin.statusCode).toBe(200);
 
@@ -725,11 +838,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         expect(instructorLogin.statusCode).toBe(200);
 
@@ -742,6 +862,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -754,18 +875,25 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         expect(availabilityResponse.statusCode).toBe(201);
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student One", email: studentOneEmail, password });
+            .send({
+                name: "Student One",
+                email: studentOneEmail,
+                password,
+            });
 
         const studentOneLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentOneEmail, password });
+            .send({
+                email: studentOneEmail,
+                password,
+            });
 
         expect(studentOneLogin.statusCode).toBe(200);
 
@@ -777,7 +905,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -786,11 +914,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student Two", email: studentTwoEmail, password });
+            .send({
+                name: "Student Two",
+                email: studentTwoEmail,
+                password,
+            });
 
         const studentTwoLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentTwoEmail, password });
+            .send({
+                email: studentTwoEmail,
+                password,
+            });
 
         expect(studentTwoLogin.statusCode).toBe(200);
 
@@ -814,11 +949,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         expect(instructorLogin.statusCode).toBe(200);
 
@@ -831,6 +973,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -843,18 +986,25 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         expect(availabilityResponse.statusCode).toBe(201);
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student User", email: studentEmail, password });
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
         const studentLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentEmail, password });
+            .send({
+                email: studentEmail,
+                password,
+            });
 
         expect(studentLogin.statusCode).toBe(200);
 
@@ -866,7 +1016,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -882,12 +1032,14 @@ describe("Appointment Api", () => {
             .patch(`/api/appointments/${appointmentId}/meeting-link`)
             .set("Authorization", `Bearer ${instructorToken}`)
             .send({
-                meetLink: "https://meet.google.com/abc-defg-hij"
+                meetLink: "https://meet.google.com/abc-defg-hij",
             });
 
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Meeting link added successfully");
+        expect(response.body.message).toBe(
+            "Meeting link added successfully"
+        );
         expect(response.body.appointment.meetLink).toBe(
             "https://meet.google.com/abc-defg-hij"
         );
@@ -900,11 +1052,18 @@ describe("Appointment Api", () => {
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Instructor User", email: instructorEmail, password });
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
         const instructorLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: instructorEmail, password });
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
         expect(instructorLogin.statusCode).toBe(200);
 
@@ -917,6 +1076,7 @@ describe("Appointment Api", () => {
             .field("ingredients", JSON.stringify(["Paneer"]))
             .field("steps", JSON.stringify(["Cook paneer"]))
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -929,16 +1089,23 @@ describe("Appointment Api", () => {
             .send({
                 dayOfWeek: "Friday",
                 startTime: "10:00",
-                endTime: "12:00"
+                endTime: "12:00",
             });
 
         await request(app)
             .post("/api/auth/register")
-            .send({ name: "Student User", email: studentEmail, password });
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
         const studentLogin = await request(app)
             .post("/api/auth/login")
-            .send({ email: studentEmail, password });
+            .send({
+                email: studentEmail,
+                password,
+            });
 
         expect(studentLogin.statusCode).toBe(200);
 
@@ -950,7 +1117,7 @@ describe("Appointment Api", () => {
             .send({
                 recipeId,
                 date: "2026-09-25",
-                startTime: "10:00"
+                startTime: "10:00",
             });
 
         expect(bookingResponse.statusCode).toBe(201);
@@ -966,7 +1133,7 @@ describe("Appointment Api", () => {
             .patch(`/api/appointments/${appointmentId}/meeting-link`)
             .set("Authorization", `Bearer ${studentToken}`)
             .send({
-                meetLink: "https://meet.google.com/abc-defg-hij"
+                meetLink: "https://meet.google.com/abc-defg-hij",
             });
 
         expect(response.statusCode).toBe(403);
@@ -976,250 +1143,299 @@ describe("Appointment Api", () => {
         );
     });
 
-
     test("should reject invalid Google Meet link", async () => {
-    const password = "12345678";
-    const instructorEmail = `instructor${Date.now()}@example.com`;
-    const studentEmail = `student${Date.now()}@example.com`;
+        const password = "12345678";
+        const instructorEmail = `instructor${Date.now()}@example.com`;
+        const studentEmail = `student${Date.now()}@example.com`;
 
-    await request(app)
-        .post("/api/auth/register")
-        .send({ name: "Instructor User", email: instructorEmail, password });
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
-    const instructorLogin = await request(app)
-        .post("/api/auth/login")
-        .send({ email: instructorEmail, password });
+        const instructorLogin = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
-    const instructorToken = instructorLogin.body.token;
+        const instructorToken = instructorLogin.body.token;
 
-    const recipeResponse = await request(app)
-        .post("/api/recipes")
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .field("title", "Invalid Link Recipe")
-        .field("ingredients", JSON.stringify(["Paneer"]))
-        .field("steps", JSON.stringify(["Cook paneer"]))
-        .field("category", "Indian")
-        .attach("image", testImage);
+        const recipeResponse = await request(app)
+            .post("/api/recipes")
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .field("title", "Invalid Link Recipe")
+            .field("ingredients", JSON.stringify(["Paneer"]))
+            .field("steps", JSON.stringify(["Cook paneer"]))
+            .field("category", "Indian")
+            .field("cookTime", "30")
+            .attach("image", testImage);
 
-    expect(recipeResponse.statusCode).toBe(201);
+        expect(recipeResponse.statusCode).toBe(201);
 
-    const recipeId = recipeResponse.body.recipe._id;
+        const recipeId = recipeResponse.body.recipe._id;
 
-    const availabilityResponse = await request(app)
-        .post("/api/availability")
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .send({
-            dayOfWeek: "Friday",
-            startTime: "10:00",
-            endTime: "12:00"
-        });
+        const availabilityResponse = await request(app)
+            .post("/api/availability")
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .send({
+                dayOfWeek: "Friday",
+                startTime: "10:00",
+                endTime: "12:00",
+            });
 
-    expect(availabilityResponse.statusCode).toBe(201);
+        expect(availabilityResponse.statusCode).toBe(201);
 
-    await request(app)
-        .post("/api/auth/register")
-        .send({ name: "Student User", email: studentEmail, password });
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
-    const studentLogin = await request(app)
-        .post("/api/auth/login")
-        .send({ email: studentEmail, password });
+        const studentLogin = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: studentEmail,
+                password,
+            });
 
-    const studentToken = studentLogin.body.token;
+        const studentToken = studentLogin.body.token;
 
-    const bookingResponse = await request(app)
-        .post("/api/appointments")
-        .set("Authorization", `Bearer ${studentToken}`)
-        .send({
-            recipeId,
-            date: "2026-09-25",
-            startTime: "10:00"
-        });
+        const bookingResponse = await request(app)
+            .post("/api/appointments")
+            .set("Authorization", `Bearer ${studentToken}`)
+            .send({
+                recipeId,
+                date: "2026-09-25",
+                startTime: "10:00",
+            });
 
-    expect(bookingResponse.statusCode).toBe(201);
+        expect(bookingResponse.statusCode).toBe(201);
 
-    const appointmentId = bookingResponse.body.appointment._id;
+        const appointmentId = bookingResponse.body.appointment._id;
 
-    await mongoose.connection.collection("appointments").updateOne(
-        { _id: new mongoose.Types.ObjectId(appointmentId) },
-        { $set: { status: "confirmed" } }
-    );
+        await mongoose.connection.collection("appointments").updateOne(
+            { _id: new mongoose.Types.ObjectId(appointmentId) },
+            { $set: { status: "confirmed" } }
+        );
 
-    const response = await request(app)
-        .patch(`/api/appointments/${appointmentId}/meeting-link`)
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .send({
-            meetLink: "https://zoom.us/test-meeting"
-        });
+        const response = await request(app)
+            .patch(`/api/appointments/${appointmentId}/meeting-link`)
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .send({
+                meetLink: "https://zoom.us/test-meeting",
+            });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe(
-        "Please provide a valid Google Meet link"
-    );
-});
+        expect(response.statusCode).toBe(400);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe(
+            "Please provide a valid Google Meet link"
+        );
+    });
 
-test("should reject meeting link for pending appointment", async () => {
-    const password = "12345678";
-    const instructorEmail = `instructor${Date.now()}@example.com`;
-    const studentEmail = `student${Date.now()}@example.com`;
+    test("should reject meeting link for pending appointment", async () => {
+        const password = "12345678";
+        const instructorEmail = `instructor${Date.now()}@example.com`;
+        const studentEmail = `student${Date.now()}@example.com`;
 
-    await request(app)
-        .post("/api/auth/register")
-        .send({ name: "Instructor User", email: instructorEmail, password });
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
-    const instructorLogin = await request(app)
-        .post("/api/auth/login")
-        .send({ email: instructorEmail, password });
+        const instructorLogin = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
-    const instructorToken = instructorLogin.body.token;
+        const instructorToken = instructorLogin.body.token;
 
-    const recipeResponse = await request(app)
-        .post("/api/recipes")
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .field("title", "Pending Meeting Recipe")
-        .field("ingredients", JSON.stringify(["Paneer"]))
-        .field("steps", JSON.stringify(["Cook paneer"]))
-        .field("category", "Indian")
-        .attach("image", testImage);
+        const recipeResponse = await request(app)
+            .post("/api/recipes")
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .field("title", "Pending Meeting Recipe")
+            .field("ingredients", JSON.stringify(["Paneer"]))
+            .field("steps", JSON.stringify(["Cook paneer"]))
+            .field("category", "Indian")
+            .field("cookTime", "30")
+            .attach("image", testImage);
 
-    expect(recipeResponse.statusCode).toBe(201);
+        expect(recipeResponse.statusCode).toBe(201);
 
-    const recipeId = recipeResponse.body.recipe._id;
+        const recipeId = recipeResponse.body.recipe._id;
 
-    const availabilityResponse = await request(app)
-        .post("/api/availability")
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .send({
-            dayOfWeek: "Friday",
-            startTime: "10:00",
-            endTime: "12:00"
-        });
+        const availabilityResponse = await request(app)
+            .post("/api/availability")
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .send({
+                dayOfWeek: "Friday",
+                startTime: "10:00",
+                endTime: "12:00",
+            });
 
-    expect(availabilityResponse.statusCode).toBe(201);
+        expect(availabilityResponse.statusCode).toBe(201);
 
-    await request(app)
-        .post("/api/auth/register")
-        .send({ name: "Student User", email: studentEmail, password });
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
-    const studentLogin = await request(app)
-        .post("/api/auth/login")
-        .send({ email: studentEmail, password });
+        const studentLogin = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: studentEmail,
+                password,
+            });
 
-    const studentToken = studentLogin.body.token;
+        const studentToken = studentLogin.body.token;
 
-    const bookingResponse = await request(app)
-        .post("/api/appointments")
-        .set("Authorization", `Bearer ${studentToken}`)
-        .send({
-            recipeId,
-            date: "2026-09-25",
-            startTime: "10:00"
-        });
+        const bookingResponse = await request(app)
+            .post("/api/appointments")
+            .set("Authorization", `Bearer ${studentToken}`)
+            .send({
+                recipeId,
+                date: "2026-09-25",
+                startTime: "10:00",
+            });
 
-    expect(bookingResponse.statusCode).toBe(201);
+        expect(bookingResponse.statusCode).toBe(201);
 
-    const appointmentId = bookingResponse.body.appointment._id;
+        const appointmentId = bookingResponse.body.appointment._id;
 
-    const response = await request(app)
-        .patch(`/api/appointments/${appointmentId}/meeting-link`)
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .send({
-            meetLink: "https://meet.google.com/abc-defg-hij"
-        });
+        const response = await request(app)
+            .patch(`/api/appointments/${appointmentId}/meeting-link`)
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .send({
+                meetLink: "https://meet.google.com/abc-defg-hij",
+            });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe(
-        "Meeting link can only be added to confirmed appointments"
-    );
-});
+        expect(response.statusCode).toBe(400);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe(
+            "Meeting link can only be added to confirmed appointments"
+        );
+    });
 
+    test("should reject payment order creation by another user", async () => {
+        const password = "12345678";
+        const instructorEmail = `instructor${Date.now()}@example.com`;
+        const studentEmail = `student${Date.now()}@example.com`;
+        const otherStudentEmail = `other${Date.now()}@example.com`;
 
-test("should reject payment order creation by another user", async () => {
-    const password = "12345678";
-    const instructorEmail = `instructor${Date.now()}@example.com`;
-    const studentEmail = `student${Date.now()}@example.com`;
-    const otherStudentEmail = `other${Date.now()}@example.com`;
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Instructor User",
+                email: instructorEmail,
+                password,
+            });
 
-    await request(app)
-        .post("/api/auth/register")
-        .send({ name: "Instructor User", email: instructorEmail, password });
+        const instructorLogin = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: instructorEmail,
+                password,
+            });
 
-    const instructorLogin = await request(app)
-        .post("/api/auth/login")
-        .send({ email: instructorEmail, password });
+        const instructorToken = instructorLogin.body.token;
 
-    const instructorToken = instructorLogin.body.token;
+        const recipeResponse = await request(app)
+            .post("/api/recipes")
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .field("title", "Payment Authorization Recipe")
+            .field("ingredients", JSON.stringify(["Paneer"]))
+            .field("steps", JSON.stringify(["Cook paneer"]))
+            .field("category", "Indian")
+            .field("cookTime", "30")
+            .attach("image", testImage);
 
-    const recipeResponse = await request(app)
-        .post("/api/recipes")
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .field("title", "Payment Authorization Recipe")
-        .field("ingredients", JSON.stringify(["Paneer"]))
-        .field("steps", JSON.stringify(["Cook paneer"]))
-        .field("category", "Indian")
-        .attach("image", testImage);
+        expect(recipeResponse.statusCode).toBe(201);
 
-    expect(recipeResponse.statusCode).toBe(201);
+        const recipeId = recipeResponse.body.recipe._id;
 
-    const recipeId = recipeResponse.body.recipe._id;
+        const availabilityResponse = await request(app)
+            .post("/api/availability")
+            .set("Authorization", `Bearer ${instructorToken}`)
+            .send({
+                dayOfWeek: "Friday",
+                startTime: "10:00",
+                endTime: "12:00",
+            });
 
-    const availabilityResponse = await request(app)
-        .post("/api/availability")
-        .set("Authorization", `Bearer ${instructorToken}`)
-        .send({
-            dayOfWeek: "Friday",
-            startTime: "10:00",
-            endTime: "12:00"
-        });
+        expect(availabilityResponse.statusCode).toBe(201);
 
-    expect(availabilityResponse.statusCode).toBe(201);
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Student User",
+                email: studentEmail,
+                password,
+            });
 
-    await request(app)
-        .post("/api/auth/register")
-        .send({ name: "Student User", email: studentEmail, password });
+        const studentLogin = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: studentEmail,
+                password,
+            });
 
-    const studentLogin = await request(app)
-        .post("/api/auth/login")
-        .send({ email: studentEmail, password });
+        const studentToken = studentLogin.body.token;
 
-    const studentToken = studentLogin.body.token;
+        const bookingResponse = await request(app)
+            .post("/api/appointments")
+            .set("Authorization", `Bearer ${studentToken}`)
+            .send({
+                recipeId,
+                date: "2026-09-25",
+                startTime: "10:00",
+            });
 
-    const bookingResponse = await request(app)
-        .post("/api/appointments")
-        .set("Authorization", `Bearer ${studentToken}`)
-        .send({
-            recipeId,
-            date: "2026-09-25",
-            startTime: "10:00"
-        });
+        expect(bookingResponse.statusCode).toBe(201);
 
-    expect(bookingResponse.statusCode).toBe(201);
+        const appointmentId = bookingResponse.body.appointment._id;
 
-    const appointmentId = bookingResponse.body.appointment._id;
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Other Student",
+                email: otherStudentEmail,
+                password,
+            });
 
-    await request(app)
-        .post("/api/auth/register")
-        .send({ name: "Other Student", email: otherStudentEmail, password });
+        const otherStudentLogin = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: otherStudentEmail,
+                password,
+            });
 
-    const otherStudentLogin = await request(app)
-        .post("/api/auth/login")
-        .send({ email: otherStudentEmail, password });
+        const otherStudentToken = otherStudentLogin.body.token;
 
-    const otherStudentToken = otherStudentLogin.body.token;
+        const response = await request(app)
+            .post("/api/payments/create-order")
+            .set("Authorization", `Bearer ${otherStudentToken}`)
+            .send({
+                appointmentId,
+            });
 
-    const response = await request(app)
-        .post("/api/payments/create-order")
-        .set("Authorization", `Bearer ${otherStudentToken}`)
-        .send({ appointmentId });
-
-    expect(response.statusCode).toBe(403);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe(
-        "You are not authorized to pay for this appointment"
-    );
-},2000);
-
-
-
+        expect(response.statusCode).toBe(403);
+        expect(response.body.success).toBe(false);
+        expect(response.body.message).toBe(
+            "You are not authorized to pay for this appointment"
+        );
+    }, 15000);
 });

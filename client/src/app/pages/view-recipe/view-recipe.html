@@ -321,9 +321,108 @@
 
     </article>
 
-    }
+
+    <!-- ============================= -->
+    <!-- Similar Recipes - Bottom -->
+    <!-- ============================= -->
+
+    <section class="similar-recipes-section">
+
+      <div class="similar-recipes-header">
+
+        <div>
+          <span class="similar-recipes-label">
+            AI RECOMMENDATIONS
+          </span>
+
+          <h2>
+            🤖 Similar Recipes
+          </h2>
+
+          <p>
+            Recipes you may also enjoy based on ingredients,
+            category, and recipe content.
+          </p>
+        </div>
+
+      </div>
+
+      @if (similarRecipesLoading()) {
+
+      <div class="similar-recipes-loading">
+
+        <div class="spinner"></div>
+
+        <p>
+          Finding similar recipes with AI...
+        </p>
+
+      </div>
+
+      }
+
+      @else if (similarRecipes().length === 0) {
+
+      <div class="similar-recipes-empty">
+
+        <p>
+          No similar recipes found.
+        </p>
+
+      </div>
+
+      }
+
+      @else {
+
+      <div class="similar-recipes-list">
+
+        @for (recipe of similarRecipes(); track recipe._id) {
+
+        <article class="similar-recipe-card">
+
+          <img
+            [src]="recipeService.getImageUrl(recipe.imageUrl)"
+            [alt]="recipe.title"
+          />
+
+          <div class="similar-recipe-content">
+
+            <span class="recipe-category">
+              {{ recipe.category }}
+            </span>
+
+            <h3>
+              {{ recipe.title }}
+            </h3>
+
+            <p>
+              {{ recipe.ingredients.slice(0, 3).join(', ') }}
+            </p>
+
+            <a
+              [routerLink]="['/recipes', recipe._id]"
+              class="view-similar-recipe-btn"
+            >
+              View Recipe
+            </a>
+
+          </div>
+
+        </article>
+
+        }
+
+      </div>
+
+      }
+
+    </section>
+
 
     <!-- Recipe Error / Loading -->
+
+    }
 
     @else {
 

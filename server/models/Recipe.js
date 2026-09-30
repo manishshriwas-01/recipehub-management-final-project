@@ -49,12 +49,23 @@ const recipeSchema = new mongoose.Schema(
                 "Other",
             ],
         },
+        cookTime: {
+    type: Number,
+    required: [true, "Cook time is required"],
+    min: [1, "Cook time must be at least 1 minute"],
+},
     },
     {
         timestamps: true,
     }
 
+
+
 );
+recipeSchema.index({
+    title: "text",
+    ingredients: "text",
+});
 
 const Recipe = mongoose.model("Recipe", recipeSchema);
 

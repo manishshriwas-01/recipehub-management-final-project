@@ -1061,3 +1061,32 @@ Food-related prediction found?
    Accept  Reject
       ↓    ↓
 Upload   Show warning
+
+
+
+# Day 3 – Smart Recipe Search & Discovery
+
+## Overview
+
+Implemented advanced recipe search and discovery features in RecipeHub to make it easier for users to find recipes based on different criteria.
+
+## Features Implemented
+
+### 1. Smart Recipe Search
+
+Users can search recipes using:
+
+- Recipe title
+- Ingredients
+- MongoDB text search
+
+MongoDB text index is configured on:
+
+- `title`
+- `ingredients`
+
+```js
+recipeSchema.index({
+  title: "text",
+  ingredients: "text",
+});

@@ -80,6 +80,7 @@ describe("Review API", () => {
             steps: ["Cook tomato", "Add paneer"],
             category: "Indian",
             imageUrl: "https://example.com/test-image.jpg",
+            cookTime: 30,
         });
     });
 

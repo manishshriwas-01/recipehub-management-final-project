@@ -133,6 +133,7 @@ describe("Recipe API", () => {
                 ])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         console.log("5. Recipe request completed");
@@ -150,7 +151,7 @@ describe("Recipe API", () => {
             "category",
             "Indian"
         );
-    });
+    },15000);
 
     test("should get all recipes", async () => {
         const email = `get${Date.now()}@example.com`;
@@ -194,6 +195,7 @@ describe("Recipe API", () => {
                 ])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         const response = await request(app)
@@ -210,7 +212,7 @@ describe("Recipe API", () => {
         expect(
             response.body.recipes.length
         ).toBeGreaterThan(0);
-    });
+    },15000);
 
     test("should search recipes by title", async () => {
         const response = await request(app)
@@ -292,6 +294,7 @@ describe("Recipe API", () => {
                 JSON.stringify(["Cook paneer"])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -363,6 +366,7 @@ describe("Recipe API", () => {
                 JSON.stringify(["Cook paneer"])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         expect(recipeResponse.statusCode).toBe(201);
@@ -425,6 +429,7 @@ describe("Recipe API", () => {
                 ])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         const recipeId = recipeResponse.body.recipe._id;
@@ -455,7 +460,7 @@ describe("Recipe API", () => {
 
         expect(response.statusCode).toBe(403);
         expect(response.body.success).toBe(false);
-    });
+    },15000);
 
     test("should allow the recipe owner to update their recipe", async () => {
         const email = `updateowner${Date.now()}@example.com`;
@@ -497,6 +502,7 @@ describe("Recipe API", () => {
                 ])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         const recipeId = recipeResponse.body.recipe._id;
@@ -506,6 +512,7 @@ describe("Recipe API", () => {
             .set("Authorization", `Bearer ${token}`)
             .send({
                 title: "Updated Recipe",
+                cookTime: 30,
             });
 
         expect(response.statusCode).toBe(200);
@@ -560,6 +567,7 @@ describe("Recipe API", () => {
                 ])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         const recipeId = recipeResponse.body.recipe._id;
@@ -587,7 +595,7 @@ describe("Recipe API", () => {
 
         expect(response.statusCode).toBe(403);
         expect(response.body.success).toBe(false);
-    });
+    },15000);
 
     test("should allow the recipe owner to delete their recipe", async () => {
         const email = `deleteown${Date.now()}@example.com`;
@@ -629,6 +637,7 @@ describe("Recipe API", () => {
                 ])
             )
             .field("category", "Indian")
+            .field("cookTime", "30")
             .attach("image", testImage);
 
         const recipeId = recipeResponse.body.recipe._id;

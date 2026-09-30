@@ -1,7 +1,14 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Observable, of, catchError, switchMap } from 'rxjs';
+import {
+  Observable,
+  of,
+  catchError,
+  switchMap,
+  tap,
+  firstValueFrom
+} from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Recipe } from '../../models/Recipe';
 import { RecipeService } from '../../services/recipe.service';
@@ -10,6 +17,7 @@ import { AuthService } from '../../services/auth.service/auth.service';
 import { Review, ReviewService } from '../../services/review-service';
 import { ToxicityService } from '../../services/toxicity';
 import { SentimentService } from '../../services/sentiment';
+import { RecipeSimilarityService } from '../../services/recipe-similarity.service.ts';
 
 @Component({
   selector: 'app-view-recipe',
@@ -26,6 +34,9 @@ export class ViewRecipe {
   private router = inject(Router);
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
+
+  // AI Similar Recipes
+  private recipeSimilarityService = inject(RecipeSimilarityService);
 
   selectedRating = signal(0);
   reviewComment = signal('');
@@ -56,6 +67,10 @@ export class ViewRecipe {
 
   recipeId = '';
 
+  // AI Similar Recipes
+  similarRecipes = signal<Recipe[]>([]);
+  similarRecipesLoading = signal(false);
+
   recipe$: Observable<{
     success: boolean;
     recipe: Recipe;
@@ -69,6 +84,38 @@ export class ViewRecipe {
       this.loadReviews();
 
       return this.recipeService.getRecipe(this.recipeId).pipe(
+
+        // AI EMBEDDING
+        tap(async (response) => {
+          if (!response?.recipe) return;
+
+          const recipe = response.recipe;
+
+          const recipeText = `
+            ${recipe.title}
+            ${recipe.ingredients.join(' ')}
+            ${recipe.category}
+          `;
+
+          try {
+            const embedding =
+              await this.recipeSimilarityService.generateEmbedding(
+                recipeText
+              );
+
+            console.log('RECIPE EMBEDDING:', embedding);
+
+            // Load other recipes for similarity comparison
+            await this.loadSimilarRecipes(recipe);
+
+          } catch (error) {
+            console.error(
+              'Embedding generation failed:',
+              error
+            );
+          }
+        }),
+
         catchError(() => {
           this.errorMessage.set('Recipe not found');
           return of(null);
@@ -301,7 +348,8 @@ export class ViewRecipe {
         review.helpfulBy = response.helpful
           ? [...review.helpfulBy, this.user()?.id || '']
           : review.helpfulBy.filter(
-              (userId) => String(userId) !== String(this.user()?.id)
+              (userId) =>
+                String(userId) !== String(this.user()?.id)
             );
 
         this.helpfulLoading.set(null);
@@ -321,4 +369,109 @@ export class ViewRecipe {
     this.reviewSort.set(sort);
     this.loadReviews();
   }
+
+  // AI Similar Recipes
+  async loadSimilarRecipes(currentRecipe: Recipe): Promise<void> {
+  this.similarRecipesLoading.set(true);
+
+  try {
+    const response = await firstValueFrom(
+      this.recipeService.getRecipes(1, 50)
+    );
+
+    const otherRecipes = response.recipes.filter(
+      (recipe) =>
+        String(recipe._id) !== String(currentRecipe._id)
+    );
+
+    const currentRecipeText = `
+      ${currentRecipe.title}
+      ${currentRecipe.ingredients.join(' ')}
+      ${currentRecipe.category}
+    `;
+
+    const currentEmbedding =
+      await this.recipeSimilarityService.generateEmbedding(
+        currentRecipeText
+      );
+
+    const recipesWithSimilarity = [];
+
+    for (const recipe of otherRecipes) {
+      const recipeText = `
+        ${recipe.title}
+        ${recipe.ingredients.join(' ')}
+        ${recipe.category}
+      `;
+
+      const embedding =
+        await this.recipeSimilarityService.generateEmbedding(
+          recipeText
+        );
+
+      const similarity =
+        this.calculateCosineSimilarity(
+          currentEmbedding,
+          embedding
+        );
+
+      recipesWithSimilarity.push({
+        recipe,
+        similarity,
+      });
+    }
+
+    recipesWithSimilarity.sort(
+      (a, b) => b.similarity - a.similarity
+    );
+
+    const topSimilarRecipes =
+      recipesWithSimilarity
+        .slice(0, 5)
+        .map(item => item.recipe);
+
+    this.similarRecipes.set(topSimilarRecipes);
+
+    console.log(
+      'SIMILAR RECIPES:',
+      recipesWithSimilarity
+    );
+
+  } catch (error) {
+    console.error(
+      'Failed to find similar recipes:',
+      error
+    );
+
+    this.similarRecipes.set([]);
+
+  } finally {
+    this.similarRecipesLoading.set(false);
+  }
+}
+
+  calculateCosineSimilarity(
+  vectorA: number[],
+  vectorB: number[]
+): number {
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+
+  for (let i = 0; i < vectorA.length; i++) {
+    dotProduct += vectorA[i] * vectorB[i];
+
+    magnitudeA += vectorA[i] * vectorA[i];
+    magnitudeB += vectorB[i] * vectorB[i];
+  }
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0;
+  }
+
+  return (
+    dotProduct /
+    (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB))
+  );
+}
 }
