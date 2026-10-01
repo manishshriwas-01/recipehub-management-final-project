@@ -64,20 +64,20 @@ io.on("connection", (socket) => {
 
     socket.join(room);
 
-    console.log("=================================");
-    console.log("SOCKET CONNECTED");
-    console.log("User ID:", userId);
-    console.log("Room:", room);
-    console.log("Rooms:", [...socket.rooms]);
-    console.log("=================================");
+    // console.log("=================================");
+    // console.log("SOCKET CONNECTED");
+    // console.log("User ID:", userId);
+    // console.log("Room:", room);
+    // console.log("Rooms:", [...socket.rooms]);
+    // console.log("=================================");
 
     socket.on("disconnect", (reason) => {
-    console.log(
-        "Socket disconnected:",
-        userId,
-        "Reason:",
-        reason
-    );
+    // console.log(
+    //     "Socket disconnected:",
+    //     userId,
+    //     "Reason:",
+    //     reason
+    // );
 });
 });
 

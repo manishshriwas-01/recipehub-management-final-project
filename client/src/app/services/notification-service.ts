@@ -20,7 +20,7 @@ export class NotificationSocketService {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      console.log('No authentication token found');
+      // console.log('No authentication token found');
       return;
     }
 
@@ -31,13 +31,13 @@ export class NotificationSocketService {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      console.log('No authentication token found');
+      // console.log('No authentication token found');
       return;
     }
 
     // Already connected
     if (this.socket?.connected) {
-      console.log('Socket already connected');
+      // console.log('Socket already connected');
       return;
     }
 
@@ -65,27 +65,27 @@ export class NotificationSocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log(
-        'Socket connected:',
-        this.socket?.id
-      );
+      // console.log(
+      //   'Socket connected:',
+      //   this.socket?.id
+      // );
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error(
-        'Socket connection error:',
-        error.message
-      );
+      // console.error(
+      //   'Socket connection error:',
+      //   error.message
+      // );
     });
 
     this.socket.on(
       'newNotification',
       (notification: Notification) => {
 
-        console.log(
-          '🔥 New notification received:',
-          notification
-        );
+        // console.log(
+        //   '🔥 New notification received:',
+        //   notification
+        // );
 
         this.notifications.update(
           notifications => [
@@ -101,18 +101,18 @@ export class NotificationSocketService {
     );
 
     this.socket.on('disconnect', (reason) => {
-      console.log(
-        'Socket disconnected:',
-        reason
-      );
+      // console.log(
+      //   'Socket disconnected:',
+      //   reason
+      // );
     });
   }
 
   disconnect(): void {
     if (this.socket) {
-      console.log(
-        'Disconnecting notification socket'
-      );
+      // console.log(
+      //   'Disconnecting notification socket'
+      // );
 
       this.socket.removeAllListeners();
       this.socket.disconnect();
@@ -139,10 +139,10 @@ export class NotificationSocketService {
         },
 
         error: (error) => {
-          console.error(
-            'Failed to load notifications:',
-            error
-          );
+          // console.error(
+          //   'Failed to load notifications:',
+          //   error
+          // );
         }
       });
   }
@@ -163,89 +163,86 @@ export class NotificationSocketService {
         },
 
         error: (error) => {
-          console.error(
-            'Failed to load unread notification count:',
-            error
-          );
+          // console.error(
+          //   'Failed to load unread notification count:',
+          //   error
+          // );
         }
       });
   }
 
-
   markAsRead(id: string): void {
-  this.http
-    .patch<{
-      success: boolean;
-      message: string;
-      notification: Notification;
-    }>(
-      `${environment.apiUrl}/notifications/${id}/read`,
-      {}
-    )
-    .subscribe({
-      next: (response) => {
-        if (!response.success) {
-          return;
-        }
+    this.http
+      .patch<{
+        success: boolean;
+        message: string;
+        notification: Notification;
+      }>(
+        `${environment.apiUrl}/notifications/${id}/read`,
+        {}
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response.success) {
+            return;
+          }
 
-        this.notifications.update((notifications) =>
-          notifications.map((notification) =>
-            notification._id === id
-              ? {
-                  ...notification,
-                  read: true,
-                }
-              : notification
-          )
-        );
+          this.notifications.update((notifications) =>
+            notifications.map((notification) =>
+              notification._id === id
+                ? {
+                    ...notification,
+                    read: true,
+                  }
+                : notification
+            )
+          );
 
-        this.unreadCount.update((count) =>
-          Math.max(0, count - 1)
-        );
-      },
+          this.unreadCount.update((count) =>
+            Math.max(0, count - 1)
+          );
+        },
 
-      error: (error) => {
-        console.error(
-          'Failed to mark notification as read:',
-          error
-        );
-      },
-    });
+        error: (error) => {
+          // console.error(
+          //   'Failed to mark notification as read:',
+          //   error
+          // );
+        },
+      });
+  }
+
+  markAllAsRead(): void {
+    this.http
+      .patch<{
+        success: boolean;
+        message: string;
+      }>(
+        `${environment.apiUrl}/notifications/read-all`,
+        {}
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response.success) {
+            return;
+          }
+
+          this.notifications.update((notifications) =>
+            notifications.map((notification) => ({
+              ...notification,
+              read: true,
+            }))
+          );
+
+          this.unreadCount.set(0);
+        },
+
+        error: (error) => {
+          // console.error(
+          //   'Failed to mark all notifications as read:',
+          //   error
+          // );
+        },
+      });
+  }
 }
-
-markAllAsRead(): void {
-  this.http
-    .patch<{
-      success: boolean;
-      message: string;
-    }>(
-      `${environment.apiUrl}/notifications/read-all`,
-      {}
-    )
-    .subscribe({
-      next: (response) => {
-        if (!response.success) {
-          return;
-        }
-
-        this.notifications.update((notifications) =>
-          notifications.map((notification) => ({
-            ...notification,
-            read: true,
-          }))
-        );
-
-        this.unreadCount.set(0);
-      },
-
-      error: (error) => {
-        console.error(
-          'Failed to mark all notifications as read:',
-          error
-        );
-      },
-    });
-}
-}
-
-

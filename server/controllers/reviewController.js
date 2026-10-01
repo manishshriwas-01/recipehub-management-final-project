@@ -3,13 +3,9 @@ import Recipe from "../models/Recipe.js";
 import Notification from "../models/Notification.js";
 import { getSocketIO } from "../utils/socket.js";
 
-
-
 export const createReview = async (req, res, next) => {
     try {
         const { recipeId, rating, comment, sentiment } = req.body;
-
-
 
         const recipe = await Recipe.findById(recipeId);
 
@@ -40,7 +36,6 @@ export const createReview = async (req, res, next) => {
             sentiment,
         });
 
-
         const notification = await Notification.create({
             recipient: recipe.owner,
             sender: req.user.userId,
@@ -64,36 +59,35 @@ export const createReview = async (req, res, next) => {
 
         const recipientRoom = `user:${recipe.owner.toString()}`;
 
-        console.log("=================================");
-        console.log("SENDING REVIEW NOTIFICATION");
-        console.log("Recipe owner:", recipe.owner.toString());
-        console.log("Reviewer:", req.user.userId);
-        console.log("Notification ID:", notification._id.toString());
-        console.log("Recipient room:", recipientRoom);
+        // console.log("=================================");
+        // console.log("SENDING REVIEW NOTIFICATION");
+        // console.log("Recipe owner:", recipe.owner.toString());
+        // console.log("Reviewer:", req.user.userId);
+        // console.log("Notification ID:", notification._id.toString());
+        // console.log("Recipient room:", recipientRoom);
 
         if (!io) {
-            console.log("ERROR: Socket.IO instance is NOT available");
+            // console.log("ERROR: Socket.IO instance is NOT available");
         } else {
-            console.log("Socket.IO instance available");
+            // console.log("Socket.IO instance available");
 
             const socketsInRoom =
                 await io.in(recipientRoom).fetchSockets();
 
-            console.log(
-                "Sockets in recipient room:",
-                socketsInRoom.length
-            );
+            // console.log(
+            //     "Sockets in recipient room:",
+            //     socketsInRoom.length
+            // );
 
             io.to(recipientRoom).emit(
                 "newNotification",
                 notification
             );
 
-            console.log("Notification emitted");
+            // console.log("Notification emitted");
         }
 
-        console.log("=================================");
-
+        // console.log("=================================");
 
         return res.status(201).json({
             success: true,

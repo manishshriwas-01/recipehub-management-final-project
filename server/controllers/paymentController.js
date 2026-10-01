@@ -58,9 +58,9 @@ export const createPaymentOrder = async (req, res, next) => {
 
   } catch (error) {
 
-    console.error("========== RAZORPAY ERROR ==========");
-    console.error(error);
-    console.error("====================================");
+    // console.error("========== RAZORPAY ERROR ==========");
+    // console.error(error);
+    // console.error("====================================");
 
     // If Razorpay order creation fails,
     // don't leave the appointment as pending.
@@ -137,9 +137,9 @@ export const verifyPayment = async (req, res, next) => {
             appointment,
         });
     } catch (error) {
-    console.error("========== RAZORPAY ERROR ==========");
-    console.error(error);
-    console.error("====================================");
+    // console.error("========== RAZORPAY ERROR ==========");
+    // console.error(error);
+    // console.error("====================================");
 
     next(error);
 }
