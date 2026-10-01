@@ -1,7 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { NotificationSocketService } from '../notification-service';
 
 interface AuthResponse {
   success: boolean;
@@ -21,6 +22,8 @@ export interface User {
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private notificationSocket = inject(NotificationSocketService);
+
   private apiUrl = `${environment.apiUrl}/auth`;
 
   user = signal<User | null>(null);
@@ -43,6 +46,12 @@ export class AuthService {
     return this.http.post<AuthResponse>(
       `${this.apiUrl}/login`,
       data
+    ).pipe(
+      tap((response) => {
+        if (response.success && response.token) {
+          localStorage.setItem('token', response.token);
+        }
+      })
     );
   }
 
@@ -61,6 +70,9 @@ export class AuthService {
   }
 
   logout(): void {
+    // Disconnect socket before removing authentication
+    this.notificationSocket.disconnect();
+
     localStorage.removeItem('token');
     this.clearUser();
   }

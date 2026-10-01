@@ -12,7 +12,8 @@
       class="menu-toggle"
       type="button"
       (click)="toggleMenu()"
-      aria-label="Toggle navigation">
+      aria-label="Toggle navigation"
+    >
       <span></span>
       <span></span>
       <span></span>
@@ -26,7 +27,8 @@
         routerLink="/"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        (click)="closeMenu()">
+        (click)="closeMenu()"
+      >
         Home
       </a>
 
@@ -34,7 +36,8 @@
       <a
         routerLink="/recipes"
         routerLinkActive="active"
-        (click)="closeMenu()">
+        (click)="closeMenu()"
+      >
         Recipes
       </a>
 
@@ -42,7 +45,8 @@
       <a
         routerLink="/ai-assistant"
         routerLinkActive="active"
-        (click)="closeMenu()">
+        (click)="closeMenu()"
+      >
         🤖 AI Assistant
       </a>
 
@@ -52,7 +56,8 @@
         <a
           routerLink="/my-recipes"
           routerLinkActive="active"
-          (click)="closeMenu()">
+          (click)="closeMenu()"
+        >
           My Recipes
         </a>
 
@@ -60,7 +65,8 @@
         <a
           routerLink="/my-bookings"
           routerLinkActive="active"
-          (click)="closeMenu()">
+          (click)="closeMenu()"
+        >
           📅 My Bookings
         </a>
 
@@ -68,9 +74,106 @@
         <a
           routerLink="/instructor-dashboard"
           routerLinkActive="active"
-          (click)="closeMenu()">
+          (click)="closeMenu()"
+        >
           👨‍🍳 Instructor
         </a>
+
+        <!-- Notifications -->
+        <div class="notification-wrapper">
+
+          <button
+            type="button"
+            class="notification-btn"
+            aria-label="Notifications"
+            (click)="toggleNotifications()"
+          >
+            <span class="notification-icon">🔔</span>
+
+            @if (unreadCount() > 0) {
+              <span class="notification-badge">
+                {{ unreadCount() }}
+              </span>
+            }
+          </button>
+
+          @if (notificationOpen()) {
+
+            <div class="notification-dropdown">
+
+              <!-- Notification Header -->
+              <div class="notification-header">
+
+                <h3>Notifications</h3>
+
+                @if (unreadCount() > 0) {
+                  <button
+                    type="button"
+                    class="mark-all-read-btn"
+                    (click)="markAllNotificationsAsRead()"
+                  >
+                    Mark all as read
+                  </button>
+                }
+
+              </div>
+
+              <!-- No Notifications -->
+              @if (notifications().length === 0) {
+
+                <div class="no-notifications">
+                  No notifications yet
+                </div>
+
+              } @else {
+
+                <!-- Notification List -->
+                <div class="notification-list">
+
+                  @for (
+                    notification of notifications();
+                    track notification._id
+                  ) {
+
+                    <div
+                      class="notification-item"
+                      [class.unread]="!notification.read"
+                      (click)="markNotificationAsRead(notification)"
+                    >
+
+                      <div class="notification-content">
+
+                        <strong>
+                          {{ notification.sender.name }}
+                        </strong>
+
+                        <span>
+                          {{ notification.message }}
+                        </span>
+
+                        <strong>
+                          {{ notification.recipe.title }}
+                        </strong>
+
+                      </div>
+
+                      <small>
+                        {{ notification.createdAt | date:'short' }}
+                      </small>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
 
         <!-- Favorites -->
         <a
@@ -78,7 +181,8 @@
           routerLinkActive="active"
           (click)="closeMenu()"
           class="favorite-link"
-          aria-label="Favorites">
+          aria-label="Favorites"
+        >
           <span class="heart">♥</span>
           <span>Favorites</span>
         </a>
@@ -88,7 +192,8 @@
           routerLink="/create-recipe"
           routerLinkActive="active"
           (click)="closeMenu()"
-          class="create-btn">
+          class="create-btn"
+        >
           + Create Recipe
         </a>
 
@@ -98,7 +203,8 @@
           <a
             routerLink="/manage-recipes"
             routerLinkActive="active"
-            (click)="closeMenu()">
+            (click)="closeMenu()"
+          >
             Manage Recipes
           </a>
 
@@ -108,7 +214,8 @@
         <button
           type="button"
           class="logout-btn"
-          (click)="logout()">
+          (click)="logout()"
+        >
           Logout
         </button>
 
@@ -118,7 +225,8 @@
         <a
           routerLink="/login"
           routerLinkActive="active"
-          (click)="closeMenu()">
+          (click)="closeMenu()"
+        >
           Login
         </a>
 
@@ -127,7 +235,8 @@
           routerLink="/register"
           routerLinkActive="active"
           (click)="closeMenu()"
-          class="register-btn">
+          class="register-btn"
+        >
           Get Started
         </a>
 

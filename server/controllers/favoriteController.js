@@ -1,5 +1,7 @@
 import Recipe from "../models/Recipe.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
+import { getSocketIO } from "../utils/socket.js";
 
 //add recipe to favorites
 export const addFavorite = async (req, res, next) => {
@@ -32,6 +34,36 @@ export const addFavorite = async (req, res, next) => {
         user.favorites.push(recipe._id);
 
         await user.save();
+
+        if (recipe.owner.toString() !== req.user.userId) {
+            const notification = await Notification.create({
+                recipient: recipe.owner,
+                sender: req.user.userId,
+                type: "SAVE",
+                message: "saved your recipe",
+                recipe: recipe._id,
+            });
+
+            await notification.populate([
+                {
+                    path: "sender",
+                    select: "name",
+                },
+                {
+                    path: "recipe",
+                    select: "title",
+                },
+            ]);
+
+            const io = getSocketIO();
+
+            if (io) {
+                io.to(`user:${recipe.owner.toString()}`).emit(
+                    "newNotification",
+                    notification
+                );
+            }
+        }
 
         res.status(200).json({
             success: true,
@@ -88,29 +120,29 @@ export const removeFavorite = async (req, res, next) => {
 //get favorite recipes
 
 export const getFavorites = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.userId).populate({
-      path: "favorites",
-      populate: {
-        path: "owner",
-        select: "name email",
-      },
-    });
+    try {
+        const user = await User.findById(req.user.userId).populate({
+            path: "favorites",
+            populate: {
+                path: "owner",
+                select: "name email",
+            },
+        });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            count: user.favorites.length,
+            recipes: user.favorites,
+        });
+    } catch (error) {
+        console.error("Get favorites error:", error);
+        next(error);
     }
-
-    res.status(200).json({
-      success: true,
-      count: user.favorites.length,
-      recipes: user.favorites,
-    });
-  } catch (error) {
-    console.error("Get favorites error:", error);
-    next(error);
-  }
 };

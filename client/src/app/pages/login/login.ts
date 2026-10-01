@@ -50,7 +50,7 @@ export class Login {
 
     this.authService.login(this.loginForm.getRawValue()).subscribe({
       next: (response) => {
-        localStorage.setItem('token', response.token);
+        // localStorage.setItem('token', response.token);
 
         this.authService.getMe().subscribe({
           next: (meResponse) => {

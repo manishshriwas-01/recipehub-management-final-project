@@ -1090,3 +1090,38 @@ recipeSchema.index({
   title: "text",
   ingredients: "text",
 });
+
+
+# Day 4 — Live Notifications
+
+## Objective
+
+Implemented a real-time notification system in RecipeHub using Socket.IO.
+
+Recipe owners now receive notifications when another user:
+
+- Reviews their recipe
+- Saves their recipe to favorites
+
+Notifications are stored in MongoDB so they remain available even after page refresh.
+
+---
+
+## Features Implemented
+
+### 1. Real-Time Notifications
+
+Integrated Socket.IO for real-time communication between Angular and Node.js.
+
+When a user reviews or saves another user's recipe:
+
+```text
+User Action
+    ↓
+Backend creates notification
+    ↓
+Notification stored in MongoDB
+    ↓
+Socket.IO emits notification
+    ↓
+Recipe owner receives notification instantly
