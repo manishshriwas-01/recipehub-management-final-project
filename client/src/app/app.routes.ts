@@ -68,6 +68,13 @@ export const routes: Routes = [
     import('./pages/shared-collection/shared-collection')
       .then(m => m.SharedCollection)
 },
+{
+  path: 'meal-planner',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./pages/meal-planner/meal-planner')
+      .then(m => m.MealPlanner)
+},
 
   // Admin only
   {

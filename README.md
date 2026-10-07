@@ -1125,3 +1125,53 @@ Notification stored in MongoDB
 Socket.IO emits notification
     ↓
 Recipe owner receives notification instantly
+
+
+
+# 📋 Today's Task – RecipeHub
+
+## Meal Planner & Shopping List Enhancements
+
+### 1. Meal Planner
+- Implemented weekly meal planning for Breakfast, Lunch, and Dinner.
+- Added recipe selection for specific dates and meal types.
+- Added edit and delete functionality for planned meals.
+- Added weekly navigation and meal plan management.
+
+### 2. Shopping List
+- Implemented automatic shopping list generation from weekly meal plans.
+- Added ingredient quantity aggregation.
+- Same ingredients are merged based on normalized ingredient names.
+- Added checkbox functionality to mark shopping items as completed.
+- Added checked-item persistence using `localStorage`.
+- Added **Clear Checked** functionality.
+- Added empty shopping-list state.
+- Added dynamic item count with proper singular/plural display.
+
+### 3. Print / Save PDF
+- Added **Print / Save PDF** functionality for the shopping list.
+- Added print-specific styling.
+- Hidden navbar, buttons, and unnecessary UI elements during printing.
+- Optimized shopping list layout for A4 printing/PDF.
+
+### 4. Cook Mode
+- Implemented browser-based text-to-speech using `speechSynthesis`.
+- Added automatic reading of ingredients and cooking steps.
+- Added Start, Pause, Resume, and Stop controls.
+- Integrated portion-scaled ingredients with Cook Mode.
+
+### 5. Portion Scaling
+- Added serving selector to the recipe view.
+- Users can increase or decrease servings.
+- Ingredient quantities automatically scale according to selected servings.
+- Added support for whole numbers, decimals, and fractions.
+
+### 6. UI/UX Improvements
+- Improved Shopping List header and actions.
+- Added responsive controls for shopping list management.
+- Added proper empty states.
+- Added print-friendly styling.
+
+## Final Result
+
+Today, the Meal Planner, Shopping List, Cook Mode, Portion Scaling, and Print/PDF features were implemented, tested, and polished for the RecipeHub application.

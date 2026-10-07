@@ -8,12 +8,7 @@
     </a>
 
     <!-- Mobile Menu Button -->
-    <button
-      class="menu-toggle"
-      type="button"
-      (click)="toggleMenu()"
-      aria-label="Toggle navigation"
-    >
+    <button class="menu-toggle" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
       <span></span>
       <span></span>
       <span></span>
@@ -23,222 +18,161 @@
     <div class="nav-menu" [class.open]="menuOpen()">
 
       <!-- Home -->
-      <a
-        routerLink="/"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="closeMenu()"
-      >
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
         Home
       </a>
 
       <!-- Recipes -->
-      <a
-        routerLink="/recipes"
-        routerLinkActive="active"
-        (click)="closeMenu()"
-      >
+      <a routerLink="/recipes" routerLinkActive="active" (click)="closeMenu()">
         Recipes
       </a>
 
       <!-- AI Assistant -->
-      <a
-        routerLink="/ai-assistant"
-        routerLinkActive="active"
-        (click)="closeMenu()"
-      >
+      <a routerLink="/ai-assistant" routerLinkActive="active" (click)="closeMenu()">
         🤖 AI Assistant
       </a>
 
       @if (user()) {
 
-        <!-- My Recipes -->
-        <a
-          routerLink="/my-recipes"
-          routerLinkActive="active"
-          (click)="closeMenu()"
-        >
-          My Recipes
-        </a>
+      <!-- My Recipes -->
+      <a routerLink="/my-recipes" routerLinkActive="active" (click)="closeMenu()">
+        My Recipes
+      </a>
 
-        <!-- My Bookings -->
-        <a
-          routerLink="/my-bookings"
-          routerLinkActive="active"
-          (click)="closeMenu()"
-        >
-          📅 My Bookings
-        </a>
+      <!-- My Bookings -->
+      <a routerLink="/my-bookings" routerLinkActive="active" (click)="closeMenu()">
+        📅 My Bookings
+      </a>
 
-        <!-- Instructor Dashboard -->
-        <a
-          routerLink="/instructor-dashboard"
-          routerLinkActive="active"
-          (click)="closeMenu()"
-        >
-          👨‍🍳 Instructor
-        </a>
+      <!-- Instructor Dashboard -->
+      <a routerLink="/instructor-dashboard" routerLinkActive="active" (click)="closeMenu()">
+        👨‍🍳 Instructor
+      </a>
 
-        <!-- Notifications -->
-        <div class="notification-wrapper">
+      <!-- Notifications -->
+      <div class="notification-wrapper">
 
-          <button
-            type="button"
-            class="notification-btn"
-            aria-label="Notifications"
-            (click)="toggleNotifications()"
-          >
-            <span class="notification-icon">🔔</span>
+        <button type="button" class="notification-btn" aria-label="Notifications" (click)="toggleNotifications()">
+          <span class="notification-icon">🔔</span>
+
+          @if (unreadCount() > 0) {
+          <span class="notification-badge">
+            {{ unreadCount() }}
+          </span>
+          }
+        </button>
+
+        @if (notificationOpen()) {
+
+        <div class="notification-dropdown">
+
+          <!-- Notification Header -->
+          <div class="notification-header">
+
+            <h3>Notifications</h3>
 
             @if (unreadCount() > 0) {
-              <span class="notification-badge">
-                {{ unreadCount() }}
-              </span>
+            <button type="button" class="mark-all-read-btn" (click)="markAllNotificationsAsRead()">
+              Mark all as read
+            </button>
             }
-          </button>
 
-          @if (notificationOpen()) {
+          </div>
 
-            <div class="notification-dropdown">
+          <!-- No Notifications -->
+          @if (notifications().length === 0) {
 
-              <!-- Notification Header -->
-              <div class="notification-header">
+          <div class="no-notifications">
+            No notifications yet
+          </div>
 
-                <h3>Notifications</h3>
+          } @else {
 
-                @if (unreadCount() > 0) {
-                  <button
-                    type="button"
-                    class="mark-all-read-btn"
-                    (click)="markAllNotificationsAsRead()"
-                  >
-                    Mark all as read
-                  </button>
-                }
+          <!-- Notification List -->
+          <div class="notification-list">
+
+            @for (
+            notification of notifications();
+            track notification._id
+            ) {
+
+            <div class="notification-item" [class.unread]="!notification.read"
+              (click)="markNotificationAsRead(notification)">
+
+              <div class="notification-content">
+
+                <strong>
+                  {{ notification.sender.name }}
+                </strong>
+
+                <span>
+                  {{ notification.message }}
+                </span>
+
+                <strong>
+                  {{ notification.recipe.title }}
+                </strong>
 
               </div>
 
-              <!-- No Notifications -->
-              @if (notifications().length === 0) {
-
-                <div class="no-notifications">
-                  No notifications yet
-                </div>
-
-              } @else {
-
-                <!-- Notification List -->
-                <div class="notification-list">
-
-                  @for (
-                    notification of notifications();
-                    track notification._id
-                  ) {
-
-                    <div
-                      class="notification-item"
-                      [class.unread]="!notification.read"
-                      (click)="markNotificationAsRead(notification)"
-                    >
-
-                      <div class="notification-content">
-
-                        <strong>
-                          {{ notification.sender.name }}
-                        </strong>
-
-                        <span>
-                          {{ notification.message }}
-                        </span>
-
-                        <strong>
-                          {{ notification.recipe.title }}
-                        </strong>
-
-                      </div>
-
-                      <small>
-                        {{ notification.createdAt | date:'short' }}
-                      </small>
-
-                    </div>
-
-                  }
-
-                </div>
-
-              }
+              <small>
+                {{ notification.createdAt | date:'short' }}
+              </small>
 
             </div>
+
+            }
+
+          </div>
 
           }
 
         </div>
 
-        <!-- Favorites -->
-        <a
-          routerLink="/favorites"
-          routerLinkActive="active"
-          (click)="closeMenu()"
-          class="favorite-link"
-          aria-label="Favorites"
-        >
-          <span class="heart">♥</span>
-          <span>Favorites</span>
-        </a>
-
-        <!-- Create Recipe -->
-        <a
-          routerLink="/create-recipe"
-          routerLinkActive="active"
-          (click)="closeMenu()"
-          class="create-btn"
-        >
-          + Create Recipe
-        </a>
-
-        <!-- Admin -->
-        @if (user()?.role === 'admin') {
-
-          <a
-            routerLink="/manage-recipes"
-            routerLinkActive="active"
-            (click)="closeMenu()"
-          >
-            Manage Recipes
-          </a>
-
         }
 
-        <!-- Logout -->
-        <button
-          type="button"
-          class="logout-btn"
-          (click)="logout()"
-        >
-          Logout
-        </button>
+      </div>
+
+      <!-- Favorites -->
+      <a routerLink="/favorites" routerLinkActive="active" (click)="closeMenu()" class="favorite-link"
+        aria-label="Favorites">
+        <span class="heart">♥</span>
+        <span>Favorites</span>
+      </a>
+
+      <!-- Create Recipe -->
+      <a routerLink="/create-recipe" routerLinkActive="active" (click)="closeMenu()" class="create-btn">
+        + Create Recipe
+      </a>
+
+      <!-- Admin -->
+      @if (user()?.role === 'admin') {
+
+      <a routerLink="/manage-recipes" routerLinkActive="active" (click)="closeMenu()">
+        Manage Recipes
+      </a>
+
+      }
+      <a class="nav-link" routerLink="/meal-planner">
+        Meal Planner
+      </a>
+
+      <!-- Logout -->
+      <button type="button" class="logout-btn" (click)="logout()">
+        Logout
+      </button>
 
       } @else {
 
-        <!-- Login -->
-        <a
-          routerLink="/login"
-          routerLinkActive="active"
-          (click)="closeMenu()"
-        >
-          Login
-        </a>
+      <!-- Login -->
+      <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">
+        Login
+      </a>
 
-        <!-- Register -->
-        <a
-          routerLink="/register"
-          routerLinkActive="active"
-          (click)="closeMenu()"
-          class="register-btn"
-        >
-          Get Started
-        </a>
+      <!-- Register -->
+      <a routerLink="/register" routerLinkActive="active" (click)="closeMenu()" class="register-btn">
+        Get Started
+      </a>
 
       }
 

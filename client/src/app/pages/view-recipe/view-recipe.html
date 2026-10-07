@@ -10,10 +10,7 @@
     <article class="recipe-detail">
 
       <div class="recipe-detail-image">
-        <img
-          [src]="recipeService.getImageUrl(response.recipe.imageUrl)"
-          [alt]="response.recipe.title"
-        />
+        <img [src]="recipeService.getImageUrl(response.recipe.imageUrl)" [alt]="response.recipe.title" />
       </div>
 
       <div class="recipe-detail-content">
@@ -44,14 +41,8 @@
 
         <!-- Favorite -->
 
-        <button
-          type="button"
-          class="favorite-btn"
-          [class.active]="isFavorite()"
-          [disabled]="isFavoriteLoading()"
-          (click)="toggleFavorite()"
-          aria-label="Toggle favorite"
-        >
+        <button type="button" class="favorite-btn" [class.active]="isFavorite()" [disabled]="isFavoriteLoading()"
+          (click)="toggleFavorite()" aria-label="Toggle favorite">
           <span class="heart">
             {{ isFavorite() ? '♥' : '♡' }}
           </span>
@@ -61,13 +52,36 @@
 
         <!-- Learn Recipe -->
 
-        <button
-          type="button"
-          class="learn-recipe-btn"
-          (click)="learnRecipe()"
-        >
+        <button type="button" class="learn-recipe-btn" (click)="learnRecipe()">
           👨‍🍳 Learn This Recipe
         </button>
+        <br>
+        <br>
+        <button type="button" class="cook-mode-btn" (click)="startCookMode(response.recipe)">
+          🍳 Start Cook Mode
+        </button>
+
+      
+
+        <!-- Portion Scaling -->
+
+        <div class="servings-selector">
+
+          <h3>🍽️ Servings</h3>
+
+          <button type="button" (click)="changeServings(selectedServings() - 1)" [disabled]="selectedServings() <= 1">
+            −
+          </button>
+
+          <span>
+            {{ selectedServings() }}
+          </span>
+
+          <button type="button" (click)="changeServings(selectedServings() + 1)">
+            +
+          </button>
+
+        </div>
 
         <!-- Ingredients -->
 
@@ -78,7 +92,7 @@
           <ul>
             @for (ingredient of response.recipe.ingredients; track $index) {
             <li>
-              {{ ingredient }}
+              {{ getScaledIngredient(ingredient) }}
             </li>
             }
           </ul>
@@ -115,11 +129,7 @@
               Sort reviews:
             </label>
 
-            <select
-              id="reviewSort"
-              [value]="reviewSort()"
-              (change)="changeReviewSort($any($event.target).value)"
-            >
+            <select id="reviewSort" [value]="reviewSort()" (change)="changeReviewSort($any($event.target).value)">
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
               <option value="highest">Highest Rating</option>
@@ -142,14 +152,8 @@
 
               @for (star of [1, 2, 3, 4, 5]; track star) {
 
-              <button
-                type="button"
-                class="star-btn"
-                [class.selected]="star <= selectedRating()"
-                (click)="selectedRating.set(star)"
-                [attr.aria-label]="star + ' stars'"
-                [disabled]="reviewSubmitting()"
-              >
+              <button type="button" class="star-btn" [class.selected]="star <= selectedRating()"
+                (click)="selectedRating.set(star)" [attr.aria-label]="star + ' stars'" [disabled]="reviewSubmitting()">
                 ★
               </button>
 
@@ -159,13 +163,8 @@
 
             <!-- Comment -->
 
-            <textarea
-              [ngModel]="reviewComment()"
-              (ngModelChange)="reviewComment.set($event)"
-              placeholder="Write your review..."
-              maxlength="1000"
-              [disabled]="reviewSubmitting()"
-            ></textarea>
+            <textarea [ngModel]="reviewComment()" (ngModelChange)="reviewComment.set($event)"
+              placeholder="Write your review..." maxlength="1000" [disabled]="reviewSubmitting()"></textarea>
 
             <!-- AI Loading State -->
 
@@ -183,16 +182,11 @@
 
             <!-- Submit Review -->
 
-            <button
-              type="button"
-              class="submit-review-btn"
-              [disabled]="reviewSubmitting()"
-              (click)="submitReview()"
-            >
+            <button type="button" class="submit-review-btn" [disabled]="reviewSubmitting()" (click)="submitReview()">
               {{
-                reviewSubmitting()
-                ? 'Analyzing...'
-                : 'Submit Review'
+              reviewSubmitting()
+              ? 'Analyzing...'
+              : 'Submit Review'
               }}
             </button>
 
@@ -264,13 +258,8 @@
 
               <div class="review-helpful">
 
-                <button
-                  type="button"
-                  class="helpful-btn"
-                  [class.active]="review.helpfulBy.includes(user()?.id || '')"
-                  [disabled]="helpfulLoading() === review._id"
-                  (click)="toggleHelpfulReview(review)"
-                >
+                <button type="button" class="helpful-btn" [class.active]="review.helpfulBy.includes(user()?.id || '')"
+                  [disabled]="helpfulLoading() === review._id" (click)="toggleHelpfulReview(review)">
                   👍
                   Helpful
                   ({{ review.helpfulBy.length }})
@@ -281,17 +270,13 @@
               <!-- Delete Review -->
 
               @if (
-                canDeleteReview(
-                  review,
-                  response.recipe.owner?._id
-                )
+              canDeleteReview(
+              review,
+              response.recipe.owner?._id
+              )
               ) {
 
-              <button
-                type="button"
-                class="delete-review-btn"
-                (click)="deleteReview(review._id)"
-              >
+              <button type="button" class="delete-review-btn" (click)="deleteReview(review._id)">
                 Delete
               </button>
 
@@ -381,10 +366,7 @@
 
         <article class="similar-recipe-card">
 
-          <img
-            [src]="recipeService.getImageUrl(recipe.imageUrl)"
-            [alt]="recipe.title"
-          />
+          <img [src]="recipeService.getImageUrl(recipe.imageUrl)" [alt]="recipe.title" />
 
           <div class="similar-recipe-content">
 
@@ -400,10 +382,7 @@
               {{ recipe.ingredients.slice(0, 3).join(', ') }}
             </p>
 
-            <a
-              [routerLink]="['/recipes', recipe._id]"
-              class="view-similar-recipe-btn"
-            >
+            <a [routerLink]="['/recipes', recipe._id]" class="view-similar-recipe-btn">
               View Recipe
             </a>
 

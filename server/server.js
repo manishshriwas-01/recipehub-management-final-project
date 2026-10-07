@@ -13,6 +13,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import reviewRoutes from './routes/reviewRoutes.js'
 import collectionRoutes from './routes/collectionRoutes.js'
+import mealPlanRoutes from "./routes/mealPlanRoutes.js";
 import helmet from "helmet";
 import cors from "cors";
 import { setSocketIO } from "./utils/socket.js";
@@ -117,6 +118,11 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/collections", collectionRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use(
+  "/api/meal-plans",
+  mealPlanRoutes
+);
+
 
 // Handle unknown API routes
 app.use("/api", (req, res) => {

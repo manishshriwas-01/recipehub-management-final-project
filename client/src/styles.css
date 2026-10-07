@@ -1,2 +1,192 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'ngx-toastr/toastr';
+
+/* =========================================
+   SHOPPING LIST - PRINT / PDF ONLY
+   ========================================= */
+
+@media print {
+
+  /* Hide EVERYTHING on the website */
+  body > * {
+    visibility: hidden !important;
+  }
+
+  /* Make Angular app visible */
+  app-root {
+    visibility: visible !important;
+  }
+
+  /* Hide everything inside app-root */
+  app-root > * {
+    visibility: hidden !important;
+  }
+
+  /* Show ONLY the shopping list */
+  app-root .shopping-section,
+  app-root .shopping-section * {
+    visibility: visible !important;
+  }
+
+  /* Shopping list becomes the only printed content */
+  app-root .shopping-section {
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    min-height: 100vh !important;
+
+    margin: 0 !important;
+    padding: 25px !important;
+
+    background: white !important;
+
+    border: none !important;
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+  }
+
+  /* Hide planner */
+  app-root .meal-planner {
+    display: none !important;
+  }
+
+  /* Hide modal */
+  app-root .modal-backdrop {
+    display: none !important;
+  }
+
+  /* Hide print button */
+  app-root .print-shopping-btn,
+  app-root .shopping-header-actions {
+    display: none !important;
+  }
+
+  /* Hide item count */
+  app-root .item-count {
+    display: none !important;
+  }
+
+  /* Shopping Header */
+  app-root .shopping-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    margin-bottom: 25px !important;
+  }
+
+  app-root .shopping-header h2 {
+    margin: 0 !important;
+
+    font-size: 28px !important;
+
+    color: #222 !important;
+  }
+
+  app-root .shopping-header p {
+    margin: 6px 0 0 !important;
+
+    font-size: 14px !important;
+
+    color: #555 !important;
+  }
+
+  /* Shopping List */
+  app-root .shopping-list {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 12px !important;
+
+    width: 100% !important;
+  }
+
+  /* Shopping Item */
+  app-root .shopping-item {
+    display: flex !important;
+
+    align-items: center !important;
+
+    width: 100% !important;
+
+    padding: 14px 16px !important;
+
+    background: white !important;
+
+    border: 1px solid #ddd !important;
+
+    border-radius: 8px !important;
+
+    break-inside: avoid !important;
+
+    page-break-inside: avoid !important;
+  }
+
+  app-root .shopping-item input {
+    display: block !important;
+
+    width: 18px !important;
+    height: 18px !important;
+
+    margin-right: 10px !important;
+  }
+
+  app-root .shopping-item .ingredient {
+    flex: 1 !important;
+
+    font-size: 15px !important;
+
+    color: #222 !important;
+  }
+
+  app-root .shopping-item .quantity {
+    font-size: 14px !important;
+
+    color: #444 !important;
+  }
+
+  /* Checked items */
+  app-root .shopping-item.checked .ingredient {
+    color: #222 !important;
+
+    text-decoration: line-through !important;
+  }
+
+  app-root .shopping-item.checked .quantity {
+    color: #444 !important;
+  }
+
+  /* Empty list */
+  app-root .empty-shopping {
+    display: block !important;
+
+    width: 100% !important;
+
+    text-align: center !important;
+  }
+
+  /* Remove shadows */
+  app-root .shopping-section,
+  app-root .shopping-section * {
+    box-shadow: none !important;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: white !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+}

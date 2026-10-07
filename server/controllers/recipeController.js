@@ -13,7 +13,7 @@ export const createRecipe = async (req, res, next) => {
             });
         }
 
-        const { title, ingredients, steps, category, cookTime } = req.body;
+        const { title, ingredients, steps, category, cookTime ,servings} = req.body;
 
         const uploadResult = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
@@ -40,7 +40,8 @@ export const createRecipe = async (req, res, next) => {
             ingredients,
             steps,
             category,
-            cookTime
+            cookTime,
+            servings
         });
 
         return res.status(201).json({
@@ -514,7 +515,8 @@ export const updateRecipe = async (req, res, next) => {
             ingredients,
             steps,
             category,
-            cookTime
+            cookTime,
+            servings
         } = req.body;
 
         const recipe = await Recipe.findById(id);
@@ -543,7 +545,8 @@ export const updateRecipe = async (req, res, next) => {
             ingredients,
             steps,
             category,
-            cookTime
+            cookTime,
+            servings
         };
 
         if (req.file) {

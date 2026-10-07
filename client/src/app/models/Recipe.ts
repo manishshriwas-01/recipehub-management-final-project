@@ -10,6 +10,8 @@ export interface Recipe {
   ingredients: string[];
   steps: string[];
   category: string;
+  cookTime: number;
+  servings: number;
   createdAt: string;
   updatedAt: string;
 }

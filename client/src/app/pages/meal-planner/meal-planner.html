@@ -1,0 +1,252 @@
+<div class="meal-planner">
+    <div class="planner-header">
+        <div>
+            <h1>Weekly Meal Planner</h1>
+            <p>Plan your breakfast, lunch and dinner for the week.</p>
+        </div>
+    </div>
+
+    <div class="grid-wrapper">
+        <div class="week-grid">
+
+            <!-- Top-left empty cell -->
+            <div class="corner">
+                <span>Meal</span>
+            </div>
+
+            <!-- Days Header -->
+            @for (day of days(); track day.date.toISOString()) {
+            <div class="day-header">
+                <strong>{{ day.dayName }}</strong>
+                <span>{{ day.dayNumber }}</span>
+            </div>
+            }
+
+            <!-- Meal Rows -->
+            @for (mealType of mealTypes; track mealType) {
+
+            <div class="meal-label">
+                <span class="meal-icon">
+                    @if (mealType === 'breakfast') {
+                    ☕
+                    } @else if (mealType === 'lunch') {
+                    🍲
+                    } @else {
+                    🍽️
+                    }
+                </span>
+
+                <span>
+                    {{ mealType | titlecase }}
+                </span>
+            </div>
+
+            @for (day of days(); track day.date.toISOString()) {
+
+            @let meal = getMealPlan(day, mealType);
+
+            <div class="meal-cell" [class.has-meal]="meal">
+
+                @if (meal) {
+
+                <div class="meal-card" (click)="selectMealSlot(day, mealType)">
+
+                    @if (meal.recipe.imageUrl) {
+                    <img [src]="meal.recipe.imageUrl" [alt]="meal.recipe.title" class="recipe-image" />
+                    }
+
+                    <div class="recipe-info">
+                        <span class="recipe-title">
+                            {{ meal.recipe.title }}
+                        </span>
+
+                        <span class="edit-text">
+                            Click to change
+                        </span>
+                    </div>
+
+                </div>
+
+                } @else {
+
+                <button type="button" class="add-meal-btn" (click)="selectMealSlot(day, mealType)"
+                    [attr.aria-label]="'Add ' + mealType">
+                    +
+                </button>
+
+                }
+
+            </div>
+            }
+            }
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Recipe Selection Modal -->
+
+@if (selectedDate() && selectedMealType()) {
+
+<div class="modal-backdrop" (click)="closeRecipeModal()">
+
+    <div class="recipe-modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+
+            <div>
+                <h2>
+                    @if (editingMealPlan()) {
+                    Change Recipe
+                    } @else {
+                    Select Recipe
+                    }
+                </h2>
+
+                <p>
+                    {{ selectedDate()?.dayName }}
+                    •
+                    {{ selectedMealType() | titlecase }}
+                </p>
+            </div>
+
+            <button type="button" class="close-btn" (click)="closeRecipeModal()" aria-label="Close">
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- Recipes -->
+
+        <div class="recipe-list">
+
+            @for (recipe of recipes(); track recipe._id) {
+
+            <button type="button" class="recipe-option" (click)="addRecipeToMeal(recipe)">
+
+                @if (recipe.imageUrl) {
+
+                <img [src]="recipe.imageUrl" [alt]="recipe.title" />
+
+                } @else {
+
+                <div class="recipe-placeholder">
+                    🍽️
+                </div>
+
+                }
+
+                <div class="recipe-option-info">
+                    <strong>
+                        {{ recipe.title }}
+                    </strong>
+
+                    <span>
+                        Add to {{ selectedMealType() }}
+                    </span>
+                </div>
+
+            </button>
+
+            } @empty {
+
+            <div class="empty-recipes">
+                <span>🍳</span>
+
+                <h3>No recipes found</h3>
+
+                <p>
+                    Create a recipe first to add it to your meal plan.
+                </p>
+            </div>
+
+            }
+
+        </div>
+
+
+        <!-- Delete existing meal -->
+
+        @if (editingMealPlan()) {
+
+        <div class="modal-footer">
+
+            <button type="button" class="delete-btn" (click)="deleteMeal(editingMealPlan()!)">
+                Remove from Meal Plan
+            </button>
+
+        </div>
+
+        }
+
+    </div>
+</div>
+
+}
+
+<section class="shopping-section">
+
+    <div class="shopping-header">
+        <div>
+            <h2>Shopping List</h2>
+            <p>Ingredients needed for this week's meals</p>
+        </div>
+
+        <span class="item-count">
+            {{ shoppingList().length }} items
+        </span>
+
+        @if (shoppingList().some(item => item.checked)) {
+        <button type="button" class="clear-checked-btn" (click)="clearCheckedItems()">
+            ✓ Clear Checked
+        </button>
+        }
+
+        <button type="button" class="print-shopping-btn" (click)="printShoppingList()">
+            🖨️ Print / Save PDF
+        </button>
+    </div>
+
+    <div class="shopping-list">
+
+        @for (
+        item of shoppingList();
+        track item.ingredient;
+        let i = $index
+        ) {
+
+        <label class="shopping-item" [class.checked]="item.checked">
+
+            <input type="checkbox" [checked]="item.checked" (change)="toggleShoppingItem(i)" />
+
+            <span class="checkmark"></span>
+
+            <span class="ingredient">
+                {{ item.ingredient | titlecase }}
+            </span>
+
+            <span class="quantity">
+                × {{ item.quantity }}
+            </span>
+
+        </label>
+
+        } @empty {
+
+        <div class="empty-shopping">
+            <span>🛒</span>
+
+            <h3>Your shopping list is empty</h3>
+
+            <p>
+                Add some recipes to your weekly meal plan.
+            </p>
+        </div>
+
+        }
+
+    </div>
+
+</section>

@@ -50,10 +50,16 @@ const recipeSchema = new mongoose.Schema(
             ],
         },
         cookTime: {
-    type: Number,
-    required: [true, "Cook time is required"],
-    min: [1, "Cook time must be at least 1 minute"],
-},
+            type: Number,
+            required: [true, "Cook time is required"],
+            min: [1, "Cook time must be at least 1 minute"],
+        },
+        servings: {
+            type: Number,
+            required: [true, "Servings are required"],
+            min: [1, "Servings must be at least 1"],
+            default: 2,
+        },
     },
     {
         timestamps: true,

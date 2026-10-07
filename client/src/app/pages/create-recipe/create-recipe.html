@@ -17,16 +17,13 @@
 
 
     @if (errorMessage) {
-      <div class="error-message">
-        {{ errorMessage }}
-      </div>
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
     }
 
 
-    <form
-      [formGroup]="recipeForm"
-      (ngSubmit)="onSubmit()"
-    >
+    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
 
       <!-- Recipe Title -->
 
@@ -36,20 +33,15 @@
           Recipe Title
         </label>
 
-        <input
-          id="title"
-          type="text"
-          formControlName="title"
-          placeholder="e.g. Paneer Butter Masala"
-        />
+        <input id="title" type="text" formControlName="title" placeholder="e.g. Paneer Butter Masala" />
 
         @if (
-          recipeForm.controls.title.touched &&
-          recipeForm.controls.title.invalid
+        recipeForm.controls.title.touched &&
+        recipeForm.controls.title.invalid
         ) {
-          <small class="field-error">
-            Title is required and must be between 3 and 100 characters.
-          </small>
+        <small class="field-error">
+          Title is required and must be between 3 and 100 characters.
+        </small>
         }
 
       </div>
@@ -63,20 +55,15 @@
           Recipe Image
         </label>
 
-        <input
-          id="image"
-          type="file"
-          accept="image/*"
-          (change)="onImageSelected($event)"
-        />
+        <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" />
 
         @if (
-          !selectedImage &&
-          errorMessage === 'Recipe image is required.'
+        !selectedImage &&
+        errorMessage === 'Recipe image is required.'
         ) {
-          <small class="field-error">
-            Recipe image is required.
-          </small>
+        <small class="field-error">
+          Recipe image is required.
+        </small>
         }
 
       </div>
@@ -90,10 +77,7 @@
           Category
         </label>
 
-        <select
-          id="category"
-          formControlName="category"
-        >
+        <select id="category" formControlName="category">
 
           <option value="Indian">
             Indian
@@ -143,21 +127,39 @@
           </span>
         </label>
 
-        <input
-          id="cookTime"
-          type="number"
-          formControlName="cookTime"
-          min="1"
-          placeholder="e.g. 30"
-        />
+        <input id="cookTime" type="number" formControlName="cookTime" min="1" placeholder="e.g. 30" />
 
         @if (
-          recipeForm.controls.cookTime.touched &&
-          recipeForm.controls.cookTime.invalid
+        recipeForm.controls.cookTime.touched &&
+        recipeForm.controls.cookTime.invalid
         ) {
-          <small class="field-error">
-            Cook time is required and must be at least 1 minute.
-          </small>
+        <small class="field-error">
+          Cook time is required and must be at least 1 minute.
+        </small>
+        }
+
+      </div>
+
+      <!-- Servings -->
+
+      <div class="form-group">
+
+        <label for="servings">
+          Servings
+          <span>
+            Number of people this recipe serves
+          </span>
+        </label>
+
+        <input id="servings" type="number" formControlName="servings" min="1" placeholder="e.g. 2" />
+
+        @if (
+        recipeForm.controls.servings.touched &&
+        recipeForm.controls.servings.invalid
+        ) {
+        <small class="field-error">
+          Servings is required and must be at least 1.
+        </small>
         }
 
       </div>
@@ -175,20 +177,16 @@
           </span>
         </label>
 
-        <textarea
-          id="ingredients"
-          rows="7"
-          formControlName="ingredients"
-          placeholder="2 cups rice&#10;1 onion&#10;2 tomatoes&#10;1 tsp salt"
-        ></textarea>
+        <textarea id="ingredients" rows="7" formControlName="ingredients"
+          placeholder="2 cups rice&#10;1 onion&#10;2 tomatoes&#10;1 tsp salt"></textarea>
 
         @if (
-          recipeForm.controls.ingredients.touched &&
-          recipeForm.controls.ingredients.invalid
+        recipeForm.controls.ingredients.touched &&
+        recipeForm.controls.ingredients.invalid
         ) {
-          <small class="field-error">
-            Ingredients are required.
-          </small>
+        <small class="field-error">
+          Ingredients are required.
+        </small>
         }
 
       </div>
@@ -206,20 +204,16 @@
           </span>
         </label>
 
-        <textarea
-          id="steps"
-          rows="8"
-          formControlName="steps"
-          placeholder="Wash the rice.&#10;Heat oil in a pan.&#10;Add the ingredients.&#10;Cook until ready."
-        ></textarea>
+        <textarea id="steps" rows="8" formControlName="steps"
+          placeholder="Wash the rice.&#10;Heat oil in a pan.&#10;Add the ingredients.&#10;Cook until ready."></textarea>
 
         @if (
-          recipeForm.controls.steps.touched &&
-          recipeForm.controls.steps.invalid
+        recipeForm.controls.steps.touched &&
+        recipeForm.controls.steps.invalid
         ) {
-          <small class="field-error">
-            Instructions are required.
-          </small>
+        <small class="field-error">
+          Instructions are required.
+        </small>
         }
 
       </div>
@@ -227,16 +221,12 @@
 
       <!-- Submit -->
 
-      <button
-        type="submit"
-        class="submit-btn"
-        [disabled]="isLoading"
-      >
+      <button type="submit" class="submit-btn" [disabled]="isLoading">
 
         @if (isLoading) {
-          Creating Recipe...
+        Creating Recipe...
         } @else {
-          Create Recipe
+        Create Recipe
         }
 
       </button>

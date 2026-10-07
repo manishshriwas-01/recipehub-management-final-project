@@ -20,286 +20,277 @@
 
     @if (isLoading) {
 
-      <div class="loading-state">
+    <div class="loading-state">
 
-        <div class="spinner"></div>
+      <div class="spinner"></div>
 
-        <p>
-          Loading recipe...
-        </p>
+      <p>
+        Loading recipe...
+      </p>
 
-      </div>
+    </div>
 
     } @else if (errorMessage) {
 
-      <div class="error-state">
+    <div class="error-state">
 
-        <h2>
-          Something went wrong
-        </h2>
+      <h2>
+        Something went wrong
+      </h2>
 
-        <p>
-          {{ errorMessage }}
-        </p>
+      <p>
+        {{ errorMessage }}
+      </p>
 
-      </div>
+    </div>
 
     } @else {
 
-      <form
-        [formGroup]="recipeForm"
-        (ngSubmit)="onSubmit()"
-      >
+    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
 
-        <!-- Recipe Title -->
+      <!-- Recipe Title -->
 
-        <div class="form-group">
+      <div class="form-group">
 
-          <label for="title">
-            Recipe Title
-          </label>
+        <label for="title">
+          Recipe Title
+        </label>
 
-          <input
-            id="title"
-            type="text"
-            formControlName="title"
-            placeholder="e.g. Paneer Butter Masala"
-          />
+        <input id="title" type="text" formControlName="title" placeholder="e.g. Paneer Butter Masala" />
 
-          @if (
-            recipeForm.controls.title.touched &&
-            recipeForm.controls.title.invalid
-          ) {
+        @if (
+        recipeForm.controls.title.touched &&
+        recipeForm.controls.title.invalid
+        ) {
 
-            <small class="field-error">
-              Title is required and must be between 3 and 100 characters.
-            </small>
+        <small class="field-error">
+          Title is required and must be between 3 and 100 characters.
+        </small>
 
-          }
+        }
 
-        </div>
+      </div>
 
 
-        <!-- Recipe Image -->
+      <!-- Recipe Image -->
 
-        <div class="form-group">
+      <div class="form-group">
 
-          <label for="image">
-            Recipe Image
-          </label>
+        <label for="image">
+          Recipe Image
+        </label>
 
-          @if (currentImageUrl) {
+        @if (currentImageUrl) {
 
-            <div class="current-image">
+        <div class="current-image">
 
-              <p>
-                Current Image
-              </p>
+          <p>
+            Current Image
+          </p>
 
-              <img
-                [src]="recipeService.getImageUrl(currentImageUrl)"
-                alt="Current recipe image"
-              />
-
-            </div>
-
-          }
-
-          <input
-            id="image"
-            type="file"
-            accept="image/*"
-            (change)="onImageSelected($event)"
-          />
-
-          @if (selectedImage) {
-
-            <small>
-              Selected image:
-              {{ selectedImage.name }}
-            </small>
-
-          }
+          <img [src]="recipeService.getImageUrl(currentImageUrl)" alt="Current recipe image" />
 
         </div>
 
+        }
 
-        <!-- Category -->
+        <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" />
 
-        <div class="form-group">
+        @if (selectedImage) {
 
-          <label for="category">
-            Category
-          </label>
+        <small>
+          Selected image:
+          {{ selectedImage.name }}
+        </small>
 
-          <select
-            id="category"
-            formControlName="category"
-          >
+        }
 
-            <option value="Indian">
-              Indian
-            </option>
-
-            <option value="Italian">
-              Italian
-            </option>
-
-            <option value="Chinese">
-              Chinese
-            </option>
-
-            <option value="Mexican">
-              Mexican
-            </option>
-
-            <option value="Dessert">
-              Dessert
-            </option>
-
-            <option value="Healthy">
-              Healthy
-            </option>
-
-            <option value="Breakfast">
-              Breakfast
-            </option>
-
-            <option value="Other">
-              Other
-            </option>
-
-          </select>
-
-        </div>
+      </div>
 
 
-        <!-- Cook Time -->
+      <!-- Category -->
 
-        <div class="form-group">
+      <div class="form-group">
 
-          <label for="cookTime">
-            Cook Time
+        <label for="category">
+          Category
+        </label>
 
-            <span>
-              Enter time in minutes
-            </span>
+        <select id="category" formControlName="category">
 
-          </label>
+          <option value="Indian">
+            Indian
+          </option>
 
-          <input
-            id="cookTime"
-            type="number"
-            formControlName="cookTime"
-            min="1"
-            placeholder="e.g. 30"
-          />
+          <option value="Italian">
+            Italian
+          </option>
 
-          @if (
-            recipeForm.controls.cookTime.touched &&
-            recipeForm.controls.cookTime.invalid
-          ) {
+          <option value="Chinese">
+            Chinese
+          </option>
 
-            <small class="field-error">
-              Cook time is required and must be at least 1 minute.
-            </small>
+          <option value="Mexican">
+            Mexican
+          </option>
 
-          }
+          <option value="Dessert">
+            Dessert
+          </option>
 
-        </div>
+          <option value="Healthy">
+            Healthy
+          </option>
 
+          <option value="Breakfast">
+            Breakfast
+          </option>
 
-        <!-- Ingredients -->
+          <option value="Other">
+            Other
+          </option>
 
-        <div class="form-group">
+        </select>
 
-          <label for="ingredients">
-
-            Ingredients
-
-            <span>
-              One ingredient per line
-            </span>
-
-          </label>
-
-          <textarea
-            id="ingredients"
-            rows="7"
-            formControlName="ingredients"
-            placeholder="2 cups rice&#10;1 onion&#10;1 tsp salt"
-          ></textarea>
-
-          @if (
-            recipeForm.controls.ingredients.touched &&
-            recipeForm.controls.ingredients.invalid
-          ) {
-
-            <small class="field-error">
-              Ingredients are required.
-            </small>
-
-          }
-
-        </div>
+      </div>
 
 
-        <!-- Instructions -->
+      <!-- Cook Time -->
 
-        <div class="form-group">
+      <div class="form-group">
 
-          <label for="steps">
+        <label for="cookTime">
+          Cook Time
 
-            Instructions
+          <span>
+            Enter time in minutes
+          </span>
 
-            <span>
-              One step per line
-            </span>
+        </label>
 
-          </label>
+        <input id="cookTime" type="number" formControlName="cookTime" min="1" placeholder="e.g. 30" />
 
-          <textarea
-            id="steps"
-            rows="8"
-            formControlName="steps"
-            placeholder="Heat oil.&#10;Add ingredients.&#10;Cook until ready."
-          ></textarea>
+        @if (
+        recipeForm.controls.cookTime.touched &&
+        recipeForm.controls.cookTime.invalid
+        ) {
 
-          @if (
-            recipeForm.controls.steps.touched &&
-            recipeForm.controls.steps.invalid
-          ) {
+        <small class="field-error">
+          Cook time is required and must be at least 1 minute.
+        </small>
 
-            <small class="field-error">
-              Instructions are required.
-            </small>
+        }
 
-          }
+      </div>
 
-        </div>
+      <!-- Servings -->
+
+      <div class="form-group">
+
+        <label for="servings">
+          Servings
+
+          <span>
+            Number of people this recipe serves
+          </span>
+
+        </label>
+
+        <input id="servings" type="number" formControlName="servings" min="1" placeholder="e.g. 2" />
+
+        @if (
+        recipeForm.controls.servings.touched &&
+        recipeForm.controls.servings.invalid
+        ) {
+
+        <small class="field-error">
+          Servings is required and must be at least 1.
+        </small>
+
+        }
+
+      </div>
 
 
-        <!-- Submit -->
+      <!-- Ingredients -->
 
-        <button
-          type="submit"
-          class="submit-btn"
-          [disabled]="isSaving"
-        >
+      <div class="form-group">
 
-          @if (isSaving) {
+        <label for="ingredients">
 
-            Updating Recipe...
+          Ingredients
 
-          } @else {
+          <span>
+            One ingredient per line
+          </span>
 
-            Update Recipe
+        </label>
 
-          }
+        <textarea id="ingredients" rows="7" formControlName="ingredients"
+          placeholder="2 cups rice&#10;1 onion&#10;1 tsp salt"></textarea>
 
-        </button>
+        @if (
+        recipeForm.controls.ingredients.touched &&
+        recipeForm.controls.ingredients.invalid
+        ) {
 
-      </form>
+        <small class="field-error">
+          Ingredients are required.
+        </small>
+
+        }
+
+      </div>
+
+
+      <!-- Instructions -->
+
+      <div class="form-group">
+
+        <label for="steps">
+
+          Instructions
+
+          <span>
+            One step per line
+          </span>
+
+        </label>
+
+        <textarea id="steps" rows="8" formControlName="steps"
+          placeholder="Heat oil.&#10;Add ingredients.&#10;Cook until ready."></textarea>
+
+        @if (
+        recipeForm.controls.steps.touched &&
+        recipeForm.controls.steps.invalid
+        ) {
+
+        <small class="field-error">
+          Instructions are required.
+        </small>
+
+        }
+
+      </div>
+
+
+      <!-- Submit -->
+
+      <button type="submit" class="submit-btn" [disabled]="isSaving">
+
+        @if (isSaving) {
+
+        Updating Recipe...
+
+        } @else {
+
+        Update Recipe
+
+        }
+
+      </button>
+
+    </form>
 
     }
 

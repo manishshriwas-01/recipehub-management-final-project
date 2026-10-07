@@ -18,6 +18,9 @@ import { Review, ReviewService } from '../../services/review-service';
 import { ToxicityService } from '../../services/toxicity';
 import { SentimentService } from '../../services/sentiment';
 import { RecipeSimilarityService } from '../../services/recipe-similarity.service.ts';
+import { CookModeService } from '../../services/cook-mode-service';
+
+
 
 @Component({
   selector: 'app-view-recipe',
@@ -34,6 +37,7 @@ export class ViewRecipe {
   private router = inject(Router);
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
+  private cookModeService = inject(CookModeService);
 
   // AI Similar Recipes
   private recipeSimilarityService = inject(RecipeSimilarityService);
@@ -65,6 +69,15 @@ export class ViewRecipe {
 
   errorMessage = signal('');
 
+  isCookMode = signal(false);
+  originalServings = signal(2);
+  selectedServings = signal(2);
+
+  currentStep = signal(0);
+
+  isSpeaking = signal(false);
+  isIngredientsSpeaking = signal(false);
+
   recipeId = '';
 
   // AI Similar Recipes
@@ -90,6 +103,10 @@ export class ViewRecipe {
           if (!response?.recipe) return;
 
           const recipe = response.recipe;
+          const servings = recipe.servings ?? 2;
+
+          this.originalServings.set(servings);
+          this.selectedServings.set(servings);
 
           const recipeText = `
             ${recipe.title}
@@ -348,9 +365,9 @@ export class ViewRecipe {
         review.helpfulBy = response.helpful
           ? [...review.helpfulBy, this.user()?.id || '']
           : review.helpfulBy.filter(
-              (userId) =>
-                String(userId) !== String(this.user()?.id)
-            );
+            (userId) =>
+              String(userId) !== String(this.user()?.id)
+          );
 
         this.helpfulLoading.set(null);
       },
@@ -372,106 +389,316 @@ export class ViewRecipe {
 
   // AI Similar Recipes
   async loadSimilarRecipes(currentRecipe: Recipe): Promise<void> {
-  this.similarRecipesLoading.set(true);
+    this.similarRecipesLoading.set(true);
 
-  try {
-    const response = await firstValueFrom(
-      this.recipeService.getRecipes(1, 50)
-    );
+    try {
+      const response = await firstValueFrom(
+        this.recipeService.getRecipes(1, 50)
+      );
 
-    const otherRecipes = response.recipes.filter(
-      (recipe) =>
-        String(recipe._id) !== String(currentRecipe._id)
-    );
+      const otherRecipes = response.recipes.filter(
+        (recipe) =>
+          String(recipe._id) !== String(currentRecipe._id)
+      );
 
-    const currentRecipeText = `
+      const currentRecipeText = `
       ${currentRecipe.title}
       ${currentRecipe.ingredients.join(' ')}
       ${currentRecipe.category}
     `;
 
-    const currentEmbedding =
-      await this.recipeSimilarityService.generateEmbedding(
-        currentRecipeText
-      );
+      const currentEmbedding =
+        await this.recipeSimilarityService.generateEmbedding(
+          currentRecipeText
+        );
 
-    const recipesWithSimilarity = [];
+      const recipesWithSimilarity = [];
 
-    for (const recipe of otherRecipes) {
-      const recipeText = `
+      for (const recipe of otherRecipes) {
+        const recipeText = `
         ${recipe.title}
         ${recipe.ingredients.join(' ')}
         ${recipe.category}
       `;
 
-      const embedding =
-        await this.recipeSimilarityService.generateEmbedding(
-          recipeText
-        );
+        const embedding =
+          await this.recipeSimilarityService.generateEmbedding(
+            recipeText
+          );
 
-      const similarity =
-        this.calculateCosineSimilarity(
-          currentEmbedding,
-          embedding
-        );
+        const similarity =
+          this.calculateCosineSimilarity(
+            currentEmbedding,
+            embedding
+          );
 
-      recipesWithSimilarity.push({
-        recipe,
-        similarity,
-      });
+        recipesWithSimilarity.push({
+          recipe,
+          similarity,
+        });
+      }
+
+      recipesWithSimilarity.sort(
+        (a, b) => b.similarity - a.similarity
+      );
+
+      const topSimilarRecipes =
+        recipesWithSimilarity
+          .slice(0, 5)
+          .map(item => item.recipe);
+
+      this.similarRecipes.set(topSimilarRecipes);
+
+      console.log(
+        'SIMILAR RECIPES:',
+        recipesWithSimilarity
+      );
+
+    } catch (error) {
+      console.error(
+        'Failed to find similar recipes:',
+        error
+      );
+
+      this.similarRecipes.set([]);
+
+    } finally {
+      this.similarRecipesLoading.set(false);
     }
-
-    recipesWithSimilarity.sort(
-      (a, b) => b.similarity - a.similarity
-    );
-
-    const topSimilarRecipes =
-      recipesWithSimilarity
-        .slice(0, 5)
-        .map(item => item.recipe);
-
-    this.similarRecipes.set(topSimilarRecipes);
-
-    console.log(
-      'SIMILAR RECIPES:',
-      recipesWithSimilarity
-    );
-
-  } catch (error) {
-    console.error(
-      'Failed to find similar recipes:',
-      error
-    );
-
-    this.similarRecipes.set([]);
-
-  } finally {
-    this.similarRecipesLoading.set(false);
   }
-}
 
   calculateCosineSimilarity(
-  vectorA: number[],
-  vectorB: number[]
-): number {
-  let dotProduct = 0;
-  let magnitudeA = 0;
-  let magnitudeB = 0;
+    vectorA: number[],
+    vectorB: number[]
+  ): number {
+    let dotProduct = 0;
+    let magnitudeA = 0;
+    let magnitudeB = 0;
 
-  for (let i = 0; i < vectorA.length; i++) {
-    dotProduct += vectorA[i] * vectorB[i];
+    for (let i = 0; i < vectorA.length; i++) {
+      dotProduct += vectorA[i] * vectorB[i];
 
-    magnitudeA += vectorA[i] * vectorA[i];
-    magnitudeB += vectorB[i] * vectorB[i];
+      magnitudeA += vectorA[i] * vectorA[i];
+      magnitudeB += vectorB[i] * vectorB[i];
+    }
+
+    if (magnitudeA === 0 || magnitudeB === 0) {
+      return 0;
+    }
+
+    return (
+      dotProduct /
+      (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB))
+    );
   }
 
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    return 0;
+
+  // ================================
+  // COOK MODE
+  // ================================
+
+  startCookMode(recipe: Recipe): void {
+    if (!recipe) {
+      this.toastr.error('Recipe not found');
+      return;
+    }
+
+    if (!recipe.ingredients?.length) {
+      this.toastr.error('No ingredients available');
+      return;
+    }
+
+    if (!recipe.steps?.length) {
+      this.toastr.error('No cooking instructions available');
+      return;
+    }
+
+    this.isCookMode.set(true);
+    this.currentStep.set(0);
+
+    this.speakIngredients(recipe);
   }
 
-  return (
-    dotProduct /
-    (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB))
+  closeCookMode(): void {
+    this.cookModeService.stop();
+
+    this.isCookMode.set(false);
+    this.currentStep.set(0);
+    this.isSpeaking.set(false);
+    this.isIngredientsSpeaking.set(false);
+  }
+
+  nextStep(recipe: Recipe): void {
+    if (this.currentStep() >= recipe.steps.length - 1) {
+      this.cookModeService.stop();
+      this.isSpeaking.set(false);
+      return;
+    }
+
+    this.currentStep.update(step => step + 1);
+
+    this.speakCurrentStep(recipe);
+  }
+
+  previousStep(recipe: Recipe): void {
+    if (this.currentStep() <= 0) {
+      return;
+    }
+
+    this.currentStep.update(step => step - 1);
+
+    this.speakCurrentStep(recipe);
+  }
+
+  speakCurrentStep(recipe: Recipe): void {
+    const stepIndex = this.currentStep();
+    const step = recipe.steps[stepIndex];
+
+    if (!step) {
+      return;
+    }
+
+    const text = `Step ${stepIndex + 1}. ${step}`;
+
+    this.isSpeaking.set(true);
+    this.isIngredientsSpeaking.set(false);
+
+    this.cookModeService.speak(
+      text,
+
+      () => {
+        this.isSpeaking.set(true);
+      },
+
+      () => {
+        this.isSpeaking.set(false);
+      }
+    );
+  }
+
+  speakIngredients(recipe: Recipe): void {
+    const ingredientsText = recipe.ingredients
+      .map((ingredient, index) => `${index + 1}. ${ingredient}`)
+      .join('. ');
+
+    const text = `
+    Let's start cooking ${recipe.title}.
+    Here are all the ingredients you will need.
+    ${ingredientsText}.
+    Now let's start cooking.
+  `;
+
+    this.isIngredientsSpeaking.set(true);
+    this.isSpeaking.set(true);
+
+    this.cookModeService.speak(
+      text,
+      () => {
+        this.isSpeaking.set(true);
+      },
+      () => {
+        this.isIngredientsSpeaking.set(false);
+
+        // Ingredients finished → start ALL instructions
+        this.speakAllSteps(recipe);
+      }
+    );
+
+
+  }
+  private speakStepSequentially(
+    recipe: Recipe,
+    index: number
+  ): void {
+
+    if (index >= recipe.steps.length) {
+      this.isSpeaking.set(false);
+      return;
+    }
+
+    this.currentStep.set(index);
+
+    const text = `Step ${index + 1}. ${recipe.steps[index]}`;
+
+    this.cookModeService.speak(
+      text,
+
+      () => {
+        this.isSpeaking.set(true);
+      },
+
+      () => {
+        // Current instruction finished
+        // Automatically speak next instruction
+        this.speakStepSequentially(recipe, index + 1);
+      }
+    );
+  }
+
+
+  speakAllSteps(recipe: Recipe): void {
+    this.isSpeaking.set(true);
+
+    this.speakStepSequentially(recipe, 0);
+  }
+
+  pauseSpeech(): void {
+    this.cookModeService.pause();
+
+    this.isSpeaking.set(false);
+  }
+
+  resumeSpeech(): void {
+    this.cookModeService.resume();
+
+    this.isSpeaking.set(true);
+  }
+
+  
+
+  changeServings(servings: number): void {
+    if (servings < 1) return;
+
+    this.selectedServings.set(servings);
+  }
+
+  getScaledIngredient(ingredient: string): string {
+  const original = this.originalServings();
+  const selected = this.selectedServings();
+
+  if (!original || !selected) {
+    return ingredient;
+  }
+
+  const multiplier = selected / original;
+
+  return ingredient.replace(
+    /^(\d+(?:\.\d+)?(?:\s+\d+\/\d+)?|\d+\/\d+)/,
+    (match) => {
+      const parts = match.trim().split(/\s+/);
+
+      let quantity = 0;
+
+      for (const part of parts) {
+        if (part.includes('/')) {
+          const [numerator, denominator] = part.split('/');
+          quantity += Number(numerator) / Number(denominator);
+        } else {
+          quantity += Number(part);
+        }
+      }
+
+      const scaledQuantity = quantity * multiplier;
+
+      return Number.isInteger(scaledQuantity)
+        ? String(scaledQuantity)
+        : scaledQuantity
+            .toFixed(2)
+            .replace(/\.?0+$/, '');
+    }
   );
 }
+
+
+
 }

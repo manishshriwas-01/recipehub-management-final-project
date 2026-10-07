@@ -58,6 +58,14 @@ export class CreateRecipe {
         Validators.min(1),
       ],
     }),
+
+    servings: new FormControl<number>(2, {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.min(1),
+      ],
+    }),
   });
 
   isLoading = false;
@@ -167,6 +175,10 @@ export class CreateRecipe {
       'cookTime',
       String(formValue.cookTime)
     );
+    formData.append(
+      'servings',
+      String(formValue.servings)
+    );
 
     formData.append(
       'image',
@@ -185,7 +197,7 @@ export class CreateRecipe {
 
           this.toastr.success(
             response.message ||
-              'Recipe created successfully!'
+            'Recipe created successfully!'
           );
 
           this.router.navigate([

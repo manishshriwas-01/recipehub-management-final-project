@@ -70,6 +70,14 @@ export class EditRecipe {
         Validators.min(1),
       ],
     }),
+
+    servings: new FormControl<number>(2, {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.min(1),
+      ],
+    }),
   });
 
   isLoading = false;
@@ -101,6 +109,7 @@ export class EditRecipe {
 
             // Added today
             cookTime: (recipe as any).cookTime,
+            servings: (recipe as any).servings ?? 2,
           });
 
           // Store existing image path
@@ -249,6 +258,11 @@ export class EditRecipe {
     formData.append(
       'cookTime',
       String(formValue.cookTime)
+    );
+
+    formData.append(
+      'servings',
+      String(formValue.servings)
     );
 
     // Only send image if user selected a new one
