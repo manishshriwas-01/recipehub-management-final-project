@@ -1,7 +1,8 @@
 import request from "supertest";
 import { app } from "../server";
 import mongoose from "mongoose";
-import connectDB from "../config/db";
+// import connectDB from "../config/db";
+import connectDB, { closeDB } from "../config/db";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -20,7 +21,8 @@ beforeAll(async () => {
 
 // Close MongoDB connection after all tests.
 afterAll(async () => {
-    await mongoose.connection.close();
+    await closeDB();
+
 });
 
 describe("Appointment Api", () => {

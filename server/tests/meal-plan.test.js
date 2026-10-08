@@ -2,7 +2,8 @@ import request from "supertest";
 import mongoose from "mongoose";
 import { jest } from "@jest/globals";
 
-import connectDB from "../config/db.js";
+// import connectDB from "../config/db.js";
+import connectDB, { closeDB } from "../config/db";
 import { app } from "../server.js";
 
 import User from "../models/User.js";
@@ -102,7 +103,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-    await mongoose.connection.close();
+   await closeDB();
 });
 
 describe("Meal Planner API", () => {

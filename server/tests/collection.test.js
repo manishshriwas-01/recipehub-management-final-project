@@ -2,7 +2,8 @@ import request from "supertest";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import connectDB from "../config/db.js";
+// import connectDB from "../config/db.js";
+import connectDB, { closeDB } from "../config/db";
 
 import { app } from "../server.js";
 import User from "../models/User.js";
@@ -84,7 +85,7 @@ describe("Collection API", () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    await closeDB();
   });
 
   describe("POST /api/collections", () => {

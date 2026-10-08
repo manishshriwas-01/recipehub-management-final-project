@@ -1,5 +1,6 @@
 import request from "supertest";
-import connectDB from "../config/db.js";
+// import connectDB from "../config/db.js";
+import connectDB, { closeDB } from "../config/db";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -14,7 +15,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    await mongoose.connection.close();
+     await closeDB();
 });
 
 describe("Review API", () => {

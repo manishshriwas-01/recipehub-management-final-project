@@ -1,6 +1,7 @@
 import request from "supertest";
-import connectDB from "../config/db.js";
-import mongoose from "mongoose";
+// import connectDB from "../config/db.js";
+import connectDB, { closeDB } from "../config/db";
+// import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 import { app } from "../server.js";
