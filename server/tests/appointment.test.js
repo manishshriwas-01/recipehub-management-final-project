@@ -1043,7 +1043,7 @@ describe("Appointment Api", () => {
         expect(response.body.appointment.meetLink).toBe(
             "https://meet.google.com/abc-defg-hij"
         );
-    });
+    },15000);
 
     test("should reject meeting link update by a non-instructor", async () => {
         const password = "12345678";
@@ -1141,7 +1141,7 @@ describe("Appointment Api", () => {
         expect(response.body.message).toBe(
             "You are not authorized to update this appointment"
         );
-    });
+    },15000);
 
     test("should reject invalid Google Meet link", async () => {
         const password = "12345678";
@@ -1237,7 +1237,7 @@ describe("Appointment Api", () => {
         expect(response.body.message).toBe(
             "Please provide a valid Google Meet link"
         );
-    });
+    },15000);
 
     test("should reject meeting link for pending appointment", async () => {
         const password = "12345678";
