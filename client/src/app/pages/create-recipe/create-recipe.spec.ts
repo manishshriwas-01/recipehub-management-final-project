@@ -26,7 +26,9 @@ describe('CreateRecipe', () => {
       title: '',
       ingredients: '',
       steps: '',
-      category: 'Other'
+      category: 'Other',
+      cookTime: null,
+      servings: 2,
     });
 
     expect(component.recipeForm.invalid).toBe(true);
@@ -37,7 +39,9 @@ describe('CreateRecipe', () => {
       title: 'Paneer Recipe',
       ingredients: 'Paneer\nTomato',
       steps: 'Cut paneer\nCook ingredients',
-      category: 'Other'
+      category: 'Other',
+      cookTime: 30,
+      servings: 2,
     });
 
     expect(component.recipeForm.valid).toBe(true);
