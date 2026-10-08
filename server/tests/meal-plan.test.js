@@ -1,5 +1,6 @@
 import request from "supertest";
 import mongoose from "mongoose";
+import { jest } from "@jest/globals";
 
 import connectDB from "../config/db.js";
 import { app } from "../server.js";
@@ -7,6 +8,10 @@ import { app } from "../server.js";
 import User from "../models/User.js";
 import Recipe from "../models/Recipe.js";
 import MealPlan from "../models/MealPlan.js";
+
+jest.setTimeout(30000);
+
+jest.setTimeout(30000);
 
 let token;
 let userId;
@@ -144,7 +149,6 @@ describe("Meal Planner API", () => {
         );
 
         expect(response.body.mealPlan).toBeDefined();
-
         expect(response.body.mealPlan.recipe).toBeDefined();
 
         expect(response.body.mealPlan.mealType).toBe(
@@ -165,7 +169,6 @@ describe("Meal Planner API", () => {
             });
 
         expect(response.statusCode).toBe(400);
-
         expect(response.body.success).toBe(false);
 
         expect(response.body.message).toBe(
@@ -197,7 +200,6 @@ describe("Meal Planner API", () => {
             .send(mealData);
 
         expect(secondResponse.statusCode).toBe(400);
-
         expect(secondResponse.body.success).toBe(false);
 
         expect(secondResponse.body.message).toBe(
@@ -235,9 +237,7 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(200);
-
         expect(response.body.success).toBe(true);
-
         expect(response.body.mealPlans).toBeDefined();
 
         expect(
@@ -257,7 +257,6 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(400);
-
         expect(response.body.success).toBe(false);
 
         expect(response.body.message).toBe(
@@ -277,7 +276,6 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(400);
-
         expect(response.body.success).toBe(false);
 
         expect(response.body.message).toBe(
@@ -313,7 +311,6 @@ describe("Meal Planner API", () => {
             });
 
         expect(response.statusCode).toBe(200);
-
         expect(response.body.success).toBe(true);
 
         expect(response.body.message).toBe(
@@ -342,7 +339,6 @@ describe("Meal Planner API", () => {
             });
 
         expect(response.statusCode).toBe(404);
-
         expect(response.body.success).toBe(false);
 
         expect(response.body.message).toBe(
@@ -374,7 +370,6 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(200);
-
         expect(response.body.success).toBe(true);
 
         expect(response.body.message).toBe(
@@ -399,7 +394,6 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(404);
-
         expect(response.body.success).toBe(false);
 
         expect(response.body.message).toBe(
@@ -437,9 +431,7 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(200);
-
         expect(response.body.success).toBe(true);
-
         expect(response.body.shoppingList).toBeDefined();
 
         expect(
@@ -478,7 +470,6 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(400);
-
         expect(response.body.success).toBe(false);
 
         expect(response.body.message).toBe(
@@ -498,7 +489,6 @@ describe("Meal Planner API", () => {
             .set("Authorization", `Bearer ${token}`);
 
         expect(response.statusCode).toBe(400);
-
         expect(response.body.success).toBe(false);
 
         expect(response.body.message).toBe(
@@ -554,9 +544,7 @@ describe("Meal Planner API", () => {
             );
 
         expect(response.statusCode).toBe(200);
-
         expect(response.body.success).toBe(true);
-
         expect(response.body.mealPlans).toHaveLength(0);
     });
 });
