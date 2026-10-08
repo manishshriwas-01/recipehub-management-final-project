@@ -193,7 +193,7 @@ export class RecipeService {
     recipeId: string
   ): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/${recipeId}/availability`
+      `${environment.apiUrl}/availability/recipe/${recipeId}`
     );
   }
 
