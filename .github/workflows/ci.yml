@@ -38,6 +38,7 @@ jobs:
       - name: Run backend tests
         env:
           MONGODB_TEST_URI: ${{ secrets.MONGODB_TEST_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
           RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
           RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
         run: npm test
